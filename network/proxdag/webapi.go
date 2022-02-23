@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	maxFromToLength  = 100
-	maxMessageLength = 1000
+	maxModelParentsLength = 100
+	maxContentLength      = 4096
 )
 
 func configureWebAPI() {
@@ -23,16 +23,16 @@ func SendModelUpdateMessage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, jsonmodels.NewErrorResponse(err))
 	}
 
-	if len(req.ModelID) > maxFromToLength {
+	if len(req.ModelID) > maxModelParentsLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "ModelID is too long"})
 	}
-	if len(req.ParentA) > maxFromToLength {
+	if len(req.ParentA) > maxModelParentsLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "ParentA is too long"})
 	}
-	if len(req.ParentB) > maxFromToLength {
+	if len(req.ParentB) > maxModelParentsLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "ParentB is too long"})
 	}
-	if len(req.Content) > maxMessageLength {
+	if len(req.Content) > maxContentLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Content is too long"})
 	}
 
