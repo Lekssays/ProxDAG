@@ -1,4 +1,4 @@
-package main
+package proxdag
 
 import (
 	"net/http"
@@ -36,8 +36,8 @@ func SendModelUpdateMessage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Content is too long"})
 	}
 
-	chatPayload := NewPayload(req.ModelID, req.ParentA, req.ParentB, req.Content)
-	msg, err := deps.Tangle.IssuePayload(chatPayload)
+	modelUpdatePayload := NewPayload(req.ModelID, req.ParentA, req.ParentB, req.Content)
+	msg, err := deps.Tangle.IssuePayload(modelUpdatePayload)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, Response{Error: err.Error()})
 	}
@@ -45,7 +45,7 @@ func SendModelUpdateMessage(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{MessageID: msg.ID().Base58()})
 }
 
-// Request defines the chat message to send.
+// Request defines the modelUpdate message to send.
 type Request struct {
 	ModelID string `json:"modelID"`
 	ParentA string `json:"parentA"`

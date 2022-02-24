@@ -1,7 +1,6 @@
-package main
+package proxdag
 
 import (
-	"github.com/iotaledger/goshimmer/packages/chat"
 	"github.com/iotaledger/goshimmer/packages/tangle"
 	"github.com/iotaledger/hive.go/events"
 	"github.com/iotaledger/hive.go/node"
@@ -10,7 +9,7 @@ import (
 )
 
 const (
-	PluginName = "ProxDag"
+	PluginName = "proxdag"
 )
 
 var (
@@ -42,7 +41,7 @@ func configure(_ *node.Plugin) {
 func onReceiveModelUpdateFromMessageLayer(messageID tangle.MessageID) {
 	var modelUpdateEvent *Event
 	deps.Tangle.Storage.Message(messageID).Consume(func(message *tangle.Message) {
-		if message.Payload().Type() != chat.Type {
+		if message.Payload().Type() != Type {
 			return
 		}
 

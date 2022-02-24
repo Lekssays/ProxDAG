@@ -1,0 +1,51 @@
+version: '3.3'
+
+networks:
+  outside:
+    external:
+      name: shimmer
+
+services:
+  goshimmer:
+    image: lekssays/goshimmer-exp:latest
+    container_name: goshimmer-exp
+    hostname: goshimmer-exp
+    stop_grace_period: 2m
+    # Mount volumes:
+    # make sure to give read/write access to the folder ./mainnetdb (e.g., chmod -R 777 ./mainnetdb)
+    # optionally, you can mount a config.json into the container
+    volumes:
+      - "goshimmer-db-volume:/tmp/mainnetdb:rw"
+      - "goshimmer-peerdb-volume:/tmp/peerdb:rw"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./start.sh:/start.sh"
+    # Add your plugins in this way
+      - "./proxdag:/proxdag"
+    ports:
+      # AutoPeering
+      - "0.0.0.0:14626:14626/udp"
+      # Gossip
+      - "0.0.0.0:14666:14666/tcp"
+      # HTTP API
+      - "0.0.0.0:8080:8080/tcp"
+      # Dashboard
+      - "0.0.0.0:8081:8081/tcp"
+      # pprof profiling
+      - "0.0.0.0:6061:6061/tcp"
+    environment:
+      - PATH=$PATH:/usr/local/go/bin
+      - ANALYSIS_CLIENT_SERVERADDRESS=analysisentry-01.devnet.shimmer.iota.cafe:21888
+      - AUTOPEERING_BINDADDRESS=0.0.0.0:14626
+      - DASHBOARD_BINDADDRESS=0.0.0.0:8081
+      - GOSSIP_BINDADDRESS=0.0.0.0:14666
+      - WEBAPI_BINDADDRESS=0.0.0.0:8080
+      - PROFILING_BINDADDRESS=0.0.0.0:6061
+      - NETWORKDELAY_ORIGINPUBLICKEY=9DB3j9cWYSuEEtkvanrzqkzCQMdH1FGv3TawJdVbDxkd
+    command: /bin/bash /start.sh
+
+    networks:
+      - outside
+
+volumes:
+  goshimmer-db-volume:
+  goshimmer-peerdb-volume:
