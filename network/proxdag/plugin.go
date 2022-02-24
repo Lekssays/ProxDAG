@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	PluginName = "proxdag"
+	PluginName = "ProxDAG"
 )
 
 var (
