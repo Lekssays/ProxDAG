@@ -46,7 +46,7 @@ func modelUpdateEventCaller(handler interface{}, params ...interface{}) {
 
 const (
 	PayloadName = "modelUpdate"
-	payloadType = 989
+	payloadType = 785
 )
 
 // Payload represents the modelUpdate payload type.

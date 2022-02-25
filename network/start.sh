@@ -29,6 +29,14 @@ sed -i 's/127.0.0.1/0.0.0.0/' config.json
 echo "Copying plugins"
 cp -R /proxdag /opt/goshimmer/plugins
 
+echo "Add plugin to research.go"
+cp /proxdag/research_sample.go /opt/goshimmer/plugins/research.go
+rm /opt/goshimmer/plugins/research_sample.go
+
+echo "Install proxdag package"
+go get github.com/Lekssays/ProxDAG/network/proxdag
+go get google.golang.org/grpc/status@v1.40.0
+
 echo "Building GoShimmer"
 ./scripts/build.sh
 
