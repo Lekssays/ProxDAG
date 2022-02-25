@@ -1,8 +1,9 @@
 package plugins
 
 import (
-	"github.com/Lekssays/ProxDAG/network/proxdag"
 	"github.com/iotaledger/hive.go/node"
+
+	"proxdag" // add your plugin to GOROOT (or to a public github repo to use go get)
 
 	"github.com/iotaledger/goshimmer/plugins/activity"
 	analysisclient "github.com/iotaledger/goshimmer/plugins/analysis/client"
@@ -28,5 +29,5 @@ var Research = node.Plugins(
 	txstream.Plugin,
 	activity.Plugin,
 	chat.Plugin,
-	proxdag.Plugin,
+	proxdag.Plugin, //Add your plugin to GoShimmer node
 )
