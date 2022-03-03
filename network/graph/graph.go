@@ -1,11 +1,8 @@
-package main
+package graph
 
 import (
-	"fmt"
-
 	messagepb "github.com/Lekssays/ProxDAG/network/graph/proto/message"
 	"github.com/Lekssays/ProxDAG/network/proxdag"
-	"github.com/heimdalr/dag"
 	"github.com/iotaledger/goshimmer/client"
 )
 
@@ -47,29 +44,29 @@ func SendMessage(message messagepb.Message) (string, error) {
 // 	panic("todo :)")
 // }
 
-func main() {
-	fmt.Println("Hello")
+// func main() {
+// 	fmt.Println("Hello")
 
-	// message := messagepb.Message{
-	// 	ModelID: "some uuid",
-	// 	ParentA: "Some hash1",
-	// 	ParentB: "SOme hash2",
-	// 	Content: "some base64 string",
-	// }
+// 	// message := messagepb.Message{
+// 	// 	ModelID: "some uuid",
+// 	// 	ParentA: "Some hash1",
+// 	// 	ParentB: "SOme hash2",
+// 	// 	Content: "some base64 string",
+// 	// }
 
-	// fmt.Println(message)
+// 	// fmt.Println(message)
 
-	d := dag.NewDAG()
+// 	d := dag.NewDAG()
 
-	// init three vertices
-	v1, _ := d.AddVertex(1)
-	v2, _ := d.AddVertex(2)
-	v3, _ := d.AddVertex(foobar{a: "foo", b: "bar"})
+// 	// init three vertices
+// 	v1, _ := d.AddVertex(1)
+// 	v2, _ := d.AddVertex(2)
+// 	v3, _ := d.AddVertex(foobar{a: "foo", b: "bar"})
 
-	// add the above vertices and connect them with two edges
-	_ = d.AddEdge(v1, v2)
-	_ = d.AddEdge(v1, v3)
+// 	// add the above vertices and connect them with two edges
+// 	_ = d.AddEdge(v1, v2)
+// 	_ = d.AddEdge(v1, v3)
 
-	// describe the graph
-	fmt.Print(d.String())
-}
+// 	// describe the graph
+// 	fmt.Print(d.String())
+// }
