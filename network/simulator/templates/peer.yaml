@@ -1,0 +1,16 @@
+  core_id:
+    container_name: core_id
+    image: ubuntu:latest
+    environment:
+    - CORE_PEER_ID=core_id
+    - CORE_PEER_IP_ADDRESS=core_ip
+    - GOSHIMMER_ENDPOINT=goshimmer.proxdag.io:8080
+    command: /bin/bash /entry/hello.sh
+    working_dir: /entry
+    volumes:
+    - ./entry:/entry
+    - ../proxdag:/autopeering
+    - ../graph:/graph
+    - ../dyncommittee:/dyncommittee
+    networks:
+    - proxdag

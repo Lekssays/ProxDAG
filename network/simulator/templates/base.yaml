@@ -1,0 +1,6 @@
+version: '2'
+
+networks:
+  limnet:
+
+services:
