@@ -8,3 +8,8 @@ require (
 	github.com/iotaledger/goshimmer v0.8.8
 	google.golang.org/protobuf v1.27.1
 )
+
+replace (
+	github.com/Lekssays/ProxDAG/network/proxdag v0.0.0-20220225162616-d7378533521a => ../proxdag
+	github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate => ./proto/modelUpdate
+)
