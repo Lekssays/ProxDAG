@@ -5,18 +5,13 @@ import (
 
 	modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
 	"github.com/Lekssays/ProxDAG/network/proxdag"
-	"github.com/heimdalr/dag"
 	"github.com/iotaledger/goshimmer/client"
+	"github.com/iotaledger/hive.go/marshalutil"
 )
 
 const (
 	GOSHIMMERNODE = "http://0.0.0.0:8080"
 )
-
-type foobar struct {
-	a string
-	b string
-}
 
 func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
@@ -35,16 +30,20 @@ func ParsePayload([]byte) (modelUpdatepb.ModelUpdate, error) {
 
 func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
-	messageRaw, err := goshimAPI.GetMessage(messageID)
+	messageRaw, _ := goshimAPI.GetMessage(messageID)
+	marshalUtil := marshalutil.New(len(messageRaw.Payload))
+	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
+	fmt.Println(modelUpdatePayload.Content)
 	if err != nil {
 		return modelUpdatepb.ModelUpdate{}, err
 	}
-	fmt.Println(messageRaw.Payload)
-	parsedPayload, err := ParsePayload(messageRaw.Payload)
-	if err != nil {
-		return modelUpdatepb.ModelUpdate{}, err
+	modelUpdate := modelUpdatepb.ModelUpdate{
+		ModelID: modelUpdatePayload.ModelID,
+		ParentA: modelUpdatePayload.ParentA,
+		ParentB: modelUpdatePayload.ParentB,
+		Content: modelUpdatePayload.Content,
 	}
-	return parsedPayload, nil
+	return modelUpdate, nil
 }
 
 // func AddModelUpdateEdge(messageID string, graph *dag.DAG) (bool, error) {
@@ -77,7 +76,7 @@ func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 // }
 
 // func HashDAG(graph dag.DAG) string {
-// 	panic("todo :)")
+// 		panic("todo :)")
 // }
 
 // func SaveDAGSnapshot(modelID string, graph dag.DAG) bool {
@@ -88,8 +87,86 @@ func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 // 	panic("todo :)")
 // }
 
+type Node struct {
+	MessageID string
+}
+
+type Graph struct {
+	AdjList map[Node][]Node
+}
+
+func NewGraph() *Graph {
+	return &Graph{
+		AdjList: make(map[Node][]Node),
+	}
+}
+
+func (graph *Graph) AddNode(node Node) {
+	graph.AdjList[node] = []Node{}
+}
+
+func (graph *Graph) AddEdge(src Node, dst Node) {
+	graph.AdjList[src] = append(graph.AdjList[src], dst)
+}
+
+func dfs(graph *Graph, sorting *[]Node, visited map[Node]bool, v Node) {
+	visited[v] = true
+	for i := 0; i < len(graph.AdjList[v]); i++ {
+		if !visited[graph.AdjList[v][i]] {
+			dfs(graph, sorting, visited, graph.AdjList[v][i])
+		}
+	}
+	*sorting = append(*sorting, v)
+}
+
+func (graph *Graph) TopologicalSort() []Node {
+	sorting := make([]Node, 0)
+	visited := make(map[Node]bool)
+
+	for node := range graph.AdjList {
+		if !visited[node] {
+			dfs(graph, &sorting, visited, node)
+		}
+	}
+	return Reverse(sorting)
+}
+
+func Reverse(s []Node) []Node {
+	tmp := make([]Node, 0)
+	for i := len(s) - 1; i >= 0; i-- {
+		tmp = append(tmp, s[i])
+	}
+	return tmp
+}
+
 func main() {
 	fmt.Println("Hello")
+
+	graph := NewGraph()
+	n1 := Node{
+		MessageID: "A",
+	}
+	n2 := Node{
+		MessageID: "B",
+	}
+	n3 := Node{
+		MessageID: "C",
+	}
+	n4 := Node{
+		MessageID: "D",
+	}
+	graph.AddNode(n1)
+	graph.AddNode(n2)
+	graph.AddNode(n3)
+	graph.AddNode(n4)
+
+	graph.AddEdge(n1, n2)
+	graph.AddEdge(n1, n3)
+	graph.AddEdge(n2, n4)
+
+	fmt.Println(graph)
+
+	fmt.Println(graph.TopologicalSort())
 
 	mupdate := modelUpdatepb.ModelUpdate{
 		ModelID: "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
@@ -103,25 +180,6 @@ func main() {
 	}
 	fmt.Printf("MessageID: %s\n", messageID)
 
-	graph := dag.NewDAG()
-
-	// response, err := AddModelUpdateEdge(messageID, &graph)
-	// if err != nil {
-	// 	fmt.Errorf(err.Error())
-	// }
-	// if response {
-	// 	fmt.Println("Vertex and Edges added successfully")
-	// }
-
-	// init three vertices
-	v1, _ := graph.AddVertex(1)
-	v2, _ := graph.AddVertex(2)
-	v3, _ := graph.AddVertex(foobar{a: "foo", b: "bar"})
-
-	// add the above vertices and connect them with two edges
-	_ = graph.AddEdge(v1, v2)
-	_ = graph.AddEdge(v1, v3)
-
-	// describe the graph
-	fmt.Print(graph.String())
+	modelUpdate, _ := GetModelUpdate("4LU1ME6XbzELT4g6HMJ9xU115EUJLgvLeeqfEKFD67Zv")
+	fmt.Println(modelUpdate.String())
 }

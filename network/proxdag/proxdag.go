@@ -188,7 +188,8 @@ func (p *Payload) Bytes() (bytes []byte) {
 		return
 	}
 
-	payloadLength := int(p.ModelIDLen + p.ParentALen + p.ParentBLen + p.ContentLen + marshalutil.Uint32Size*3)
+	payloadLength := int(p.ModelIDLen + p.ParentALen + p.ParentBLen + p.ContentLen + marshalutil.Uint32Size*4)
+
 	// initialize helper
 	marshalUtil := marshalutil.New(marshalutil.Uint32Size + marshalutil.Uint32Size + payloadLength)
 
