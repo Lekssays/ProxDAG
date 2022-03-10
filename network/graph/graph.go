@@ -1,91 +1,23 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"encoding/gob"
 	"fmt"
+	"time"
 
 	modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
 	"github.com/Lekssays/ProxDAG/network/proxdag"
+	"github.com/gomodule/redigo/redis"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/iotaledger/hive.go/marshalutil"
 )
 
 const (
 	GOSHIMMERNODE = "http://0.0.0.0:8080"
+	REDISENDPOINT = "http://127.0.0.1:6379"
 )
-
-func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
-	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content)
-	fmt.Println("Content-length:", len(mupdate.Content))
-	messageID, err := goshimAPI.SendPayload(payload.Bytes())
-	if err != nil {
-		return "", err
-	}
-	return messageID, nil
-}
-
-func ParsePayload([]byte) (modelUpdatepb.ModelUpdate, error) {
-	panic("todo:)")
-}
-
-func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
-	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	marshalUtil := marshalutil.New(len(messageRaw.Payload))
-	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
-	fmt.Println(modelUpdatePayload.Content)
-	if err != nil {
-		return modelUpdatepb.ModelUpdate{}, err
-	}
-	modelUpdate := modelUpdatepb.ModelUpdate{
-		ModelID: modelUpdatePayload.ModelID,
-		ParentA: modelUpdatePayload.ParentA,
-		ParentB: modelUpdatePayload.ParentB,
-		Content: modelUpdatePayload.Content,
-	}
-	return modelUpdate, nil
-}
-
-// func AddModelUpdateEdge(messageID string, graph *dag.DAG) (bool, error) {
-// 	mupdate, err := GetModelUpdate(messageID)
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	// mupdate := modelUpdatepb.ModelUpdate{
-// 	// 	ModelID: "b494b247-777e-4de3-a3f0-b2f7c0107c9d",
-// 	// 	ParentA: "3yZ6ZzmsV6tcUN8JWVQJSFRMsqHXXeLqzHpQy1yfkV9w",
-// 	// 	ParentB: "Cnt7S5KbAmMsu9azEDksR9xqaD21y6hjE8ENXPpJ5z7Q",
-// 	// 	Content: "some base64 string",
-// 	// }
-
-// 	mupdateParentA, err := GetModelUpdate(mupdate.ParentA)
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	mupdateParentB, err := GetModelUpdate(mupdate.ParentB)
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	graph.AddVertex(mupdate)
-// 	graph.AddEdge(mupdate, mupdateParentA)
-// 	graph.AddEdge(mupdate, mupdateParentB)
-
-// 	return true, nil
-// }
-
-// func HashDAG(graph dag.DAG) string {
-// 		panic("todo :)")
-// }
-
-// func SaveDAGSnapshot(modelID string, graph dag.DAG) bool {
-// 	panic("todo :)")
-// }
-
-// func RetrieveDAGSnapshot(hash string) dag.DAG {
-// 	panic("todo :)")
-// }
 
 type Node struct {
 	MessageID string
@@ -93,6 +25,10 @@ type Node struct {
 
 type Graph struct {
 	AdjList map[Node][]Node
+}
+
+type Model struct {
+	Models map[string][]Graph
 }
 
 func NewGraph() *Graph {
@@ -128,10 +64,10 @@ func (graph *Graph) TopologicalSort() []Node {
 			dfs(graph, &sorting, visited, node)
 		}
 	}
-	return Reverse(sorting)
+	return reverse(sorting)
 }
 
-func Reverse(s []Node) []Node {
+func reverse(s []Node) []Node {
 	tmp := make([]Node, 0)
 	for i := len(s) - 1; i >= 0; i-- {
 		tmp = append(tmp, s[i])
@@ -139,9 +75,88 @@ func Reverse(s []Node) []Node {
 	return tmp
 }
 
-func main() {
-	fmt.Println("Hello")
+func SaveDAGSnapshot(modelID string, graph Graph) {
+	pool := &redis.Pool{
+		DialContext: func(ctx context.Context) (redis.Conn, error) {
+			return redis.Dial("tcp", REDISENDPOINT)
+		},
 
+		MaxIdle:     1024,
+		IdleTimeout: 5 * time.Minute,
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	var buf bytes.Buffer
+	gob.NewEncoder(&buf).Encode(graph)
+	conn.Do("SET", modelID, buf.Bytes())
+}
+
+func RetrieveDAGSnapshot(modelID string) Graph {
+	pool := &redis.Pool{
+		DialContext: func(ctx context.Context) (redis.Conn, error) {
+			return redis.Dial("tcp", REDISENDPOINT)
+		},
+
+		MaxIdle:     1024,
+		IdleTimeout: 5 * time.Minute,
+	}
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	bs, _ := redis.Bytes(conn.Do("GET", modelID))
+	bytesReader := bytes.NewReader(bs)
+
+	var graph Graph
+	gob.NewDecoder(bytesReader).Decode(&graph)
+
+	return graph
+}
+
+func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
+	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content)
+	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	if err != nil {
+		return "", err
+	}
+	return messageID, nil
+}
+
+func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
+	messageRaw, _ := goshimAPI.GetMessage(messageID)
+	marshalUtil := marshalutil.New(len(messageRaw.Payload))
+	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
+	fmt.Println(modelUpdatePayload.Content)
+	if err != nil {
+		return modelUpdatepb.ModelUpdate{}, err
+	}
+	modelUpdate := modelUpdatepb.ModelUpdate{
+		ModelID: modelUpdatePayload.ModelID,
+		ParentA: modelUpdatePayload.ParentA,
+		ParentB: modelUpdatePayload.ParentB,
+		Content: modelUpdatePayload.Content,
+	}
+	return modelUpdate, nil
+}
+
+func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {
+	mupdate, err := GetModelUpdate(messageID)
+	if err != nil {
+		return false, err
+	}
+
+	graph.AddNode(Node{MessageID: messageID})
+	graph.AddEdge(Node{MessageID: mupdate.ParentA}, Node{MessageID: messageID})
+	graph.AddEdge(Node{MessageID: mupdate.ParentB}, Node{MessageID: messageID})
+
+	return true, nil
+}
+
+func main() {
 	graph := NewGraph()
 	n1 := Node{
 		MessageID: "A",
@@ -165,8 +180,11 @@ func main() {
 	graph.AddEdge(n2, n4)
 
 	fmt.Println(graph)
-
 	fmt.Println(graph.TopologicalSort())
+
+	SaveDAGSnapshot("test", *graph)
+	graphNew := RetrieveDAGSnapshot("test")
+	fmt.Println("Saved Graph:", graphNew)
 
 	mupdate := modelUpdatepb.ModelUpdate{
 		ModelID: "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
@@ -182,4 +200,7 @@ func main() {
 
 	modelUpdate, _ := GetModelUpdate("4LU1ME6XbzELT4g6HMJ9xU115EUJLgvLeeqfEKFD67Zv")
 	fmt.Println(modelUpdate.String())
+
+	AddModelUpdateEdge(messageID, *graph)
+	fmt.Println(graph)
 }
