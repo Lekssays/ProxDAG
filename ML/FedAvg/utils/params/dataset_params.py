@@ -1,0 +1,4 @@
+
+dataset_params = {
+    "mnist": {}
+}
