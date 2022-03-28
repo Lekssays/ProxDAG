@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	GOSHIMMERNODE = "http://0.0.0.0:8080"
-	REDISENDPOINT = "http://127.0.0.1:6379"
+	GOSHIMMER_NODE = "http://0.0.0.0:8080"
+	REDIS_ENDPOINT = "http://127.0.0.1:6379"
 )
 
 type Node struct {
@@ -78,7 +78,7 @@ func reverse(s []Node) []Node {
 func SaveDAGSnapshot(modelID string, graph Graph) {
 	pool := &redis.Pool{
 		DialContext: func(ctx context.Context) (redis.Conn, error) {
-			return redis.Dial("tcp", REDISENDPOINT)
+			return redis.Dial("tcp", REDIS_ENDPOINT)
 		},
 
 		MaxIdle:     1024,
@@ -96,7 +96,7 @@ func SaveDAGSnapshot(modelID string, graph Graph) {
 func RetrieveDAGSnapshot(modelID string) Graph {
 	pool := &redis.Pool{
 		DialContext: func(ctx context.Context) (redis.Conn, error) {
-			return redis.Dial("tcp", REDISENDPOINT)
+			return redis.Dial("tcp", REDIS_ENDPOINT)
 		},
 
 		MaxIdle:     1024,
@@ -116,8 +116,8 @@ func RetrieveDAGSnapshot(modelID string) Graph {
 }
 
 func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
-	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content)
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content, mupdate.Endpoint)
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "", err
@@ -126,7 +126,7 @@ func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
 }
 
 func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	marshalUtil := marshalutil.New(len(messageRaw.Payload))
 	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
@@ -139,6 +139,7 @@ func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 		ParentA: modelUpdatePayload.ParentA,
 		ParentB: modelUpdatePayload.ParentB,
 		Content: modelUpdatePayload.Content,
+		Endpoint: modelUpdatePayload.Endpoint,
 	}
 	return modelUpdate, nil
 }
@@ -191,6 +192,7 @@ func main() {
 		ParentA: "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",
 		ParentB: "5SSTDBDHhstyRavjexGzLWDKxs1bckwkgxeLP9BLpDW9",
 		Content: "some",
+		Endpoint: "peer0.proxdag.io:5696",
 	}
 	messageID, err := SendModelUpdate(mupdate)
 	if err != nil {
