@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	GOSHIMMER_NODE = "http://0.0.0.0:8080"
-	REDIS_ENDPOINT = "http://127.0.0.1:6379"
+	GOSHIMMERNODE = "http://0.0.0.0:8080"
+	REDISENDPOINT = "http://127.0.0.1:6379"
 )
 
 type Node struct {
@@ -78,7 +78,7 @@ func reverse(s []Node) []Node {
 func SaveDAGSnapshot(modelID string, graph Graph) {
 	pool := &redis.Pool{
 		DialContext: func(ctx context.Context) (redis.Conn, error) {
-			return redis.Dial("tcp", REDIS_ENDPOINT)
+			return redis.Dial("tcp", REDISENDPOINT)
 		},
 
 		MaxIdle:     1024,
@@ -96,7 +96,7 @@ func SaveDAGSnapshot(modelID string, graph Graph) {
 func RetrieveDAGSnapshot(modelID string) Graph {
 	pool := &redis.Pool{
 		DialContext: func(ctx context.Context) (redis.Conn, error) {
-			return redis.Dial("tcp", REDIS_ENDPOINT)
+			return redis.Dial("tcp", REDISENDPOINT)
 		},
 
 		MaxIdle:     1024,
@@ -116,7 +116,7 @@ func RetrieveDAGSnapshot(modelID string) Graph {
 }
 
 func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
 	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content, mupdate.Endpoint)
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
@@ -126,7 +126,7 @@ func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
 }
 
 func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMERNODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	marshalUtil := marshalutil.New(len(messageRaw.Payload))
 	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))

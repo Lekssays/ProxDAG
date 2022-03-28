@@ -10,6 +10,6 @@
     - ./entry:/entry
     - ./../../consensus:/consensus
     - ./../../graph:/graph
-    - ./../../dyncommittee:/dyncommittee
+    - ./../../committee:/committee
     networks:
     - outside

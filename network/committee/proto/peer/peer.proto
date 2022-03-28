@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package modelUpdate;
+
+option go_package = "github.com/Lekssays/ProxDAG/network/committee/proto/peer";
+
+message Peer {
+    string endpoint = 1;
+    string publickey = 2;
+}
