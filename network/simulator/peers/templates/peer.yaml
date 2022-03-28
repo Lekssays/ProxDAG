@@ -8,8 +8,8 @@
     working_dir: /entry
     volumes:
     - ./entry:/entry
-    - ../../../proxdag:/autopeering
-    - ../../../graph:/graph
-    - ../../../dyncommittee:/dyncommittee
+    - ./../../consensus:/consensus
+    - ./../../graph:/graph
+    - ./../../dyncommittee:/dyncommittee
     networks:
     - outside

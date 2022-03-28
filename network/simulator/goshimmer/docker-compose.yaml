@@ -8,8 +8,8 @@ networks:
 services:
   goshimmer.proxdag.io:
     image: lekssays/goshimmer-exp:latest
-    container_name: goshimmer-exp
-    hostname: goshimmer-exp
+    container_name: goshimmer.proxdag.io
+    hostname: goshimmer.proxdag.io
     stop_grace_period: 2m
     # Mount volumes:
     # make sure to give read/write access to the folder ./mainnetdb (e.g., chmod -R 777 ./mainnetdb)

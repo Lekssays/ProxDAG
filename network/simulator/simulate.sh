@@ -1,9 +1,11 @@
 #!/bin/bash
 
-docker create network proxdag
+docker network create proxdag
 
 cd ./goshimmer/
-docker-compose up
+docker-compose up -d
+
+sleep 60
 
 cd ../peers/
-docker-compose up
+docker-compose up -d
