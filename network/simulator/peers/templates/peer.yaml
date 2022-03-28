@@ -1,0 +1,15 @@
+  peer_id:
+    container_name: peer_id
+    image: ubuntu:latest
+    environment:
+    - CORE_PEER_ID=peer_id
+    - GOSHIMMER_ENDPOINT=goshimmer.proxdag.io:8081
+    command: /bin/bash /entry/hello.sh
+    working_dir: /entry
+    volumes:
+    - ./entry:/entry
+    - ../../../proxdag:/autopeering
+    - ../../../graph:/graph
+    - ../../../dyncommittee:/dyncommittee
+    networks:
+    - outside

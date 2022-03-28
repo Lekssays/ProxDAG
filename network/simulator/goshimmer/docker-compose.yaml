@@ -3,10 +3,10 @@ version: '3.3'
 networks:
   outside:
     external:
-      name: shimmer
+      name: proxdag
 
 services:
-  goshimmer:
+  goshimmer.proxdag.io:
     image: lekssays/goshimmer-exp:latest
     container_name: goshimmer-exp
     hostname: goshimmer-exp
@@ -20,7 +20,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "./start.sh:/start.sh"
     # Add your plugins in this way
-      - "./proxdag:/proxdag"
+      - "./../../proxdag:/proxdag"
       - "./research_sample.go:/research_sample.go"
     ports:
       # AutoPeering

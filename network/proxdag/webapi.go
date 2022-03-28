@@ -35,8 +35,11 @@ func SendModelUpdateMessage(c echo.Context) error {
 	if len(req.Content) > maxContentLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Content is too long"})
 	}
+	if len(req.Endpoint) > maxBaseLength {
+		return c.JSON(http.StatusBadRequest, Response{Error: "Endpoint is too long"})
+	}
 
-	modelUpdatePayload := NewPayload(req.ModelID, req.ParentA, req.ParentB, req.Content)
+	modelUpdatePayload := NewPayload(req.ModelID, req.ParentA, req.ParentB, req.Content, req.Endpoint)
 	msg, err := deps.Tangle.IssuePayload(modelUpdatePayload)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, Response{Error: err.Error()})
@@ -47,10 +50,11 @@ func SendModelUpdateMessage(c echo.Context) error {
 
 // Request defines the modelUpdate message to send.
 type Request struct {
-	ModelID string `json:"modelID"`
-	ParentA string `json:"parentA"`
-	ParentB string `json:"parentB"`
-	Content string `json:"content"`
+	ModelID  string `json:"modelID"`
+	ParentA  string `json:"parentA"`
+	ParentB  string `json:"parentB"`
+	Content  string `json:"content"`
+	Endpoint string `json:"endpoint"`
 }
 
 // Response contains the ID of the message sent.

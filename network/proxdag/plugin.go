@@ -56,6 +56,7 @@ func onReceiveModelUpdateFromMessageLayer(messageID tangle.MessageID) {
 			ParentA:   modelUpdatePayload.ParentA,
 			ParentB:   modelUpdatePayload.ParentB,
 			Content:   modelUpdatePayload.Content,
+			Endpoint:  modelUpdatePayload.Endpoint,
 			Timestamp: message.IssuingTime(),
 			MessageID: message.ID().Base58(),
 		}

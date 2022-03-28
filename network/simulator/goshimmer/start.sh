@@ -39,7 +39,7 @@ echo "Running GoShimmer"
 ./goshimmer --skip-config=true \
             --autoPeering.entryNodes=2PV5487xMw5rasGBXXWeqSi4hLz7r19YBt8Y1TGAsQbj@analysisentry-01.devnet.shimmer.iota.cafe:15626,5EDH4uY78EA6wrBkHHAVBWBMDt7EcksRq6pjzipoW15B@entry-0.devnet.tanglebay.com:14646,CAB87iQZR6BjBrCgEBupQJ4gpEBgvGKKv3uuGVRBKb4n@entry-1.devnet.tanglebay.com:14646 \
             --node.disablePlugins=portcheck \
-            --node.enablePlugins=remotelog,networkdelay,spammer,prometheus,proxdag \
+            --node.enablePlugins=remotelog,networkdelay,spammer,prometheus,proxdag,txstream \
             --database.directory=/tmp/mainnetdb \
             --node.peerDBDirectory=/tmp/peerdb \
             --logger.level=info \

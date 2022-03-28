@@ -1,0 +1,56 @@
+version: '3.3'
+
+networks:
+  outside:
+    external:
+      name: proxdag
+
+services:
+  peer0.proxdag.io:
+    container_name: peer0.proxdag.io
+    image: ubuntu:latest
+    environment:
+    - CORE_PEER_ID=peer0.proxdag.io
+    - GOSHIMMER_ENDPOINT=goshimmer.proxdag.io:8081
+    command: /bin/bash /entry/hello.sh
+    working_dir: /entry
+    volumes:
+    - ./entry:/entry
+    - ../../../proxdag:/autopeering
+    - ../../../graph:/graph
+    - ../../../dyncommittee:/dyncommittee
+    networks:
+    - outside
+
+  peer1.proxdag.io:
+    container_name: peer1.proxdag.io
+    image: ubuntu:latest
+    environment:
+    - CORE_PEER_ID=peer1.proxdag.io
+    - GOSHIMMER_ENDPOINT=goshimmer.proxdag.io:8081
+    command: /bin/bash /entry/hello.sh
+    working_dir: /entry
+    volumes:
+    - ./entry:/entry
+    - ../../../proxdag:/autopeering
+    - ../../../graph:/graph
+    - ../../../dyncommittee:/dyncommittee
+    networks:
+    - outside
+
+  peer2.proxdag.io:
+    container_name: peer2.proxdag.io
+    image: ubuntu:latest
+    environment:
+    - CORE_PEER_ID=peer2.proxdag.io
+    - GOSHIMMER_ENDPOINT=goshimmer.proxdag.io:8081
+    command: /bin/bash /entry/hello.sh
+    working_dir: /entry
+    volumes:
+    - ./entry:/entry
+    - ../../../proxdag:/autopeering
+    - ../../../graph:/graph
+    - ../../../dyncommittee:/dyncommittee
+    networks:
+    - outside
+
