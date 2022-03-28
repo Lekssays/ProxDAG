@@ -53,6 +53,38 @@ func GetKey(key string) (string, error) {
 	return content, nil
 }
 
+func SaveKeyBytes(content []byte, key string) (bool, error) {
+	var ctx = context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     REDIS_ENDPOINT,
+		Password: "",
+		DB:       0,
+	})
+
+	err := rdb.Set(ctx, key, content, 0).Err()
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func GetKeyBytes(key string) ([]byte, error) {
+	var ctx = context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     REDIS_ENDPOINT,
+		Password: "",
+		DB:       0,
+	})
+
+	content, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return []byte(content), nil
+}
+
 func WriteToFile(content string, filename string) (bool, error) {
 	f, err := os.Create(filename)
 	if err != nil {
