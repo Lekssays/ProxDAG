@@ -6,7 +6,7 @@ import (
 
 const (
 	GOSHIMMER_NODE = "http://0.0.0.0:8080"
-	REDIS_ENDPOINT = "http://127.0.0.1:6379"
+	REDIS_ENDPOINT = "127.0.0.1:6379"
 )
 
 func main() {

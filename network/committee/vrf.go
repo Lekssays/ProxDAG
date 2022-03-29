@@ -7,8 +7,6 @@ import (
 	"github.com/drand/drand/client"
 	"github.com/drand/drand/client/http"
 	"log"
-	"fmt"
-	"reflect"
 )
 
 func GetMagicSeed() ([]byte, error) {
@@ -49,7 +47,7 @@ func GenerateVRFKeys() ([]byte, []byte, error) {
 	}
 	VerificationKeyBin := verificationKey.Bytes()
 	SaveKeyBytes(VerificationKeyBin, "verificationKey")
-	fmt.Println(reflect.TypeOf(tst))
+
 	return SecretKeyBin, VerificationKeyBin, nil
 }
 
