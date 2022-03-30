@@ -22,6 +22,7 @@ services:
     # Add your plugins in this way
       - "./../../proxdag:/proxdag"
       - "./research_sample.go:/research_sample.go"
+      - "./config.default.json:/config.default.json"
     ports:
       # AutoPeering
       - "0.0.0.0:14626:14626/udp"
@@ -33,6 +34,8 @@ services:
       - "0.0.0.0:8081:8081/tcp"
       # pprof profiling
       - "0.0.0.0:6061:6061/tcp"
+      # txstream
+      - "0.0.0.0:5000:5000/tcp"
     environment:
       - PATH=$PATH:/usr/local/go/bin
       - ANALYSIS_CLIENT_SERVERADDRESS=analysisentry-01.devnet.shimmer.iota.cafe:21888
@@ -41,6 +44,7 @@ services:
       - GOSSIP_BINDADDRESS=0.0.0.0:14666
       - WEBAPI_BINDADDRESS=0.0.0.0:8080
       - PROFILING_BINDADDRESS=0.0.0.0:6061
+      - TXSTREAM_BINDADDRESS=0.0.0.0:5000
       - NETWORKDELAY_ORIGINPUBLICKEY=9DB3j9cWYSuEEtkvanrzqkzCQMdH1FGv3TawJdVbDxkd
     command: /bin/bash /start.sh
 

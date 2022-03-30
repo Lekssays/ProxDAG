@@ -23,6 +23,7 @@ echo "Downloading the latest snapshot"
 wget -q -O snapshot.bin https://dbfiles-goshimmer.s3.eu-central-1.amazonaws.com/snapshots/nectar/snapshot-latest.bin
 
 echo "Changing interface to 0.0.0.0 to make services accessible"
+cp /config.default.json /opt/goshimmer/config.default.json
 mv config.default.json config.json
 sed -i 's/127.0.0.1/0.0.0.0/' config.json
 

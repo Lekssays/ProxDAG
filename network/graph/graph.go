@@ -130,10 +130,10 @@ func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	marshalUtil := marshalutil.New(len(messageRaw.Payload))
 	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
-	fmt.Println(modelUpdatePayload.Content)
 	if err != nil {
 		return modelUpdatepb.ModelUpdate{}, err
 	}
+
 	modelUpdate := modelUpdatepb.ModelUpdate{
 		ModelID: modelUpdatePayload.ModelID,
 		ParentA: modelUpdatePayload.ParentA,
@@ -141,6 +141,7 @@ func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
 		Content: modelUpdatePayload.Content,
 		Endpoint: modelUpdatePayload.Endpoint,
 	}
+	
 	return modelUpdate, nil
 }
 
@@ -200,7 +201,7 @@ func main() {
 	}
 	fmt.Printf("MessageID: %s\n", messageID)
 
-	modelUpdate, _ := GetModelUpdate("4LU1ME6XbzELT4g6HMJ9xU115EUJLgvLeeqfEKFD67Zv")
+	modelUpdate, _ := GetModelUpdate(messageID)
 	fmt.Println(modelUpdate.String())
 
 	AddModelUpdateEdge(messageID, *graph)
