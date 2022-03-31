@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"strings"
 	"github.com/gorilla/websocket"
 )
 
@@ -39,7 +40,10 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
-			log.Printf("%s", message)
+			// PayloadType for ModelUpdate is 758 (see proxdag/proxdag.go)
+			if strings.Contains(string(message), ":785") {
+				log.Printf("%s", message)
+			}
 		}
 	}()
 
