@@ -41,8 +41,10 @@ func main() {
 				return
 			}
 			// PayloadType for ModelUpdate is 758 (see proxdag/proxdag.go)
-			if strings.Contains(string(message), ":785") {
+			if strings.Contains(string(message), "\"payload_type\":785") {
+				messageID := message[24:68]
 				log.Printf("%s", message)
+				log.Printf("MessageID: %s", messageID)
 			}
 		}
 	}()
