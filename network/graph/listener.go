@@ -2,19 +2,19 @@ package main
 
 import (
 	"flag"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
-	"time"
-
 	"strings"
-	"github.com/gorilla/websocket"
+	"sync"
+	"time"
 )
 
-var addr = flag.String("addr", "0.0.0.0:8081", "http service address")
+var addr = flag.String("addr", GOSHIMMER_WEBSOCKETS_ENDPOINT, "http service address")
 
-func main() {
+func RunLiveFeed(wg *sync.WaitGroup) {
 	flag.Parse()
 	log.SetFlags(0)
 

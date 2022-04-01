@@ -6,9 +6,11 @@ require (
 	github.com/Lekssays/ProxDAG/network/proxdag v0.0.0-20220225162616-d7378533521a
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/gomodule/redigo v1.8.8
+	github.com/gorilla/websocket v1.4.2
 	github.com/iotaledger/goshimmer v0.8.8
 	github.com/iotaledger/hive.go v0.0.0-20220210121915-5c76c0ccc668
 	github.com/onsi/gomega v1.16.0 // indirect
+	go.mongodb.org/mongo-driver v1.5.1
 	google.golang.org/protobuf v1.27.1
 )
 
