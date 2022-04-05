@@ -32,7 +32,9 @@ type Events struct {
 
 type Event struct {
 	ModelID  string
-	Endpoint string
+	VoteID   string
+	Decision string
+	Metadata string
 
 	Timestamp time.Time
 	MessageID string
@@ -49,29 +51,29 @@ const (
 
 // Payload represents the vote payload type.
 type Payload struct {
-	ModelID       string
-	ModelIDLen    uint32
-	ElectionID    string
-	ElectionIDLen uint32
-	Decision      string
-	DecisionLen   uint32
-	Metadata      string
-	MetadataLen   uint32
+	ModelID     string
+	ModelIDLen  uint32
+	VoteID      string
+	VoteIDLen   uint32
+	Decision    string
+	DecisionLen uint32
+	Metadata    string
+	MetadataLen uint32
 
 	bytes      []byte
 	bytesMutex sync.RWMutex
 }
 
-func NewPayload(modelID string, electionID string, decision string, metadata string) *Payload {
+func NewPayload(modelID string, voteID string, decision string, metadata string) *Payload {
 	return &Payload{
-		ModelID:       modelID,
-		ModelIDLen:    uint32(len([]byte(modelID))),
-		ElectionID:    electionID,
-		ElectionIDLen: uint32(len([]byte(electionID))),
-		Decision:      decision,
-		DecisionLen:   uint32(len([]byte(decision))),
-		Metadata:      metadata,
-		MetadataLen:   uint32(len([]byte(metadata))),
+		ModelID:     modelID,
+		ModelIDLen:  uint32(len([]byte(modelID))),
+		VoteID:      voteID,
+		VoteIDLen:   uint32(len([]byte(voteID))),
+		Decision:    decision,
+		DecisionLen: uint32(len([]byte(decision))),
+		Metadata:    metadata,
+		MetadataLen: uint32(len([]byte(metadata))),
 	}
 }
 
@@ -113,21 +115,21 @@ func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
 	}
 	result.ModelID = string(modelID)
 
-	// parse ElectionID
+	// parse VoteID
 	result = &Payload{}
-	electionIDLen, err := marshalUtil.ReadUint32()
+	voteIDLen, err := marshalUtil.ReadUint32()
 	if err != nil {
-		err = fmt.Errorf("failed to parse ElectionIDLen field of vote payload: %w", err)
+		err = fmt.Errorf("failed to parse VoteIDLen field of vote payload: %w", err)
 		return
 	}
-	result.ElectionIDLen = electionIDLen
+	result.VoteIDLen = voteIDLen
 
-	electionID, err := marshalUtil.ReadBytes(int(electionIDLen))
+	voteID, err := marshalUtil.ReadBytes(int(voteIDLen))
 	if err != nil {
-		err = fmt.Errorf("failed to parse ElectionID field of vote payload: %w", err)
+		err = fmt.Errorf("failed to parse VoteID field of vote payload: %w", err)
 		return
 	}
-	result.ElectionID = string(electionID)
+	result.VoteID = string(voteID)
 
 	// parse Decision
 	result = &Payload{}
@@ -189,7 +191,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 		return
 	}
 
-	payloadLength := int(p.ModelIDLen + p.ElectionIDLen + p.DecisionLen + p.Metadata + marshalutil.Uint32Size*4)
+	payloadLength := int(p.ModelIDLen + p.VoteIDLen + p.DecisionLen + p.MetadataLen + marshalutil.Uint32Size*4)
 
 	// initialize helper
 	marshalUtil := marshalutil.New(marshalutil.Uint32Size + marshalutil.Uint32Size + payloadLength)
@@ -199,12 +201,12 @@ func (p *Payload) Bytes() (bytes []byte) {
 	marshalUtil.WriteBytes(Type.Bytes())
 	marshalUtil.WriteUint32(p.ModelIDLen)
 	marshalUtil.WriteBytes([]byte(p.ModelID))
-	marshalUtil.WriteUint32(p.ElectionIDLen)
-	marshalUtil.WriteBytes([]byte(p.ElectionID))
+	marshalUtil.WriteUint32(p.VoteIDLen)
+	marshalUtil.WriteBytes([]byte(p.VoteID))
 	marshalUtil.WriteUint32(p.DecisionLen)
 	marshalUtil.WriteBytes([]byte(p.Decision))
 	marshalUtil.WriteUint32(p.MetadataLen)
-	marshalUtil.WriteBytes([]byte(p.metadata))
+	marshalUtil.WriteBytes([]byte(p.Metadata))
 
 	bytes = marshalUtil.Bytes()
 
@@ -215,7 +217,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 func (p *Payload) String() string {
 	return stringify.Struct("VotePayload",
 		stringify.StructField("modelID", p.ModelID),
-		stringify.StructField("electionID", p.ElectionID),
+		stringify.StructField("voteID", p.VoteID),
 		stringify.StructField("decision", p.Decision),
 		stringify.StructField("endpoint", p.Metadata),
 	)

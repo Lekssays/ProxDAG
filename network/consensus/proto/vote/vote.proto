@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package vote;
+
+option go_package = "github.com/Lekssays/ProxDAG/network/consensus/proto/vote";
+
+message Vote {
+    string modelID = 1;
+    string voteID = 2;
+    bool decision = 3;
+    string metadata = 4;
+}

@@ -26,18 +26,18 @@ func SendVoteMessage(c echo.Context) error {
 	if len(req.ModelID) > maxBaseLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "ModelID is too long"})
 	}
-	if len(req.Parents) > maxBaseLength {
-		return c.JSON(http.StatusBadRequest, Response{Error: "ElectionID is too long"})
+	if len(req.VoteID) > maxBaseLength {
+		return c.JSON(http.StatusBadRequest, Response{Error: "VoteID is too long"})
 	}
 
-	if len(req.Content) > maxBaseLength {
+	if len(req.Decision) > maxBaseLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Decision is too long"})
 	}
-	if len(req.Endpoint) > maxMetadataLength {
+	if len(req.Metadata) > maxMetadataLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Metadata is too long"})
 	}
 
-	votePayload := NewPayload(req.ModelID, req.Parents, req.Content, req.Endpoint)
+	votePayload := NewPayload(req.ModelID, req.VoteID, req.Decision, req.Metadata)
 	msg, err := deps.Tangle.IssuePayload(votePayload)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, Response{Error: err.Error()})
@@ -48,10 +48,10 @@ func SendVoteMessage(c echo.Context) error {
 
 // Request defines the vote message to send.
 type Request struct {
-	ModelID    string `json:"modelID"`
-	ElectionID string `json:"electionID"`
-	Decision   string `json:"decision"`
-	Metadata   string `json:"metadata"`
+	ModelID  string `json:"modelID"`
+	VoteID   string `json:"voteID"`
+	Decision string `json:"decision"`
+	Metadata string `json:"metadata"`
 }
 
 // Response contains the ID of the message sent.

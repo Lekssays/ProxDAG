@@ -52,12 +52,12 @@ func onReceiveVoteFromMessageLayer(messageID tangle.MessageID) {
 		}
 
 		voteEvent = &Event{
-			ModelID:    votePayload.ModelID,
-			ElectionID: votePayload.ElectionID,
-			Decision:   votePayload.Decision,
-			Metadata:   votePayload.Metadata,
-			Timestamp:  message.IssuingTime(),
-			MessageID:  message.ID().Base58(),
+			ModelID:   votePayload.ModelID,
+			VoteID:    votePayload.VoteID,
+			Decision:  votePayload.Decision,
+			Metadata:  votePayload.Metadata,
+			Timestamp: message.IssuingTime(),
+			MessageID: message.ID().Base58(),
 		}
 	})
 

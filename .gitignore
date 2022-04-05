@@ -4,3 +4,4 @@ network/committee/committee
 network/graph/graph
 network/listener/listener
 network/proxdagDB
+network/consensus/consensus
