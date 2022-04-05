@@ -9,6 +9,7 @@ import (
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/iotaledger/hive.go/marshalutil"
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -19,12 +20,12 @@ const (
 )
 
 type Node struct {
-	MessageID string `bson:"messageID"`
+	MessageID string
 }
 
 type Graph struct {
-	ModelID string          `bson:"modelID"`
-	AdjList map[Node][]Node `bson:"adjList"`
+	ModelID string
+	AdjList map[Node][]Node
 }
 
 func NewGraph(modelID string) *Graph {
@@ -149,4 +150,45 @@ func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {
 	graph.AddEdge(Node{MessageID: mupdate.ParentB}, Node{MessageID: messageID})
 
 	return true, nil
+}
+
+func SaveModelUpdate(modelUpdate modelUpdatepb.ModelUpdate) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	modelUpdateBytes, err := proto.Marshal(&modelUpdate)
+	if err != nil {
+		return err
+	}
+
+	err = db.Put([]byte(modelUpdate.ModelID), modelUpdateBytes, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RetrieveModelUpdate(modelID string) (*modelUpdatepb.ModelUpdate, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return &modelUpdatepb.ModelUpdate{}, err
+	}
+	defer db.Close()
+
+	data, err := db.Get([]byte(modelID), nil)
+	if err != nil {
+		return &modelUpdatepb.ModelUpdate{}, err
+	}
+
+	modelUpdate := &modelUpdatepb.ModelUpdate{}
+	err = proto.Unmarshal(data, modelUpdate)
+	if err != nil {
+		return &modelUpdatepb.ModelUpdate{}, err
+	}
+
+	return modelUpdate, nil
 }

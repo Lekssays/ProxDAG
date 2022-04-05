@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Lekssays/ProxDAG/network/proxdag v0.0.0-20220225162616-d7378533521a
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v1.8.8
 	github.com/gorilla/websocket v1.4.2
 	github.com/iotaledger/goshimmer v0.8.8

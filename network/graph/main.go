@@ -67,6 +67,18 @@ func main() {
 
 		AddModelUpdateEdge(messageID, *graph)
 		fmt.Println(graph)
+
+		err = SaveModelUpdate(mupdate)
+		if err != nil {
+			fmt.Errorf(err.Error())
+		}
+
+		rmupdate, err := RetrieveModelUpdate(mupdate.ModelID)
+		if err != nil {
+			fmt.Errorf(err.Error())
+		}
+		
+		fmt.Println("Retrieved ModelUpdate:", rmupdate)
 	} else if args[0] == "listener" {
 		var wg sync.WaitGroup
 		for {
