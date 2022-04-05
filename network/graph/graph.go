@@ -2,25 +2,20 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/gob"
-	"time"
 
 	modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
 	"github.com/Lekssays/ProxDAG/network/proxdag"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/iotaledger/hive.go/marshalutil"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 const (
 	GOSHIMMER_NODE                = "http://0.0.0.0:8080"
 	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
 	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
-	MONGODB_ENDPOINT              = "mongodb://localhost:27017"
+	LEVELDB_ENDPOINT              = "./../proxdagDB"
 )
 
 type Node struct {
@@ -78,24 +73,15 @@ func reverse(s []Node) []Node {
 }
 
 func (graph *Graph) SaveDAGSnapshot() error {
-	client, err := mongo.NewClient(options.Client().ApplyURI(MONGODB_ENDPOINT))
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-
-	err = client.Connect(ctx)
-	if err != nil {
-		return err
-	}
-
-	db := client.Database("proxdag")
-	collection := db.Collection("graphs")
+	defer db.Close()
 
 	var graphBytes bytes.Buffer
 	gob.NewEncoder(&graphBytes).Encode(graph)
-	_, err = collection.InsertOne(ctx, bson.M{"modelID": graph.ModelID, "adjList": graphBytes.Bytes()})
+	err = db.Put([]byte(graph.ModelID), graphBytes.Bytes(), nil)
 	if err != nil {
 		return err
 	}
@@ -104,38 +90,20 @@ func (graph *Graph) SaveDAGSnapshot() error {
 }
 
 func RetrieveDAGSnapshot(modelID string) (Graph, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(MONGODB_ENDPOINT))
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return Graph{}, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
+	defer db.Close()
 
-	err = client.Connect(ctx)
-	if err != nil {
-		return Graph{}, err
-	}
-
-	db := client.Database("proxdag")
-	collection := db.Collection("graphs")
-
-	result := struct {
-		ModelID string
-		AdjList []byte
-	}{}
-	err = collection.FindOne(ctx, bson.M{"modelID": modelID}).Decode(&result)
+	data, err := db.Get([]byte(modelID), nil)
 	if err != nil {
 		return Graph{}, err
 	}
 
-	bytesReader := bytes.NewReader(result.AdjList)
-	var adjList map[Node][]Node
-	gob.NewDecoder(bytesReader).Decode(&adjList)
-
-	graph := Graph{
-		ModelID: result.ModelID,
-		AdjList: adjList,
-	}
+	bytesReader := bytes.NewReader(data)
+	var graph Graph
+	gob.NewDecoder(bytesReader).Decode(&graph)
 
 	return graph, nil
 }

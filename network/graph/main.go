@@ -5,7 +5,8 @@ import (
 	"os"
 	"sync"
 	"time"
-	// modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
+
+	modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
 )
 
 func main() {
@@ -45,26 +46,27 @@ func main() {
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+
 		fmt.Println("Saved Graph:", graphNew)
 
-		// mupdate := modelUpdatepb.ModelUpdate{
-		// 	ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
-		// 	ParentA:  "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",
-		// 	ParentB:  "5SSTDBDHhstyRavjexGzLWDKxs1bckwkgxeLP9BLpDW9",
-		// 	Content:  "some",
-		// 	Endpoint: "peer0.proxdag.io:5696",
-		// }
-		// messageID, err := SendModelUpdate(mupdate)
-		// if err != nil {
-		// 	fmt.Errorf(err.Error())
-		// }
-		// fmt.Printf("MessageID: %s\n", messageID)
+		mupdate := modelUpdatepb.ModelUpdate{
+			ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
+			ParentA:  "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",
+			ParentB:  "5SSTDBDHhstyRavjexGzLWDKxs1bckwkgxeLP9BLpDW9",
+			Content:  "some",
+			Endpoint: "peer0.proxdag.io:5696",
+		}
+		messageID, err := SendModelUpdate(mupdate)
+		if err != nil {
+			fmt.Errorf(err.Error())
+		}
+		fmt.Printf("MessageID: %s\n", messageID)
 
-		// modelUpdate, _ := GetModelUpdate(messageID)
-		// fmt.Println(modelUpdate.String())
+		modelUpdate, _ := GetModelUpdate(messageID)
+		fmt.Println(modelUpdate.String())
 
-		// AddModelUpdateEdge(messageID, *graph)
-		// fmt.Println(graph)
+		AddModelUpdateEdge(messageID, *graph)
+		fmt.Println(graph)
 	} else if args[0] == "listener" {
 		var wg sync.WaitGroup
 		for {
