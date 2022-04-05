@@ -40,8 +40,13 @@ func RunLiveFeed(wg *sync.WaitGroup) {
 				log.Println("read:", err)
 				return
 			}
-			// PayloadType for ModelUpdate is 758 (see proxdag/proxdag.go)
+			// PayloadType for ModelUpdate is 785 (see plugins/modelupdate/modelupdate.go)
+			// and 786 for Vote (see plugins/vote/vote.go)
 			if strings.Contains(string(message), "\"payload_type\":785") {
+				messageID := message[24:68]
+				log.Printf("%s", message)
+				log.Printf("MessageID: %s", messageID)
+			} else if strings.Contains(string(message), "\"payload_type\":786") {
 				messageID := message[24:68]
 				log.Printf("%s", message)
 				log.Printf("MessageID: %s", messageID)
