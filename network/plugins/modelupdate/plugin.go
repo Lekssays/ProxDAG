@@ -1,4 +1,4 @@
-package proxdag
+package modelupdate
 
 import (
 	"github.com/iotaledger/goshimmer/packages/tangle"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	PluginName = "ProxDAG"
+	PluginName = "ProxDAGModelUpdate"
 )
 
 var (
@@ -53,8 +53,7 @@ func onReceiveModelUpdateFromMessageLayer(messageID tangle.MessageID) {
 
 		modelUpdateEvent = &Event{
 			ModelID:   modelUpdatePayload.ModelID,
-			ParentA:   modelUpdatePayload.ParentA,
-			ParentB:   modelUpdatePayload.ParentB,
+			Parents:   modelUpdatePayload.Parents,
 			Content:   modelUpdatePayload.Content,
 			Endpoint:  modelUpdatePayload.Endpoint,
 			Timestamp: message.IssuingTime(),

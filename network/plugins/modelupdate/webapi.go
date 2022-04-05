@@ -1,4 +1,4 @@
-package proxdag
+package modelupdate
 
 import (
 	"net/http"
@@ -9,6 +9,7 @@ import (
 
 const (
 	maxBaseLength    = 32
+	parentsMaxLength = 380
 	maxContentLength = 4096
 )
 
@@ -26,12 +27,10 @@ func SendModelUpdateMessage(c echo.Context) error {
 	if len(req.ModelID) > maxBaseLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "ModelID is too long"})
 	}
-	if len(req.ParentA) > maxBaseLength {
-		return c.JSON(http.StatusBadRequest, Response{Error: "ParentA is too long"})
+	if len(req.Parents) > parentsMaxLength {
+		return c.JSON(http.StatusBadRequest, Response{Error: "Parents is too long"})
 	}
-	if len(req.ParentB) > maxBaseLength {
-		return c.JSON(http.StatusBadRequest, Response{Error: "ParentB is too long"})
-	}
+
 	if len(req.Content) > maxContentLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Content is too long"})
 	}
@@ -39,7 +38,7 @@ func SendModelUpdateMessage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Endpoint is too long"})
 	}
 
-	modelUpdatePayload := NewPayload(req.ModelID, req.ParentA, req.ParentB, req.Content, req.Endpoint)
+	modelUpdatePayload := NewPayload(req.ModelID, req.Parents, req.Content, req.Endpoint)
 	msg, err := deps.Tangle.IssuePayload(modelUpdatePayload)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, Response{Error: err.Error()})
@@ -50,11 +49,10 @@ func SendModelUpdateMessage(c echo.Context) error {
 
 // Request defines the modelUpdate message to send.
 type Request struct {
-	ModelID  string `json:"modelID"`
-	ParentA  string `json:"parentA"`
-	ParentB  string `json:"parentB"`
-	Content  string `json:"content"`
-	Endpoint string `json:"endpoint"`
+	ModelID  string  `json:"modelID"`
+	Parents  []uint8 `json:"parents"`
+	Content  []uint8 `json:"content"`
+	Endpoint string  `json:"endpoint"`
 }
 
 // Response contains the ID of the message sent.

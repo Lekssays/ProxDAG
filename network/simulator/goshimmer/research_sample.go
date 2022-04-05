@@ -3,7 +3,7 @@ package plugins
 import (
 	"github.com/iotaledger/hive.go/node"
 
-	"proxdag" // add your plugin to GOROOT (or to a public github repo to use go get)
+	"modelupdate" // add your plugin to GOROOT (or to a public github repo to use go get)
 
 	"github.com/iotaledger/goshimmer/plugins/activity"
 	analysisclient "github.com/iotaledger/goshimmer/plugins/analysis/client"
@@ -29,5 +29,5 @@ var Research = node.Plugins(
 	txstream.Plugin,
 	activity.Plugin,
 	chat.Plugin,
-	proxdag.Plugin, //Add your plugin to GoShimmer node
+	modelupdate.Plugin, //Add your plugin to GoShimmer node
 )

@@ -1,4 +1,4 @@
-package proxdag
+package modelupdate
 
 import (
 	"fmt"
@@ -32,9 +32,8 @@ type Events struct {
 
 type Event struct {
 	ModelID  string
-	ParentA  string
-	ParentB  string
-	Content  string
+	Parents  []uint8
+	Content  []uint8
 	Endpoint string
 
 	Timestamp time.Time
@@ -54,11 +53,9 @@ const (
 type Payload struct {
 	ModelID     string
 	ModelIDLen  uint32
-	ParentA     string
-	ParentALen  uint32
-	ParentB     string
-	ParentBLen  uint32
-	Content     string
+	Parents     []uint8
+	ParentsLen  uint32
+	Content     []uint8
 	ContentLen  uint32
 	Endpoint    string
 	EndpointLen uint32
@@ -67,16 +64,14 @@ type Payload struct {
 	bytesMutex sync.RWMutex
 }
 
-func NewPayload(modelID string, parentA string, parentB string, content string, endpoint string) *Payload {
+func NewPayload(modelID string, parents []uint8, content []uint8, endpoint string) *Payload {
 	return &Payload{
 		ModelID:     modelID,
 		ModelIDLen:  uint32(len([]byte(modelID))),
-		ParentA:     parentA,
-		ParentALen:  uint32(len([]byte(parentA))),
-		ParentB:     parentB,
-		ParentBLen:  uint32(len([]byte(parentB))),
+		Parents:     parents,
+		ParentsLen:  uint32(len(parents)),
 		Content:     content,
-		ContentLen:  uint32(len([]byte(content))),
+		ContentLen:  uint32(len(content)),
 		Endpoint:    endpoint,
 		EndpointLen: uint32(len([]byte(endpoint))),
 	}
@@ -100,7 +95,7 @@ func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
 		return
 	}
 	if _, err = marshalUtil.ReadUint32(); err != nil {
-		err = fmt.Errorf("failed to parse payload type of modelUpdate payload: %w", err)
+		err = fmt.Errorf("failed to parse payload size of modelUpdate payload: %w", err)
 		return
 	}
 
@@ -120,35 +115,20 @@ func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
 	}
 	result.ModelID = string(modelID)
 
-	// parse ParentA
-	parentALen, err := marshalUtil.ReadUint32()
+	// parse Parents
+	parentsLen, err := marshalUtil.ReadUint32()
 	if err != nil {
-		err = fmt.Errorf("failed to parse ParentALen field of modelUpdate payload: %w", err)
+		err = fmt.Errorf("failed to parse ParentsLen field of modelUpdate payload: %w", err)
 		return
 	}
-	result.ParentALen = parentALen
+	result.ParentsLen = parentsLen
 
-	parentA, err := marshalUtil.ReadBytes(int(parentALen))
+	parents, err := marshalUtil.ReadBytes(int(parentsLen))
 	if err != nil {
-		err = fmt.Errorf("failed to parse ParentA field of modelUpdate payload: %w", err)
+		err = fmt.Errorf("failed to parse Parents field of modelUpdate payload: %w", err)
 		return
 	}
-	result.ParentA = string(parentA)
-
-	// parse ParentB
-	parentBLen, err := marshalUtil.ReadUint32()
-	if err != nil {
-		err = fmt.Errorf("failed to parse ParentBLen field of modelUpdate payload: %w", err)
-		return
-	}
-	result.ParentBLen = parentBLen
-
-	parentB, err := marshalUtil.ReadBytes(int(parentBLen))
-	if err != nil {
-		err = fmt.Errorf("failed to parse ParentB field of modelUpdate payload: %w", err)
-		return
-	}
-	result.ParentB = string(parentB)
+	result.Parents = parents
 
 	// parse Content
 	contentLen, err := marshalUtil.ReadUint32()
@@ -163,7 +143,7 @@ func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
 		err = fmt.Errorf("failed to parse Content field of modelUpdate payload: %w", err)
 		return
 	}
-	result.Content = string(content)
+	result.Content = content
 
 	// parse Endpoint
 	result = &Payload{}
@@ -209,7 +189,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 		return
 	}
 
-	payloadLength := int(p.ModelIDLen + p.ParentALen + p.ParentBLen + p.ContentLen + p.EndpointLen + marshalutil.Uint32Size*5)
+	payloadLength := int(p.ModelIDLen + p.ParentsLen + p.ContentLen + p.EndpointLen + marshalutil.Uint32Size*4)
 
 	// initialize helper
 	marshalUtil := marshalutil.New(marshalutil.Uint32Size + marshalutil.Uint32Size + payloadLength)
@@ -219,12 +199,10 @@ func (p *Payload) Bytes() (bytes []byte) {
 	marshalUtil.WriteBytes(Type.Bytes())
 	marshalUtil.WriteUint32(p.ModelIDLen)
 	marshalUtil.WriteBytes([]byte(p.ModelID))
-	marshalUtil.WriteUint32(p.ParentALen)
-	marshalUtil.WriteBytes([]byte(p.ParentA))
-	marshalUtil.WriteUint32(p.ParentBLen)
-	marshalUtil.WriteBytes([]byte(p.ParentB))
+	marshalUtil.WriteUint32(p.ParentsLen)
+	marshalUtil.WriteBytes(p.Parents)
 	marshalUtil.WriteUint32(p.ContentLen)
-	marshalUtil.WriteBytes([]byte(p.Content))
+	marshalUtil.WriteBytes(p.Content)
 	marshalUtil.WriteUint32(p.EndpointLen)
 	marshalUtil.WriteBytes([]byte(p.Endpoint))
 
@@ -237,8 +215,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 func (p *Payload) String() string {
 	return stringify.Struct("ModelUpdatePayload",
 		stringify.StructField("modelID", p.ModelID),
-		stringify.StructField("parentA", p.ParentA),
-		stringify.StructField("parentB", p.ParentB),
+		stringify.StructField("parents", p.Parents),
 		stringify.StructField("content", p.Content),
 		stringify.StructField("endpoint", p.Endpoint),
 	)

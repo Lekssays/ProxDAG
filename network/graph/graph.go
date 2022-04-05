@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/gob"
 
-	modelUpdatepb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
-	"github.com/Lekssays/ProxDAG/network/proxdag"
+	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
+	"github.com/Lekssays/ProxDAG/network/plugins/modelupdate"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/iotaledger/hive.go/marshalutil"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -107,11 +107,26 @@ func RetrieveDAGSnapshot(modelID string) (Graph, error) {
 	gob.NewDecoder(bytesReader).Decode(&graph)
 
 	return graph, nil
-}
+} 
 
-func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
+func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	payload := proxdag.NewPayload(mupdate.ModelID, mupdate.ParentA, mupdate.ParentB, mupdate.Content, mupdate.Endpoint)
+
+	var parentsBytes bytes.Buffer
+	enc := gob.NewEncoder(&parentsBytes)
+	err := enc.Encode(mupdate.Parents)
+	if err != nil {
+		return "", err
+	}
+
+	var contentBytes bytes.Buffer
+	enc = gob.NewEncoder(&contentBytes)
+	err = enc.Encode(mupdate.Content)
+	if err != nil {
+		return "", err
+	}
+
+	payload := modelupdate.NewPayload(mupdate.ModelID, parentsBytes.Bytes(), contentBytes.Bytes(), mupdate.Endpoint)
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "", err
@@ -119,20 +134,35 @@ func SendModelUpdate(mupdate modelUpdatepb.ModelUpdate) (string, error) {
 	return messageID, nil
 }
 
-func GetModelUpdate(messageID string) (modelUpdatepb.ModelUpdate, error) {
+func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	marshalUtil := marshalutil.New(len(messageRaw.Payload))
-	modelUpdatePayload, err := proxdag.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
+	modelUpdatePayload, err := modelupdate.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
 	if err != nil {
-		return modelUpdatepb.ModelUpdate{}, err
+		return mupb.ModelUpdate{}, err
 	}
 
-	modelUpdate := modelUpdatepb.ModelUpdate{
+	buf := bytes.NewBuffer(modelUpdatePayload.Parents)
+	dec := gob.NewDecoder(buf)
+	var parents []string
+	err = dec.Decode(&parents)
+	if err != nil {
+		return mupb.ModelUpdate{}, err
+	}
+
+	buf = bytes.NewBuffer(modelUpdatePayload.Content)
+	dec = gob.NewDecoder(buf)
+	var content []float32
+	err = dec.Decode(&content)
+	if err != nil {
+		return mupb.ModelUpdate{}, err
+	}
+
+	modelUpdate := mupb.ModelUpdate{
 		ModelID:  modelUpdatePayload.ModelID,
-		ParentA:  modelUpdatePayload.ParentA,
-		ParentB:  modelUpdatePayload.ParentB,
-		Content:  modelUpdatePayload.Content,
+		Parents:  parents,
+		Content:  content,
 		Endpoint: modelUpdatePayload.Endpoint,
 	}
 
@@ -146,13 +176,15 @@ func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {
 	}
 
 	graph.AddNode(Node{MessageID: messageID})
-	graph.AddEdge(Node{MessageID: mupdate.ParentA}, Node{MessageID: messageID})
-	graph.AddEdge(Node{MessageID: mupdate.ParentB}, Node{MessageID: messageID})
+
+	for i := 0; i < len(mupdate.Parents); i++ {
+		graph.AddEdge(Node{MessageID: mupdate.Parents[i]}, Node{MessageID: messageID})
+	}
 
 	return true, nil
 }
 
-func SaveModelUpdate(modelUpdate modelUpdatepb.ModelUpdate) error {
+func SaveModelUpdate(modelUpdate mupb.ModelUpdate) error {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return err
@@ -172,22 +204,22 @@ func SaveModelUpdate(modelUpdate modelUpdatepb.ModelUpdate) error {
 	return nil
 }
 
-func RetrieveModelUpdate(modelID string) (*modelUpdatepb.ModelUpdate, error) {
+func RetrieveModelUpdate(modelID string) (*mupb.ModelUpdate, error) {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
-		return &modelUpdatepb.ModelUpdate{}, err
+		return &mupb.ModelUpdate{}, err
 	}
 	defer db.Close()
 
 	data, err := db.Get([]byte(modelID), nil)
 	if err != nil {
-		return &modelUpdatepb.ModelUpdate{}, err
+		return &mupb.ModelUpdate{}, err
 	}
 
-	modelUpdate := &modelUpdatepb.ModelUpdate{}
+	modelUpdate := &mupb.ModelUpdate{}
 	err = proto.Unmarshal(data, modelUpdate)
 	if err != nil {
-		return &modelUpdatepb.ModelUpdate{}, err
+		return &mupb.ModelUpdate{}, err
 	}
 
 	return modelUpdate, nil

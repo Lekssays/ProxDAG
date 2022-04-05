@@ -3,20 +3,18 @@ module github.com/Lekssays/ProxDAG/network/graph
 go 1.16
 
 require (
-	github.com/Lekssays/ProxDAG/network/proxdag v0.0.0-20220225162616-d7378533521a
+	github.com/Lekssays/ProxDAG/network/plugins/modelupdate v0.0.0-20220225162616-d7378533521a
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/gomodule/redigo v1.8.8
+	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/iotaledger/goshimmer v0.8.8
 	github.com/iotaledger/hive.go v0.0.0-20220210121915-5c76c0ccc668
 	github.com/onsi/gomega v1.16.0 // indirect
-	github.com/syndtr/goleveldb v1.0.0 // indirect
-	go.mongodb.org/mongo-driver v1.5.1
-	google.golang.org/protobuf v1.27.1
+	github.com/syndtr/goleveldb v1.0.0
+	google.golang.org/protobuf v1.28.0
 )
 
 replace (
 	github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate => ./proto/modelUpdate
-	github.com/Lekssays/ProxDAG/network/proxdag v0.0.0-20220225162616-d7378533521a => ../proxdag
+	github.com/Lekssays/ProxDAG/network/plugins/modelupdate v0.0.0-20220225162616-d7378533521a => ../plugins/modelupdate
 )

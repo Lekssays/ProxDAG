@@ -51,9 +51,8 @@ func main() {
 
 		mupdate := modelUpdatepb.ModelUpdate{
 			ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
-			ParentA:  "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",
-			ParentB:  "5SSTDBDHhstyRavjexGzLWDKxs1bckwkgxeLP9BLpDW9",
-			Content:  "some",
+			Parents:  []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",  "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
+			Content:  []float32{1.558, 0.125, -9.458632},
 			Endpoint: "peer0.proxdag.io:5696",
 		}
 		messageID, err := SendModelUpdate(mupdate)
