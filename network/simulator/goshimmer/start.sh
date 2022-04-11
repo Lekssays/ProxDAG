@@ -28,8 +28,7 @@ mv config.default.json config.json
 sed -i 's/127.0.0.1/0.0.0.0/' config.json
 
 echo "Copying plugins"
-cp -R /modelupdate /usr/local/go/src/
-cp -R /vote /usr/local/go/src/
+cp -R /proxdag /usr/local/go/src/
 
 echo "Add plugin to research.go"
 cp /research_sample.go /opt/goshimmer/plugins/research.go
@@ -41,7 +40,7 @@ echo "Running GoShimmer"
 ./goshimmer --skip-config=true \
             --autoPeering.entryNodes=2PV5487xMw5rasGBXXWeqSi4hLz7r19YBt8Y1TGAsQbj@analysisentry-01.devnet.shimmer.iota.cafe:15626,5EDH4uY78EA6wrBkHHAVBWBMDt7EcksRq6pjzipoW15B@entry-0.devnet.tanglebay.com:14646,CAB87iQZR6BjBrCgEBupQJ4gpEBgvGKKv3uuGVRBKb4n@entry-1.devnet.tanglebay.com:14646 \
             --node.disablePlugins=portcheck \
-            --node.enablePlugins=remotelog,networkdelay,spammer,prometheus,modelupdate,vote,txstream \
+            --node.enablePlugins=remotelog,networkdelay,spammer,prometheus,txstream,proxdag \
             --database.directory=/tmp/mainnetdb \
             --node.peerDBDirectory=/tmp/peerdb \
             --logger.level=info \

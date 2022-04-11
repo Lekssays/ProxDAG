@@ -1,4 +1,4 @@
-module github.com/Lekssays/ProxDAG/network/plugins/vote
+module github.com/Lekssays/ProxDAG/network/plugins/proxdag
 
 go 1.18
 

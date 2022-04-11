@@ -1,4 +1,4 @@
-package modelupdate
+package proxdag
 
 import (
 	"github.com/iotaledger/goshimmer/packages/tangle"
@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	PluginName = "ProxDAGModelUpdate"
+	PluginName = "ProxDAG"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 func init() {
 	Plugin = node.NewPlugin(PluginName, deps, node.Enabled, configure)
 	Plugin.Events.Init.Attach(events.NewClosure(func(_ *node.Plugin, container *dig.Container) {
-		if err := container.Provide(NewModelUpdate); err != nil {
+		if err := container.Provide(NewProxdag); err != nil {
 			Plugin.Panic(err)
 		}
 	}))
@@ -28,42 +28,40 @@ func init() {
 
 type dependencies struct {
 	dig.In
-	Tangle      *tangle.Tangle
-	Server      *echo.Echo
-	ModelUpdate *ModelUpdate
+	Tangle  *tangle.Tangle
+	Server  *echo.Echo
+	Proxdag *Proxdag
 }
 
 func configure(_ *node.Plugin) {
-	deps.Tangle.Booker.Events.MessageBooked.Attach(events.NewClosure(onReceiveModelUpdateFromMessageLayer))
+	deps.Tangle.Booker.Events.MessageBooked.Attach(events.NewClosure(onReceiveProxdagFromMessageLayer))
 	configureWebAPI()
 }
 
-func onReceiveModelUpdateFromMessageLayer(messageID tangle.MessageID) {
-	var modelUpdateEvent *Event
+func onReceiveProxdagFromMessageLayer(messageID tangle.MessageID) {
+	var proxdagEvent *Event
 	deps.Tangle.Storage.Message(messageID).Consume(func(message *tangle.Message) {
 		if message.Payload().Type() != Type {
 			return
 		}
 
-		modelUpdatePayload, _, err := FromBytes(message.Payload().Bytes())
+		proxdagPayload, _, err := FromBytes(message.Payload().Bytes())
 		if err != nil {
 			Plugin.LogError(err)
 			return
 		}
 
-		modelUpdateEvent = &Event{
-			ModelID:   modelUpdatePayload.ModelID,
-			Parents:   modelUpdatePayload.Parents,
-			Content:   modelUpdatePayload.Content,
-			Endpoint:  modelUpdatePayload.Endpoint,
+		proxdagEvent = &Event{
+			Purpose:   proxdagPayload.Purpose,
+			Data:      proxdagPayload.Data,
 			Timestamp: message.IssuingTime(),
 			MessageID: message.ID().Base58(),
 		}
 	})
 
-	if modelUpdateEvent == nil {
+	if proxdagEvent == nil {
 		return
 	}
 
-	deps.ModelUpdate.Events.MessageReceived.Trigger(modelUpdateEvent)
+	deps.Proxdag.Events.MessageReceived.Trigger(proxdagEvent)
 }

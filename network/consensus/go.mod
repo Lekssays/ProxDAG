@@ -3,7 +3,7 @@ module github.com/Lekssays/ProxDAG/network/consensus
 go 1.18
 
 require (
-	github.com/Lekssays/ProxDAG/network/plugins/vote v0.0.0-20220225162616-d7378533521a
+	github.com/Lekssays/ProxDAG/network/plugins/proxdag v0.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/iotaledger/goshimmer v0.8.8
 	github.com/iotaledger/hive.go v0.0.0-20220210121915-5c76c0ccc668
@@ -143,5 +143,5 @@ require (
 
 replace (
 	github.com/Lekssays/ProxDAG/network/consensus/proto/vote => ./proto/vote
-	github.com/Lekssays/ProxDAG/network/plugins/vote v0.0.0-20220225162616-d7378533521a => ../plugins/vote
+	github.com/Lekssays/ProxDAG/network/plugins/proxdag v0.0.0 => ../plugins/proxdag
 )

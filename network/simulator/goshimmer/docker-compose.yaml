@@ -20,8 +20,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "./start.sh:/start.sh"
     # Add your plugins in this way
-      - "./../../plugins/modelupdate:/modelupdate"
-      - "./../../plugins/vote:/vote"
+      - "./../../plugins/proxdag:/proxdag"
       - "./research_sample.go:/research_sample.go"
       - "./config.default.json:/config.default.json"
     ports:

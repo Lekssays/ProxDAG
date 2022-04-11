@@ -3,11 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
+	"strings"
 
 	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
-	"github.com/Lekssays/ProxDAG/network/plugins/modelupdate"
+	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
 	"github.com/iotaledger/goshimmer/client"
-	"github.com/iotaledger/hive.go/marshalutil"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/golang/protobuf/proto"
 )
@@ -111,22 +112,12 @@ func RetrieveDAGSnapshot(modelID string) (Graph, error) {
 
 func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-
-	var parentsBytes bytes.Buffer
-	enc := gob.NewEncoder(&parentsBytes)
-	err := enc.Encode(mupdate.Parents)
+	mupdatePayloadBytes, err := proto.Marshal(&mupdate)
 	if err != nil {
 		return "", err
 	}
 
-	var contentBytes bytes.Buffer
-	enc = gob.NewEncoder(&contentBytes)
-	err = enc.Encode(mupdate.Content)
-	if err != nil {
-		return "", err
-	}
-
-	payload := modelupdate.NewPayload(mupdate.ModelID, parentsBytes.Bytes(), contentBytes.Bytes(), mupdate.Endpoint)
+	payload := proxdag.NewPayload("MODEL_UPDATE", string(mupdatePayloadBytes))
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "", err
@@ -137,36 +128,23 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	marshalUtil := marshalutil.New(len(messageRaw.Payload))
-	modelUpdatePayload, err := modelupdate.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
+	payload, _, err := proxdag.FromBytes(messageRaw.Payload)
 	if err != nil {
 		return mupb.ModelUpdate{}, err
 	}
 
-	buf := bytes.NewBuffer(modelUpdatePayload.Parents)
-	dec := gob.NewDecoder(buf)
-	var parents []string
-	err = dec.Decode(&parents)
-	if err != nil {
-		return mupb.ModelUpdate{}, err
+	// todo(ahmed): check model purposeID
+	if !strings.Contains(string(payload.Data), "vote") {
+		var mupdate mupb.ModelUpdate
+		err = proto.Unmarshal([]byte(payload.Data), &mupdate)
+		if err != nil {
+			return mupb.ModelUpdate{}, err
+		}
+		return mupdate, nil
 	}
+	
+	return mupb.ModelUpdate{}, errors.New("Unknown payload type!")
 
-	buf = bytes.NewBuffer(modelUpdatePayload.Content)
-	dec = gob.NewDecoder(buf)
-	var content []float32
-	err = dec.Decode(&content)
-	if err != nil {
-		return mupb.ModelUpdate{}, err
-	}
-
-	modelUpdate := mupb.ModelUpdate{
-		ModelID:  modelUpdatePayload.ModelID,
-		Parents:  parents,
-		Content:  content,
-		Endpoint: modelUpdatePayload.Endpoint,
-	}
-
-	return modelUpdate, nil
 }
 
 func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
+	"strings"
+
 	vpb "github.com/Lekssays/ProxDAG/network/consensus/proto/vote"
-	"github.com/Lekssays/ProxDAG/network/plugins/vote"
+	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
-	"github.com/iotaledger/hive.go/marshalutil"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -18,16 +20,16 @@ const (
 
 func SendVote(votePayload vpb.Vote) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	var decision string
-	if votePayload.Decision {
-		decision = "true"
-	} else {
-		decision = "false"
+	votePayloadBytes, err := proto.Marshal(&votePayload)
+	if err != nil {
+		return "nil", err
 	}
-	payload := vote.NewPayload(votePayload.ModelID, votePayload.VoteID, decision, votePayload.Metadata)
+
+	payload := proxdag.NewPayload("VOTE", string(votePayloadBytes))
+
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
-		return "", err
+		return "nil", err
 	}
 	return messageID, nil
 }
@@ -35,27 +37,21 @@ func SendVote(votePayload vpb.Vote) (string, error) {
 func GetVote(messageID string) (vpb.Vote, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	marshalUtil := marshalutil.New(len(messageRaw.Payload))
-	votePayload, err := vote.Parse(marshalUtil.WriteBytes(messageRaw.Payload))
+	payload, _, err := proxdag.FromBytes(messageRaw.Payload)
 	if err != nil {
 		return vpb.Vote{}, err
 	}
 
-	var decision bool
-	if votePayload.Decision == "true" {
-		decision = true
-	} else {
-		decision = false
+	if strings.Contains(string(payload.Data), "vote") {
+		var vote vpb.Vote
+		err = proto.Unmarshal([]byte(payload.Data), &vote)
+		if err != nil {
+			return vpb.Vote{}, err
+		}
+		return vote, nil
 	}
 
-	vote := vpb.Vote{
-		ModelID:  votePayload.ModelID,
-		VoteID:   votePayload.VoteID,
-		Decision: decision,
-		Metadata: votePayload.Metadata,
-	}
-
-	return vote, nil
+	return vpb.Vote{}, errors.New("Unknown payload type!")
 }
 
 func SaveVote(vote vpb.Vote) error {

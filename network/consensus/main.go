@@ -20,7 +20,7 @@ func main() {
 	fmt.Printf("MessageID: %s\n", messageID)
 
 	votePayload, _ := GetVote(messageID)
-	fmt.Println("Vote:", votePayload.String())
+	fmt.Println("Vote:", votePayload)
 
 	err = SaveVote(vote)
 	if err != nil {

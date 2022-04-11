@@ -3,7 +3,7 @@ module github.com/Lekssays/ProxDAG/network/graph
 go 1.16
 
 require (
-	github.com/Lekssays/ProxDAG/network/plugins/modelupdate v0.0.0-20220225162616-d7378533521a
+	github.com/Lekssays/ProxDAG/network/plugins/proxdag v0.0.0
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
@@ -16,5 +16,5 @@ require (
 
 replace (
 	github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate => ./proto/modelUpdate
-	github.com/Lekssays/ProxDAG/network/plugins/modelupdate v0.0.0-20220225162616-d7378533521a => ../plugins/modelupdate
+	github.com/Lekssays/ProxDAG/network/plugins/proxdag v0.0.0 => ../plugins/proxdag
 )
