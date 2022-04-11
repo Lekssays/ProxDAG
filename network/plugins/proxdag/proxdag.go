@@ -31,7 +31,7 @@ type Events struct {
 }
 
 type Event struct {
-	Purpose string
+	Purpose uint32
 	Data    string
 
 	Timestamp time.Time

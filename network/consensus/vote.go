@@ -42,6 +42,7 @@ func GetVote(messageID string) (vpb.Vote, error) {
 		return vpb.Vote{}, err
 	}
 
+	// todo(ahmed): check model purposeID
 	if strings.Contains(string(payload.Data), "vote") {
 		var vote vpb.Vote
 		err = proto.Unmarshal([]byte(payload.Data), &vote)
