@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	maxPurposeLen = 10
 	maxDataLength = 4096
 )
 
@@ -23,9 +22,6 @@ func SendProxdagMessage(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, jsonmodels.NewErrorResponse(err))
 	}
 
-	if len(req.Purpose) > maxPurposeLen {
-		return c.JSON(http.StatusBadRequest, Response{Error: "Purpose is too long"})
-	}
 	if len(req.Data) > maxDataLength {
 		return c.JSON(http.StatusBadRequest, Response{Error: "Data is too long"})
 	}
@@ -41,7 +37,7 @@ func SendProxdagMessage(c echo.Context) error {
 
 // Request defines the proxdag message to send.
 type Request struct {
-	Purpose string `json:"purpose"`
+	Purpose uint32 `json:"purpose"`
 	Data    string `json:"data"`
 }
 

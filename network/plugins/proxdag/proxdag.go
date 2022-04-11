@@ -49,8 +49,7 @@ const (
 
 // Payload represents the proxdag payload type.
 type Payload struct {
-	Purpose    string
-	PurposeLen uint32
+	Purpose    uint32
 	Data       string
 	DataLen    uint32
 
@@ -58,10 +57,9 @@ type Payload struct {
 	bytesMutex sync.RWMutex
 }
 
-func NewPayload(purpose string, data string) *Payload {
+func NewPayload(purpose uint32, data string) *Payload {
 	return &Payload{
 		Purpose:    purpose,
-		PurposeLen: uint32(len([]byte(purpose))),
 		Data:       data,
 		DataLen:    uint32(len([]byte(data))),
 	}
@@ -89,23 +87,16 @@ func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
 		return
 	}
 
-	// parse Type
+	// parse puprose
 	result = &Payload{}
-	puproseLen, err := marshalUtil.ReadUint32()
-	if err != nil {
-		err = fmt.Errorf("failed to parse PurposeLen field of proxdag payload: %w", err)
-		return
-	}
-	result.PurposeLen = puproseLen
-
-	purpose, err := marshalUtil.ReadBytes(int(puproseLen))
+	puprose, err := marshalUtil.ReadUint32()
 	if err != nil {
 		err = fmt.Errorf("failed to parse Purpose field of proxdag payload: %w", err)
 		return
 	}
-	result.Purpose = string(purpose)
+	result.Purpose = puprose
 
-	// parse Payload
+	// parse Data
 	result = &Payload{}
 	dataLen, err := marshalUtil.ReadUint32()
 	if err != nil {
@@ -149,7 +140,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 		return
 	}
 
-	payloadLength := int(p.PurposeLen + p.DataLen + marshalutil.Uint32Size*2)
+	payloadLength := int(p.DataLen + marshalutil.Uint32Size*2)
 
 	// initialize helper
 	marshalUtil := marshalutil.New(marshalutil.Uint32Size + marshalutil.Uint32Size + payloadLength)
@@ -157,8 +148,7 @@ func (p *Payload) Bytes() (bytes []byte) {
 	// marshal the payload specific information
 	marshalUtil.WriteUint32(payload.TypeLength + uint32(payloadLength))
 	marshalUtil.WriteBytes(Type.Bytes())
-	marshalUtil.WriteUint32(p.PurposeLen)
-	marshalUtil.WriteBytes([]byte(p.Purpose))
+	marshalUtil.WriteUint32(p.Purpose)
 	marshalUtil.WriteUint32(p.DataLen)
 	marshalUtil.WriteBytes([]byte(p.Data))
 
