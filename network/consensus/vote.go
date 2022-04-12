@@ -16,6 +16,7 @@ const (
 	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
 	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
 	LEVELDB_ENDPOINT              = "./../proxdagDB"
+	VOTE_PURPOSE_ID               = 18
 )
 
 func SendVote(votePayload vpb.Vote) (string, error) {
@@ -25,8 +26,7 @@ func SendVote(votePayload vpb.Vote) (string, error) {
 		return "nil", err
 	}
 
-	payload := proxdag.NewPayload("VOTE", string(votePayloadBytes))
-
+	payload := proxdag.NewPayload(VOTE_PURPOSE_ID, string(votePayloadBytes))
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "nil", err
@@ -43,6 +43,8 @@ func GetVote(messageID string) (vpb.Vote, error) {
 	}
 
 	// todo(ahmed): check model purposeID
+	//if strings.Contains(string(payload.Data), "vote") {
+	// if payload.Purpose == VOTE_PURPOSE_ID 
 	if strings.Contains(string(payload.Data), "vote") {
 		var vote vpb.Vote
 		err = proto.Unmarshal([]byte(payload.Data), &vote)

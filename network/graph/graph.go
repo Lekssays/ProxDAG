@@ -18,6 +18,7 @@ const (
 	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
 	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
 	LEVELDB_ENDPOINT              = "./../proxdagDB"
+	MODEL_UPDATE_PURPOSE_ID       = 17
 )
 
 type Node struct {
@@ -117,7 +118,7 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 		return "", err
 	}
 
-	payload := proxdag.NewPayload("MODEL_UPDATE", string(mupdatePayloadBytes))
+	payload := proxdag.NewPayload(MODEL_UPDATE_PURPOSE_ID, string(mupdatePayloadBytes))
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "", err
@@ -133,7 +134,8 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		return mupb.ModelUpdate{}, err
 	}
 
-	// todo(ahmed): check model purposeID
+	// todo(ahmed): check model purpose
+	// if payload.Purpose == MODEL_UPDATE_PURPOSE_ID 
 	if !strings.Contains(string(payload.Data), "vote") {
 		var mupdate mupb.ModelUpdate
 		err = proto.Unmarshal([]byte(payload.Data), &mupdate)
