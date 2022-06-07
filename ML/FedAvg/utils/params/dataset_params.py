@@ -1,4 +1,0 @@
-
-dataset_params = {
-    "mnist": {}
-}
