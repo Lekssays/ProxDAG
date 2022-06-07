@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"strings"
 
 	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
 	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
+	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -109,7 +110,7 @@ func RetrieveDAGSnapshot(modelID string) (Graph, error) {
 	gob.NewDecoder(bytesReader).Decode(&graph)
 
 	return graph, nil
-} 
+}
 
 func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
@@ -119,6 +120,7 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	}
 
 	payload := proxdag.NewPayload(MODEL_UPDATE_PURPOSE_ID, string(mupdatePayloadBytes))
+	fmt.Println("Payload:", payload)
 	messageID, err := goshimAPI.SendPayload(payload.Bytes())
 	if err != nil {
 		return "", err
@@ -135,7 +137,8 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	}
 
 	// todo(ahmed): check model purpose
-	// if payload.Purpose == MODEL_UPDATE_PURPOSE_ID 
+	// if payload.Purpose == MODEL_UPDATE_PURPOSE_ID
+	fmt.Println("PayloadAfter:", payload)
 	if !strings.Contains(string(payload.Data), "vote") {
 		var mupdate mupb.ModelUpdate
 		err = proto.Unmarshal([]byte(payload.Data), &mupdate)
@@ -144,7 +147,7 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		}
 		return mupdate, nil
 	}
-	
+
 	return mupb.ModelUpdate{}, errors.New("Unknown payload type!")
 
 }

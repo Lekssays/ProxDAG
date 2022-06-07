@@ -7,6 +7,6 @@ option go_package = "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate
 message ModelUpdate {
     string modelID = 1;
     repeated string parents = 2;
-    repeated float content = 4;
-    string endpoint = 5;
+    repeated float content = 3;
+    string endpoint = 4;
 }

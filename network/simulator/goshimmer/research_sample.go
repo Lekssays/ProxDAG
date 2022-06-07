@@ -14,7 +14,6 @@ import (
 	"github.com/iotaledger/goshimmer/plugins/prometheus"
 	"github.com/iotaledger/goshimmer/plugins/remotelog"
 	"github.com/iotaledger/goshimmer/plugins/remotemetrics"
-	"github.com/iotaledger/goshimmer/plugins/txstream"
 )
 
 // Research contains research plugins of a GoShimmer node.
@@ -26,7 +25,6 @@ var Research = node.Plugins(
 	prometheus.Plugin,
 	remotemetrics.Plugin,
 	networkdelay.App(),
-	txstream.Plugin,
 	activity.Plugin,
 	chat.Plugin,
 	proxdag.Plugin,

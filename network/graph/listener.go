@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 var addr = flag.String("addr", GOSHIMMER_WEBSOCKETS_ENDPOINT, "http service address")
@@ -40,15 +41,9 @@ func RunLiveFeed(wg *sync.WaitGroup) {
 				log.Println("read:", err)
 				return
 			}
-			// PayloadType for ModelUpdate is 785 (see plugins/modelupdate/modelupdate.go)
-			// and 786 for Vote (see plugins/vote/vote.go)
-			if strings.Contains(string(message), "\"payload_type\":785") {
+			// PayloadType for ProxDAG is 787 (see plugins/proxdag/proxdag.go)
+			if strings.Contains(string(message), "\"payload_type\":787") {
 				messageID := message[24:68]
-				log.Printf("%s", message)
-				log.Printf("MessageID: %s", messageID)
-			} else if strings.Contains(string(message), "\"payload_type\":786") {
-				messageID := message[24:68]
-				log.Printf("%s", message)
 				log.Printf("MessageID: %s", messageID)
 			}
 		}

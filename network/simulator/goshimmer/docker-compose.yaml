@@ -34,8 +34,6 @@ services:
       - "0.0.0.0:8081:8081/tcp"
       # pprof profiling
       - "0.0.0.0:6061:6061/tcp"
-      # txstream
-      - "0.0.0.0:5000:5000/tcp"
     environment:
       - PATH=$PATH:/usr/local/go/bin
       - ANALYSIS_CLIENT_SERVERADDRESS=analysisentry-01.devnet.shimmer.iota.cafe:21888

@@ -1,160 +1,93 @@
 package proxdag
 
 import (
+	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/cockroachdb/errors"
-	"github.com/iotaledger/hive.go/events"
-	"github.com/iotaledger/hive.go/marshalutil"
+	"github.com/iotaledger/hive.go/serix"
 	"github.com/iotaledger/hive.go/stringify"
 
 	"github.com/iotaledger/goshimmer/packages/tangle/payload"
 )
 
-// NewProxdag creates a new Proxdag.
-func NewProxdag() *Proxdag {
-	return &Proxdag{
-		Events: Events{
-			MessageReceived: events.NewEvent(proxdagEventCaller),
-		},
+func init() {
+	err := serix.DefaultAPI.RegisterTypeSettings(Payload{}, serix.TypeSettings{}.WithObjectType(uint32(new(Payload).Type())))
+	if err != nil {
+		panic(fmt.Errorf("error registering ProxDAG type settings: %w", err))
+	}
+	err = serix.DefaultAPI.RegisterInterfaceObjects((*payload.Payload)(nil), new(Payload))
+	if err != nil {
+		panic(fmt.Errorf("error registering ProxDAG as Payload interface: %w", err))
 	}
 }
 
+// NewProxdag creates a new Proxdag.
+func NewProxdag() *Proxdag {
+	return &Proxdag{
+		Events: newEvents(),
+	}
+}
+
+// Proxdag manages proxdag messages happening over the Tangle.
 type Proxdag struct {
-	Events
-}
-
-type Events struct {
-	MessageReceived *events.Event
-}
-
-type Event struct {
-	Purpose uint32
-	Data    string
-
-	Timestamp time.Time
-	MessageID string
-}
-
-func proxdagEventCaller(handler interface{}, params ...interface{}) {
-	handler.(func(*Event))(params[0].(*Event))
+	*Events
 }
 
 const (
+	// PayloadName defines the name of the proxdag payload.
 	PayloadName = "proxdag"
 	payloadType = 787
 )
 
 // Payload represents the proxdag payload type.
 type Payload struct {
-	Purpose    uint32
-	Data       string
-	DataLen    uint32
+	Purpose uint32 `serix:"0"`
+	Data    string `serix:"1,lengthPrefixType=uint32"`
 
 	bytes      []byte
 	bytesMutex sync.RWMutex
 }
 
+// NewPayload creates a new proxdag payload.
 func NewPayload(purpose uint32, data string) *Payload {
 	return &Payload{
-		Purpose:    purpose,
-		Data:       data,
-		DataLen:    uint32(len([]byte(data))),
+		Purpose: purpose,
+		Data:    data,
 	}
 }
 
 // FromBytes parses the marshaled version of a Payload into a Go object.
 // It either returns a new Payload or fills an optionally provided Payload with the parsed information.
-func FromBytes(bytes []byte) (result *Payload, consumedBytes int, err error) {
-	marshalUtil := marshalutil.New(bytes)
-	result, err = Parse(marshalUtil)
-	consumedBytes = marshalUtil.ReadOffset()
+func FromBytes(bytes []byte) (payloadDecoded *Payload, consumedBytes int, err error) {
+	payloadDecoded = new(Payload)
+
+	consumedBytes, err = serix.DefaultAPI.Decode(context.Background(), bytes, payloadDecoded, serix.WithValidation())
+	if err != nil {
+		err = errors.Errorf("failed to parse Proxdag Payload: %w", err)
+		return
+	}
+	payloadDecoded.bytes = bytes
 
 	return
 }
 
-// Parse unmarshals a Payload using the given marshalUtil (for easier marshaling/unmarshaling).
-func Parse(marshalUtil *marshalutil.MarshalUtil) (result *Payload, err error) {
-	// read information that are required to identify the payload from the outside
-	if _, err = marshalUtil.ReadUint32(); err != nil {
-		err = fmt.Errorf("failed to parse payload size of proxdag payload: %w", err)
-		return
-	}
-	if _, err = marshalUtil.ReadUint32(); err != nil {
-		err = fmt.Errorf("failed to parse payload size of proxdag payload: %w", err)
-		return
-	}
-
-	// parse puprose
-	result = &Payload{}
-	puprose, err := marshalUtil.ReadUint32()
-	if err != nil {
-		err = fmt.Errorf("failed to parse Purpose field of proxdag payload: %w", err)
-		return
-	}
-	result.Purpose = puprose
-
-	// parse Data
-	result = &Payload{}
-	dataLen, err := marshalUtil.ReadUint32()
-	if err != nil {
-		err = fmt.Errorf("failed to parse DataLen field of proxdag payload: %w", err)
-		return
-	}
-	result.DataLen = dataLen
-
-	data, err := marshalUtil.ReadBytes(int(dataLen))
-	if err != nil {
-		err = fmt.Errorf("failed to parse Data field of proxdag payload: %w", err)
-		return
-	}
-	result.Data = string(data)
-
-	// store bytes, so we don't have to marshal manually
-	consumedBytes := marshalUtil.ReadOffset()
-	copy(result.bytes, marshalUtil.Bytes()[:consumedBytes])
-
-	return result, nil
-}
-
 // Bytes returns a marshaled version of this Payload.
-func (p *Payload) Bytes() (bytes []byte) {
-	// acquire lock for reading bytes
-	p.bytesMutex.RLock()
-
-	// return if bytes have been determined already
-	if bytes = p.bytes; bytes != nil {
-		p.bytesMutex.RUnlock()
-		return
-	}
-
-	// switch to write lock
-	p.bytesMutex.RUnlock()
+func (p *Payload) Bytes() []byte {
 	p.bytesMutex.Lock()
 	defer p.bytesMutex.Unlock()
-
-	// return if bytes have been determined in the mean time
-	if bytes = p.bytes; bytes != nil {
-		return
+	if objBytes := p.bytes; objBytes != nil {
+		return objBytes
 	}
 
-	payloadLength := int(p.DataLen + marshalutil.Uint32Size*2)
-
-	// initialize helper
-	marshalUtil := marshalutil.New(marshalutil.Uint32Size + marshalutil.Uint32Size + payloadLength)
-
-	// marshal the payload specific information
-	marshalUtil.WriteUint32(payload.TypeLength + uint32(payloadLength))
-	marshalUtil.WriteBytes(Type.Bytes())
-	marshalUtil.WriteUint32(p.Purpose)
-	marshalUtil.WriteUint32(p.DataLen)
-	marshalUtil.WriteBytes([]byte(p.Data))
-
-	bytes = marshalUtil.Bytes()
-
-	return bytes
+	objBytes, err := serix.DefaultAPI.Encode(context.Background(), p, serix.WithValidation())
+	if err != nil {
+		// TODO: what do?
+		panic(err)
+	}
+	p.bytes = objBytes
+	return objBytes
 }
 
 // String returns a human-friendly representation of the Payload.
@@ -166,17 +99,7 @@ func (p *Payload) String() string {
 }
 
 // Type represents the identifier which addresses the proxdag payload type.
-var Type = payload.NewType(payloadType, PayloadName, func(data []byte) (payload payload.Payload, err error) {
-	var consumedBytes int
-	payload, consumedBytes, err = FromBytes(data)
-	if err != nil {
-		return nil, err
-	}
-	if consumedBytes != len(data) {
-		return nil, errors.New("not all payload bytes were consumed")
-	}
-	return
-})
+var Type = payload.NewType(payloadType, PayloadName)
 
 // Type returns the type of the Payload.
 func (p *Payload) Type() payload.Type {
