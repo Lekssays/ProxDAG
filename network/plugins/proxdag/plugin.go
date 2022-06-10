@@ -51,15 +51,10 @@ func onReceiveMessageFromMessageLayer(messageID tangle.MessageID) {
 			return
 		}
 
-		proxdagPayload, _, err := FromBytes(message.Payload().Bytes())
-		if err != nil {
-			Plugin.LogError(err)
-			return
-		}
-
+		proxdagPayload := message.Payload().(*Payload)
 		proxdagEvent = &MessageReceivedEvent{
-			Purpose:   proxdagPayload.Purpose,
-			Data:      proxdagPayload.Data,
+			Purpose:   proxdagPayload.Purpose(),
+			Data:      proxdagPayload.Data(),
 			Timestamp: message.IssuingTime(),
 			MessageID: message.ID().Base58(),
 		}

@@ -51,7 +51,7 @@ func main() {
 
 		mupdate := modelUpdatepb.ModelUpdate{
 			ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
-			Parents:  []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3",  "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
+			Parents:  []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
 			Content:  []float32{1.558, 0.125, -9.458632},
 			Endpoint: "peer0.proxdag.io:5696",
 		}
@@ -76,7 +76,7 @@ func main() {
 		if err != nil {
 			fmt.Errorf(err.Error())
 		}
-		
+
 		fmt.Println("Retrieved ModelUpdate:", rmupdate)
 	} else if args[0] == "listener" {
 		var wg sync.WaitGroup

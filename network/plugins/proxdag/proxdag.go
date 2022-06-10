@@ -1,13 +1,10 @@
 package proxdag
 
 import (
-	"context"
 	"fmt"
-	"sync"
 
-	"github.com/cockroachdb/errors"
+	"github.com/iotaledger/hive.go/generics/model"
 	"github.com/iotaledger/hive.go/serix"
-	"github.com/iotaledger/hive.go/stringify"
 
 	"github.com/iotaledger/goshimmer/packages/tangle/payload"
 )
@@ -41,67 +38,39 @@ const (
 	payloadType = 787
 )
 
-// Payload represents the proxdag payload type.
+// Payload represents the chat payload type.
 type Payload struct {
+	model.Immutable[Payload, *Payload, payloadModel] `serix:"0"`
+}
+
+type payloadModel struct {
 	Purpose uint32 `serix:"0"`
 	Data    string `serix:"1,lengthPrefixType=uint32"`
-
-	bytes      []byte
-	bytesMutex sync.RWMutex
 }
 
-// NewPayload creates a new proxdag payload.
+// NewPayload creates a new chat payload.
 func NewPayload(purpose uint32, data string) *Payload {
-	return &Payload{
+	return model.NewImmutable[Payload](&payloadModel{
 		Purpose: purpose,
 		Data:    data,
-	}
-}
-
-// FromBytes parses the marshaled version of a Payload into a Go object.
-// It either returns a new Payload or fills an optionally provided Payload with the parsed information.
-func FromBytes(bytes []byte) (payloadDecoded *Payload, consumedBytes int, err error) {
-	payloadDecoded = new(Payload)
-
-	consumedBytes, err = serix.DefaultAPI.Decode(context.Background(), bytes, payloadDecoded, serix.WithValidation())
-	if err != nil {
-		err = errors.Errorf("failed to parse Proxdag Payload: %w", err)
-		return
-	}
-	payloadDecoded.bytes = bytes
-
-	return
-}
-
-// Bytes returns a marshaled version of this Payload.
-func (p *Payload) Bytes() []byte {
-	p.bytesMutex.Lock()
-	defer p.bytesMutex.Unlock()
-	if objBytes := p.bytes; objBytes != nil {
-		return objBytes
-	}
-
-	objBytes, err := serix.DefaultAPI.Encode(context.Background(), p, serix.WithValidation())
-	if err != nil {
-		// TODO: what do?
-		panic(err)
-	}
-	p.bytes = objBytes
-	return objBytes
-}
-
-// String returns a human-friendly representation of the Payload.
-func (p *Payload) String() string {
-	return stringify.Struct("ProxdagPayload",
-		stringify.StructField("purpose", p.Purpose),
-		stringify.StructField("data", p.Data),
+	},
 	)
 }
 
-// Type represents the identifier which addresses the proxdag payload type.
+// Type represents the identifier which addresses the chat payload type.
 var Type = payload.NewType(payloadType, PayloadName)
 
 // Type returns the type of the Payload.
 func (p *Payload) Type() payload.Type {
 	return Type
+}
+
+// Purpose returns an author of the message.
+func (p *Payload) Purpose() uint32 {
+	return p.M.Purpose
+}
+
+// Data returns a recipient of the message.
+func (p *Payload) Data() string {
+	return p.M.Data
 }
