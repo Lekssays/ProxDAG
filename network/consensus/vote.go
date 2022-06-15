@@ -44,7 +44,7 @@ func GetVote(messageID string) (vpb.Vote, error) {
 
 	// todo(ahmed): check model purposeID
 	//if strings.Contains(string(payload.Data), "vote") {
-	// if payload.Purpose == VOTE_PURPOSE_ID 
+	// if payload.Purpose == VOTE_PURPOSE_ID
 	if strings.Contains(string(payload.Data), "vote") {
 		var vote vpb.Vote
 		err = proto.Unmarshal([]byte(payload.Data), &vote)

@@ -3,13 +3,26 @@ package main
 import (
 	"errors"
 	"math"
+
+	mupb "github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate"
+	scpb "github.com/Lekssays/ProxDAG/network/consensus/proto/score"
+	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
+	"github.com/golang/protobuf/proto"
+	"github.com/iotaledger/goshimmer/client"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 const (
-	THRESHOLD  = 0.1
-	DECAY_RATE = 0.0001
-	DELTA      = 0.01
-	K          = 10
+	THRESHOLD                     = 0.1
+	DECAY_RATE                    = 0.0001
+	DELTA                         = 0.01
+	K                             = 10
+	GOSHIMMER_NODE                = "http://0.0.0.0:8080"
+	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
+	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
+	LEVELDB_ENDPOINT              = "./../proxdagDB"
+	TRUST_PURPOSE_ID              = 21
+	SIMILARITY_PURPOSE_ID         = 22
 )
 
 // ComputeCS returns the cosine similarity of two vectors
@@ -116,4 +129,116 @@ func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32
 		}
 	}
 	return trustScores
+}
+
+func StoreSimilarity(csMatrix scpb.Similarity) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	csMatrixBytes, err := proto.Marshal(&csMatrix)
+	if err != nil {
+		return err
+	}
+
+	err = db.Put([]byte("similarity"), csMatrixBytes, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func StoreTrust(trustScores scpb.Trust) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	trustScoresBytes, err := proto.Marshal(&trustScores)
+	if err != nil {
+		return err
+	}
+
+	err = db.Put([]byte("trust"), trustScoresBytes, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RetrieveSimilarity() (*scpb.Similarity, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return &scpb.Similarity{}, err
+	}
+	defer db.Close()
+
+	data, err := db.Get([]byte("similarity"), nil)
+	if err != nil {
+		return &scpb.Similarity{}, err
+	}
+
+	similarity := &scpb.Similarity{}
+	err = proto.Unmarshal(data, similarity)
+	if err != nil {
+		return &scpb.Similarity{}, err
+	}
+
+	return similarity, nil
+}
+
+func RetrieveTrust() (*scpb.Trust, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return &scpb.Trust{}, err
+	}
+	defer db.Close()
+
+	data, err := db.Get([]byte("trust"), nil)
+	if err != nil {
+		return &scpb.Trust{}, err
+	}
+
+	trust := &scpb.Trust{}
+	err = proto.Unmarshal(data, trust)
+	if err != nil {
+		return &scpb.Trust{}, err
+	}
+
+	return trust, nil
+}
+
+func PublishSimilarity(similarity scpb.Similarity) (string, error) {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	similarityBytes, err := proto.Marshal(&similarity)
+	if err != nil {
+		return "nil", err
+	}
+
+	payload := proxdag.NewPayload(SIMILARITY_PURPOSE_ID, string(similarityBytes))
+	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	if err != nil {
+		return "nil", err
+	}
+	return messageID, nil
+}
+
+func PublishTrustScore(trustScores scpb.Trust) error {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	trustScoresBytes, err := proto.Marshal(&trustScores)
+	if err != nil {
+		return "nil", err
+	}
+
+	payload := proxdag.NewPayload(TRUST_PURPOSE_ID, string(trustScoresBytes))
+	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	if err != nil {
+		return "nil", err
+	}
+	return messageID, nil
 }

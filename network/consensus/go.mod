@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/iotaledger/goshimmer v0.8.14
 	github.com/syndtr/goleveldb v1.0.0
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.27.1
 )
 
 require (
@@ -15,7 +15,7 @@ require (
 	github.com/beevik/ntp v0.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/cockroachdb/errors v1.8.9 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
 	github.com/cockroachdb/redact v1.1.3 // indirect
@@ -34,7 +34,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/huin/goupnp v1.0.2 // indirect
 	github.com/iotaledger/hive.go v0.0.0-20220607150119-1be29e962175 // indirect
-	github.com/iotaledger/hive.go/serializer/v2 v2.0.0-20220429043012-1f37deae4664 // indirect
 	github.com/ipfs/go-cid v0.0.7 // indirect
 	github.com/ipfs/go-ipfs-util v0.0.2 // indirect
 	github.com/ipfs/go-log v1.0.5 // indirect
@@ -105,7 +104,6 @@ require (
 	github.com/multiformats/go-multistream v0.2.2 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/oasisprotocol/ed25519 v0.0.0-20210505154701-76d8c688d86e // indirect
-	github.com/onsi/gomega v1.16.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/panjf2000/ants/v2 v2.4.8 // indirect
 	github.com/paulbellamy/ratecounter v0.2.0 // indirect
@@ -126,6 +124,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/whyrusleeping/multiaddr-filter v0.0.0-20160516205228-e903e4adabd7 // indirect
+	gitlab.com/NebulousLabs/merkletree v0.0.0-20200118113624-07fbf710afc4 // indirect
 	go.dedis.ch/fixbuf v1.0.3 // indirect
 	go.dedis.ch/kyber/v3 v3.0.13 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
@@ -143,6 +142,8 @@ require (
 )
 
 replace (
+	github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate => ./proto/modelUpdate
+	github.com/Lekssays/ProxDAG/network/consensus/proto/score => ./proto/score
 	github.com/Lekssays/ProxDAG/network/consensus/proto/vote => ./proto/vote
-	github.com/Lekssays/ProxDAG/network/plugins/proxdag v0.0.0 => ../plugins/proxdag
+	github.com/Lekssays/ProxDAG/network/plugins/proxdag => ../plugins/proxdag
 )
