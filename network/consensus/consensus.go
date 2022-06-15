@@ -13,16 +13,12 @@ import (
 )
 
 const (
-	THRESHOLD                     = 0.1
-	DECAY_RATE                    = 0.0001
-	DELTA                         = 0.01
-	K                             = 10
-	GOSHIMMER_NODE                = "http://0.0.0.0:8080"
-	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
-	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
-	LEVELDB_ENDPOINT              = "./../proxdagDB"
-	TRUST_PURPOSE_ID              = 21
-	SIMILARITY_PURPOSE_ID         = 22
+	THRESHOLD             = 0.1
+	DECAY_RATE            = 0.0001
+	DELTA                 = 0.01
+	K                     = 10
+	TRUST_PURPOSE_ID      = 21
+	SIMILARITY_PURPOSE_ID = 22
 )
 
 // ComputeCS returns the cosine similarity of two vectors
@@ -60,15 +56,15 @@ func ComputeCS(a []float64, b []float64) (float64, error) {
 }
 
 // GetClients returns a list of clients' names from the
-// updates shared in IOTA
-func GetClients(updates []mupb.ModelUpdate) []string {
+// updates shared in IOTA and a mapping of clients IDs and pubkeys
+func GetClients(updates []mupb.ModelUpdate) ([]int, map[int]string) {
 	panic("todo :)")
 }
 
 // GetModelUpdates returns a map of clients' names and their updates
 // from the set of model updates published in IOTA for the modelID
 // NOTE: it returns the updates pending from the latest verification
-func GetModelUpdates(modelID string) map[string][]mupb.ModelUpdate {
+func GetModelUpdates(modelID string) []mupb.ModelUpdate {
 	panic("todo :)")
 }
 
@@ -84,7 +80,7 @@ func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 	var csMatrix [][]float64
 	var algnScore []float64
 	updates := GetModelUpdates(modelID)
-	clients := GetClients(updates)
+	clients, _ := GetClients(updates)
 
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
@@ -93,8 +89,8 @@ func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 			}
 			// todo(lekssays): check multiple updates of the same client
 			// get the latest one for the moment
-			a := updates[clients[i]]
-			b := updates[clients[j]]
+			a := updates[clients[i]].Content
+			b := updates[clients[j]].Content
 			csMatrix[i][j], _ = ComputeCS(a, b)
 			csMatrix[j][i] = csMatrix[i][j]
 		}
