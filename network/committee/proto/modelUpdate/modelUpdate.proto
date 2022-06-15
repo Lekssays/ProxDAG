@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package modelUpdate;
+
+option go_package = "github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate";
+
+message ModelUpdate {
+    string modelID = 1;
+    repeated string parents = 2;
+    repeated float content = 3;
+    string endpoint = 4;
+}
