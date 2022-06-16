@@ -217,14 +217,15 @@ func PublishSimilarity(similarity scpb.Similarity) (string, error) {
 	}
 
 	payload := proxdag.NewPayload(SIMILARITY_PURPOSE_ID, string(similarityBytes))
-	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	payloadBytes, _ := payload.Bytes()
+	messageID, err := goshimAPI.SendPayload(payloadBytes)
 	if err != nil {
 		return "nil", err
 	}
 	return messageID, nil
 }
 
-func PublishTrustScore(trustScores scpb.Trust) error {
+func PublishTrustScore(trustScores scpb.Trust) (string, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	trustScoresBytes, err := proto.Marshal(&trustScores)
 	if err != nil {
@@ -232,7 +233,8 @@ func PublishTrustScore(trustScores scpb.Trust) error {
 	}
 
 	payload := proxdag.NewPayload(TRUST_PURPOSE_ID, string(trustScoresBytes))
-	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	payloadBytes, _ := payload.Bytes()
+	messageID, err := goshimAPI.SendPayload(payloadBytes)
 	if err != nil {
 		return "nil", err
 	}

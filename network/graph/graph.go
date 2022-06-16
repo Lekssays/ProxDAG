@@ -121,7 +121,8 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 
 	payload := proxdag.NewPayload(MODEL_UPDATE_PURPOSE_ID, string(mupdatePayloadBytes))
 	fmt.Println("Payload:", payload)
-	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	payloadBytes, _ := payload.Bytes()
+	messageID, err := goshimAPI.SendPayload(payloadBytes)
 	if err != nil {
 		return "", err
 	}
@@ -131,7 +132,8 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	payload, _, err := proxdag.FromBytes(messageRaw.Payload)
+	payload := new(proxdag.Payload)
+	err := payload.FromBytes(messageRaw.Payload)
 	if err != nil {
 		return mupb.ModelUpdate{}, err
 	}
@@ -139,9 +141,9 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	// todo(ahmed): check model purpose
 	// if payload.Purpose == MODEL_UPDATE_PURPOSE_ID
 	fmt.Println("PayloadAfter:", payload)
-	if !strings.Contains(string(payload.Data), "vote") {
+	if !strings.Contains(string(payload.Data()), "vote") {
 		var mupdate mupb.ModelUpdate
-		err = proto.Unmarshal([]byte(payload.Data), &mupdate)
+		err = proto.Unmarshal([]byte(payload.Data()), &mupdate)
 		if err != nil {
 			return mupb.ModelUpdate{}, err
 		}

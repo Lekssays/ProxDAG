@@ -27,7 +27,8 @@ func SendVote(votePayload vpb.Vote) (string, error) {
 	}
 
 	payload := proxdag.NewPayload(VOTE_PURPOSE_ID, string(votePayloadBytes))
-	messageID, err := goshimAPI.SendPayload(payload.Bytes())
+	payloadBytes, _ := payload.Bytes()
+	messageID, err := goshimAPI.SendPayload(payloadBytes)
 	if err != nil {
 		return "nil", err
 	}
@@ -37,17 +38,17 @@ func SendVote(votePayload vpb.Vote) (string, error) {
 func GetVote(messageID string) (vpb.Vote, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	payload, _, err := proxdag.FromBytes(messageRaw.Payload)
+	payload := new(proxdag.Payload)
+	err := payload.FromBytes(messageRaw.Payload)
 	if err != nil {
 		return vpb.Vote{}, err
 	}
-
 	// todo(ahmed): check model purposeID
 	//if strings.Contains(string(payload.Data), "vote") {
 	// if payload.Purpose == VOTE_PURPOSE_ID
-	if strings.Contains(string(payload.Data), "vote") {
+	if strings.Contains(string(payload.Data()), "vote") {
 		var vote vpb.Vote
-		err = proto.Unmarshal([]byte(payload.Data), &vote)
+		err := proto.Unmarshal([]byte(payload.Data()), &vote)
 		if err != nil {
 			return vpb.Vote{}, err
 		}
