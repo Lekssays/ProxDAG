@@ -9,4 +9,5 @@ message ModelUpdate {
     repeated string parents = 2;
     repeated float content = 3;
     string endpoint = 4;
+    string pubkey = 5;
 }

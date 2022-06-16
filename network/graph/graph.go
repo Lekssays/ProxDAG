@@ -5,8 +5,10 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
@@ -14,6 +16,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 const (
@@ -22,7 +25,13 @@ const (
 	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
 	LEVELDB_ENDPOINT              = "./../proxdagDB"
 	MODEL_UPDATE_PURPOSE_ID       = 17
+	INF                           = 1e6
 )
+
+type Model struct {
+	ID      string
+	Updates []string
+}
 
 type Message struct {
 	Purpose uint32 `json:"purpose"`
@@ -156,7 +165,7 @@ func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {
 	return true, nil
 }
 
-func SaveModelUpdate(modelUpdate mupb.ModelUpdate) error {
+func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return err
@@ -168,7 +177,8 @@ func SaveModelUpdate(modelUpdate mupb.ModelUpdate) error {
 		return err
 	}
 
-	err = db.Put([]byte(modelUpdate.ModelID), modelUpdateBytes, nil)
+	ID := fmt.Sprintf("%s-MU-%s", modelUpdate.ModelID, messageID)
+	err = db.Put([]byte(ID), modelUpdateBytes, nil)
 	if err != nil {
 		return err
 	}
@@ -176,14 +186,15 @@ func SaveModelUpdate(modelUpdate mupb.ModelUpdate) error {
 	return nil
 }
 
-func RetrieveModelUpdate(modelID string) (*mupb.ModelUpdate, error) {
+func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, error) {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
 	defer db.Close()
 
-	data, err := db.Get([]byte(modelID), nil)
+	ID := fmt.Sprintf("%s-MU-%s", modelID, messageID)
+	data, err := db.Get([]byte(ID), nil)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
@@ -222,9 +233,104 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	message := string(body)
+	fmt.Println(message)
 	if strings.Contains(message, "messageID") {
 		return message[14:58], nil
 	}
 
 	return "", errors.New(message)
+}
+
+func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return []string{}, err
+	}
+	defer db.Close()
+
+	var key []byte
+	var updates []string
+
+	ID := fmt.Sprintf("%s-MU-", modelID)
+	iter := db.NewIterator(util.BytesPrefix([]byte(ID)), nil)
+	for iter.Next() {
+		key = iter.Key()
+		messageID := strings.Split(string(key[:]), "-")[2]
+		updates = append(updates, messageID)
+	}
+	iter.Release()
+
+	return []string{}, iter.Error()
+}
+
+func GetModelUpdates(modelID string) ([]mupb.ModelUpdate, error) {
+	updates, err := GetModelUpdatesMessageIDs(modelID)
+	if err != nil {
+		return []mupb.ModelUpdate{}, err
+	}
+
+	var modelUpdates []mupb.ModelUpdate
+	for i := 0; i < len(updates); i++ {
+		modelUpdate, err := GetModelUpdate(updates[i])
+		if err != nil {
+			return []mupb.ModelUpdate{}, err
+		}
+		modelUpdates = append(modelUpdates, modelUpdate)
+	}
+
+	return modelUpdates, nil
+}
+
+func StoreClientID(pubkey string, modelID string) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	clients, err := GetClients(modelID)
+	ID := []byte(strconv.Itoa(len(clients)))
+
+	key := fmt.Sprintf("%s-CL-%s", modelID, pubkey)
+	err = db.Put([]byte(key), []byte(ID), nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetClients(modelID string) ([]string, error) {
+	updates, err := GetModelUpdates(modelID)
+	if err != nil {
+		return []string{}, err
+	}
+
+	var clients []string
+	for i := 0; i < len(updates); i++ {
+		modelUpdate, err := GetModelUpdate(clients[i])
+		if err != nil {
+			return []string{}, err
+		}
+		clients = append(clients, modelUpdate.Endpoint)
+	}
+
+	return clients, nil
+}
+
+func GetClientID(pubkey string, modelID string) (uint32, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return INF, err
+	}
+	defer db.Close()
+
+	key := fmt.Sprintf("%s-CL-%s", modelID, pubkey)
+	data, err := db.Get([]byte(key), nil)
+	if err != nil {
+		return INF, err
+	}
+
+	ID, err := strconv.Atoi(string(data))
+	return uint32(ID), nil
 }

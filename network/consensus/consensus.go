@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"math"
+	"net/http"
+	"strings"
 
 	mupb "github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate"
 	scpb "github.com/Lekssays/ProxDAG/network/consensus/proto/score"
@@ -210,33 +215,107 @@ func RetrieveTrust() (*scpb.Trust, error) {
 }
 
 func PublishSimilarity(similarity scpb.Similarity) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	similarityBytes, err := proto.Marshal(&similarity)
-	if err != nil {
-		return "nil", err
+	url := GOSHIMMER_NODE + "/proxdag"
+
+	payload := Message{
+		Purpose: SIMILARITY_PURPOSE_ID,
+		Data:    []byte(similarity.String()),
 	}
 
-	payload := proxdag.NewPayload(SIMILARITY_PURPOSE_ID, string(similarityBytes))
-	payloadBytes, _ := payload.Bytes()
-	messageID, err := goshimAPI.SendPayload(payloadBytes)
+	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
-	return messageID, nil
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	message := string(body)
+	if strings.Contains(message, "messageID") {
+		return message[14:58], nil
+	}
+
+	return "", errors.New(message)
 }
 
 func PublishTrustScore(trustScores scpb.Trust) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	trustScoresBytes, err := proto.Marshal(&trustScores)
-	if err != nil {
-		return "nil", err
+	url := GOSHIMMER_NODE + "/proxdag"
+
+	payload := Message{
+		Purpose: TRUST_PURPOSE_ID,
+		Data:    []byte(trustScores.String()),
 	}
 
-	payload := proxdag.NewPayload(TRUST_PURPOSE_ID, string(trustScoresBytes))
-	payloadBytes, _ := payload.Bytes()
-	messageID, err := goshimAPI.SendPayload(payloadBytes)
+	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
-	return messageID, nil
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	message := string(body)
+	if strings.Contains(message, "messageID") {
+		return message[14:58], nil
+	}
+
+	return "", errors.New(message)
+}
+
+func GetSimilarity(messageID string) (scpb.Similarity, error) {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	messageRaw, _ := goshimAPI.GetMessage(messageID)
+	payload := new(proxdag.Payload)
+	err := payload.FromBytes(messageRaw.Payload)
+	if err != nil {
+		return scpb.Similarity{}, err
+	}
+
+	if payload.Purpose() == SIMILARITY_PURPOSE_ID {
+		var similarity scpb.Similarity
+		err := proto.Unmarshal([]byte(payload.Data()), &similarity)
+		if err != nil {
+			return scpb.Similarity{}, err
+		}
+		return similarity, nil
+	}
+
+	return scpb.Similarity{}, errors.New("Unknown payload type!")
+}
+
+func GetTrust(messageID string) (scpb.Trust, error) {
+	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
+	messageRaw, _ := goshimAPI.GetMessage(messageID)
+	payload := new(proxdag.Payload)
+	err := payload.FromBytes(messageRaw.Payload)
+	if err != nil {
+		return scpb.Trust{}, err
+	}
+
+	if payload.Purpose() == TRUST_PURPOSE_ID {
+		var trust scpb.Trust
+		err := proto.Unmarshal([]byte(payload.Data()), &trust)
+		if err != nil {
+			return scpb.Trust{}, err
+		}
+		return trust, nil
+	}
+
+	return scpb.Trust{}, errors.New("Unknown payload type!")
 }
