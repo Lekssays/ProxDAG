@@ -55,6 +55,7 @@ func main() {
 			Content:  []float32{1.558, 0.125, -9.458632},
 			Endpoint: "peer0.proxdag.io:5696",
 		}
+
 		messageID, err := SendModelUpdate(mupdate)
 		if err != nil {
 			fmt.Errorf(err.Error())

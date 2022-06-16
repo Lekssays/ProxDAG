@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 	"errors"
-	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
 
 	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
@@ -21,6 +23,11 @@ const (
 	LEVELDB_ENDPOINT              = "./../proxdagDB"
 	MODEL_UPDATE_PURPOSE_ID       = 17
 )
+
+type Message struct {
+	Purpose uint32 `json:"purpose"`
+	Data    []byte `json:"data"`
+}
 
 type Node struct {
 	MessageID string
@@ -112,23 +119,6 @@ func RetrieveDAGSnapshot(modelID string) (Graph, error) {
 	return graph, nil
 }
 
-func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	mupdatePayloadBytes, err := proto.Marshal(&mupdate)
-	if err != nil {
-		return "", err
-	}
-
-	payload := proxdag.NewPayload(MODEL_UPDATE_PURPOSE_ID, string(mupdatePayloadBytes))
-	fmt.Println("Payload:", payload)
-	payloadBytes, _ := payload.Bytes()
-	messageID, err := goshimAPI.SendPayload(payloadBytes)
-	if err != nil {
-		return "", err
-	}
-	return messageID, nil
-}
-
 func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
@@ -138,10 +128,7 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		return mupb.ModelUpdate{}, err
 	}
 
-	// todo(ahmed): check model purpose
-	// if payload.Purpose == MODEL_UPDATE_PURPOSE_ID
-	fmt.Println("PayloadAfter:", payload)
-	if !strings.Contains(string(payload.Data()), "vote") {
+	if payload.Purpose() == MODEL_UPDATE_PURPOSE_ID {
 		var mupdate mupb.ModelUpdate
 		err = proto.Unmarshal([]byte(payload.Data()), &mupdate)
 		if err != nil {
@@ -208,4 +195,36 @@ func RetrieveModelUpdate(modelID string) (*mupb.ModelUpdate, error) {
 	}
 
 	return modelUpdate, nil
+}
+
+func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
+	url := GOSHIMMER_NODE + "/proxdag"
+
+	payload := Message{
+		Purpose: MODEL_UPDATE_PURPOSE_ID,
+		Data:    []byte(mupdate.String()),
+	}
+
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	message := string(body)
+	if strings.Contains(message, "messageID") {
+		return message[14:58], nil
+	}
+
+	return "", errors.New(message)
 }

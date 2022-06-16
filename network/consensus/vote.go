@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
 	"strings"
 
 	vpb "github.com/Lekssays/ProxDAG/network/consensus/proto/vote"
@@ -19,20 +23,41 @@ const (
 	VOTE_PURPOSE_ID               = 18
 )
 
+type Message struct {
+	Purpose uint32 `json:"purpose"`
+	Data    []byte `json:"data"`
+}
+
 func SendVote(votePayload vpb.Vote) (string, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	votePayloadBytes, err := proto.Marshal(&votePayload)
-	if err != nil {
-		return "nil", err
+	url := GOSHIMMER_NODE + "/proxdag"
+
+	payload := Message{
+		Purpose: VOTE_PURPOSE_ID,
+		Data:    []byte(votePayload.String()),
 	}
 
-	payload := proxdag.NewPayload(VOTE_PURPOSE_ID, string(votePayloadBytes))
-	payloadBytes, _ := payload.Bytes()
-	messageID, err := goshimAPI.SendPayload(payloadBytes)
+	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
-		return "nil", err
+		return "", err
 	}
-	return messageID, nil
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	message := string(body)
+	if strings.Contains(message, "messageID") {
+		return message[14:58], nil
+	}
+
+	return "", errors.New(message)
 }
 
 func GetVote(messageID string) (vpb.Vote, error) {
@@ -43,10 +68,8 @@ func GetVote(messageID string) (vpb.Vote, error) {
 	if err != nil {
 		return vpb.Vote{}, err
 	}
-	// todo(ahmed): check model purposeID
-	//if strings.Contains(string(payload.Data), "vote") {
-	// if payload.Purpose == VOTE_PURPOSE_ID
-	if strings.Contains(string(payload.Data()), "vote") {
+
+	if payload.Purpose() == VOTE_PURPOSE_ID {
 		var vote vpb.Vote
 		err := proto.Unmarshal([]byte(payload.Data()), &vote)
 		if err != nil {
