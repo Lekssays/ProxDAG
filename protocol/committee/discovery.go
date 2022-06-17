@@ -1,11 +1,16 @@
-package main
+package committee
 
 import (
 	"context"
-	peerpb "github.com/Lekssays/ProxDAG/network/committee/proto/peer"
+	"log"
+
+	peerpb "github.com/Lekssays/ProxDAG/protocol/committee/proto/peer"
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
-	"log"
+)
+
+const (
+	REDIS_ENDPOINT = "127.0.0.1:6379"
 )
 
 func SavePeer(peer peerpb.Peer) (bool, error) {

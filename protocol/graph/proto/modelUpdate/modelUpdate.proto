@@ -2,11 +2,12 @@ syntax = "proto3";
 
 package modelUpdate;
 
-option go_package = "github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate";
+option go_package = "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate";
 
 message ModelUpdate {
     string modelID = 1;
     repeated string parents = 2;
     repeated double content = 3;
     string endpoint = 4;
+    string pubkey = 5;
 }

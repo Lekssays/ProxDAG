@@ -1,4 +1,4 @@
-package main
+package consensus
 
 import (
 	"bytes"
@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	vpb "github.com/Lekssays/ProxDAG/network/consensus/proto/vote"
-	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
+	vpb "github.com/Lekssays/ProxDAG/protocol/consensus/proto/vote"
+	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"

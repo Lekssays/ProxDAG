@@ -1,8 +1,11 @@
 .idea
 __pycache__
-network/committee/committee
-network/graph/graph
-network/listener/listener
-network/proxdagDB
-network/consensus/consensus
+protocol/committee/committee
+protocol/graph/graph
+protocol/listener/listener
+protocol/proxdagDB
+protocol/consensus/consensus
+protocol/protocol
 ML/datasets
+proxdagDB/*
+protocol/proxdagDB/*

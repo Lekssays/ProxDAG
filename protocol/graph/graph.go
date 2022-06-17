@@ -1,4 +1,4 @@
-package main
+package graph
 
 import (
 	"bytes"
@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	mupb "github.com/Lekssays/ProxDAG/network/graph/proto/modelUpdate"
-	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
+	mupb "github.com/Lekssays/ProxDAG/protocol/graph/proto/modelUpdate"
+	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"

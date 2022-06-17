@@ -1,4 +1,4 @@
-package main
+package consensus
 
 import (
 	"bytes"
@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"strings"
 
-	mupb "github.com/Lekssays/ProxDAG/network/consensus/proto/modelUpdate"
-	scpb "github.com/Lekssays/ProxDAG/network/consensus/proto/score"
-	"github.com/Lekssays/ProxDAG/network/plugins/proxdag"
+	scpb "github.com/Lekssays/ProxDAG/protocol/consensus/proto/score"
+	"github.com/Lekssays/ProxDAG/protocol/graph"
+	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -60,19 +60,6 @@ func ComputeCS(a []float64, b []float64) (float64, error) {
 	return cosine, nil
 }
 
-// GetClients returns a list of clients' names from the
-// updates shared in IOTA and a mapping of clients IDs and pubkeys
-func GetClients(updates []mupb.ModelUpdate) ([]int, map[int]string) {
-	panic("todo :)")
-}
-
-// GetModelUpdates returns a map of clients' names and their updates
-// from the set of model updates published in IOTA for the modelID
-// NOTE: it returns the updates pending from the latest verification
-func GetModelUpdates(modelID string) []mupb.ModelUpdate {
-	panic("todo :)")
-}
-
 func getAverage(a []float64) float64 {
 	sum := 0.0
 	for i := 0; i < len(a); i++ {
@@ -84,8 +71,15 @@ func getAverage(a []float64) float64 {
 func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 	var csMatrix [][]float64
 	var algnScore []float64
-	updates := GetModelUpdates(modelID)
-	clients, _ := GetClients(updates)
+	updates, err := graph.GetModelUpdates(modelID)
+	if err != nil {
+		return [][]float64{}, []float64{}
+	}
+
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return [][]float64{}, []float64{}
+	}
 
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
@@ -94,9 +88,22 @@ func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 			}
 			// todo(lekssays): check multiple updates of the same client
 			// get the latest one for the moment
-			a := updates[clients[i]].Content
-			b := updates[clients[j]].Content
-			csMatrix[i][j], _ = ComputeCS(a, b)
+			clientAID, err := graph.GetClientID(clients[i], modelID)
+			if err != nil {
+				return [][]float64{}, []float64{}
+			}
+
+			clientBID, err := graph.GetClientID(clients[j], modelID)
+			if err != nil {
+				return [][]float64{}, []float64{}
+			}
+
+			a := updates[clientAID].Content
+			b := updates[clientBID].Content
+			csMatrix[i][j], err = ComputeCS(a, b)
+			if err != nil {
+				return [][]float64{}, []float64{}
+			}
 			csMatrix[j][i] = csMatrix[i][j]
 		}
 		// warning(lekssays): not sure about the alignment score
@@ -239,11 +246,13 @@ func PublishSimilarity(similarity scpb.Similarity) (string, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	message := string(body)
+	var response graph.Response
+	json.Unmarshal(body, &response)
 	if strings.Contains(message, "messageID") {
-		return message[14:58], nil
+		return response.MessageID, nil
 	}
 
-	return "", errors.New(message)
+	return "", errors.New(response.Error)
 }
 
 func PublishTrustScore(trustScores scpb.Trust) (string, error) {

@@ -1,12 +1,13 @@
-package main
+package committee
 
 import (
 	"context"
 	"encoding/hex"
+	"log"
+
 	"github.com/ProtonMail/go-ecvrf/ecvrf"
 	"github.com/drand/drand/client"
 	"github.com/drand/drand/client/http"
-	"log"
 )
 
 func GetMagicSeed() ([]byte, error) {
