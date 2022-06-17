@@ -16,6 +16,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
@@ -31,6 +32,11 @@ const (
 type Model struct {
 	ID      string
 	Updates []string
+}
+
+type Response struct {
+	MessageID string `json:"messageID,omitempty"`
+	Error     string `json:"error,omitempty"`
 }
 
 type Message struct {
@@ -178,9 +184,16 @@ func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
 	}
 
 	ID := fmt.Sprintf("%s!MU!%s", modelUpdate.ModelID, messageID)
-	err = db.Put([]byte(ID), modelUpdateBytes, nil)
+	exists, err := db.Has([]byte(ID), &opt.ReadOptions{})
 	if err != nil {
 		return err
+	}
+
+	if !exists {
+		err = db.Put([]byte(ID), modelUpdateBytes, nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -233,8 +246,11 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	message := string(body)
+
+	var response Response
+	json.Unmarshal(body, &response)
 	if strings.Contains(message, "messageID") {
-		err = SaveModelUpdate(message[14:58], mupdate)
+		err = SaveModelUpdate(response.MessageID, mupdate)
 		if err != nil {
 			return "", err
 		}
@@ -243,10 +259,10 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return message[14:58], nil
+		return response.MessageID, nil
 	}
 
-	return "", errors.New(message)
+	return "", errors.New(response.Error)
 }
 
 func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
@@ -299,10 +315,19 @@ func StoreClientID(pubkey string, modelID string) error {
 	clients, err := GetClients(modelID)
 	ID := []byte(strconv.Itoa(len(clients)))
 	key := fmt.Sprintf("%s!CL!%s", modelID, pubkey)
-	err = db.Put([]byte(key), []byte(ID), nil)
+
+	exists, err := db.Has([]byte(key), &opt.ReadOptions{})
 	if err != nil {
 		return err
 	}
+
+	if !exists {
+		err = db.Put([]byte(key), []byte(ID), nil)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
