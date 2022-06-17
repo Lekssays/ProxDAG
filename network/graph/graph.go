@@ -177,7 +177,7 @@ func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
 		return err
 	}
 
-	ID := fmt.Sprintf("%s-MU-%s", modelUpdate.ModelID, messageID)
+	ID := fmt.Sprintf("%s!MU!%s", modelUpdate.ModelID, messageID)
 	err = db.Put([]byte(ID), modelUpdateBytes, nil)
 	if err != nil {
 		return err
@@ -193,7 +193,7 @@ func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, e
 	}
 	defer db.Close()
 
-	ID := fmt.Sprintf("%s-MU-%s", modelID, messageID)
+	ID := fmt.Sprintf("%s!MU!%s", modelID, messageID)
 	data, err := db.Get([]byte(ID), nil)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
@@ -233,8 +233,16 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	message := string(body)
-	fmt.Println(message)
 	if strings.Contains(message, "messageID") {
+		err = SaveModelUpdate(message[14:58], mupdate)
+		if err != nil {
+			return "", err
+		}
+
+		err = StoreClientID(mupdate.Pubkey, mupdate.ModelID)
+		if err != nil {
+			return "", err
+		}
 		return message[14:58], nil
 	}
 
@@ -248,32 +256,32 @@ func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
 	}
 	defer db.Close()
 
-	var key []byte
+	var key string
 	var updates []string
 
-	ID := fmt.Sprintf("%s-MU-", modelID)
+	ID := fmt.Sprintf("%s!MU!", modelID)
 	iter := db.NewIterator(util.BytesPrefix([]byte(ID)), nil)
 	for iter.Next() {
-		key = iter.Key()
-		messageID := strings.Split(string(key[:]), "-")[2]
+		key = string(iter.Key())
+		messageID := strings.Split(string(key[:]), "!")[2]
 		updates = append(updates, messageID)
 	}
 	iter.Release()
 
-	return []string{}, iter.Error()
+	return updates, iter.Error()
 }
 
-func GetModelUpdates(modelID string) ([]mupb.ModelUpdate, error) {
-	updates, err := GetModelUpdatesMessageIDs(modelID)
+func GetModelUpdates(modelID string) ([]*mupb.ModelUpdate, error) {
+	messageIDs, err := GetModelUpdatesMessageIDs(modelID)
 	if err != nil {
-		return []mupb.ModelUpdate{}, err
+		return []*mupb.ModelUpdate{}, err
 	}
 
-	var modelUpdates []mupb.ModelUpdate
-	for i := 0; i < len(updates); i++ {
-		modelUpdate, err := GetModelUpdate(updates[i])
+	var modelUpdates []*mupb.ModelUpdate
+	for i := 0; i < len(messageIDs); i++ {
+		modelUpdate, err := RetrieveModelUpdate(modelID, messageIDs[i])
 		if err != nil {
-			return []mupb.ModelUpdate{}, err
+			return []*mupb.ModelUpdate{}, err
 		}
 		modelUpdates = append(modelUpdates, modelUpdate)
 	}
@@ -290,29 +298,28 @@ func StoreClientID(pubkey string, modelID string) error {
 
 	clients, err := GetClients(modelID)
 	ID := []byte(strconv.Itoa(len(clients)))
-
-	key := fmt.Sprintf("%s-CL-%s", modelID, pubkey)
+	key := fmt.Sprintf("%s!CL!%s", modelID, pubkey)
 	err = db.Put([]byte(key), []byte(ID), nil)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
 func GetClients(modelID string) ([]string, error) {
-	updates, err := GetModelUpdates(modelID)
+	messageIDs, err := GetModelUpdatesMessageIDs(modelID)
+
 	if err != nil {
 		return []string{}, err
 	}
 
 	var clients []string
-	for i := 0; i < len(updates); i++ {
-		modelUpdate, err := GetModelUpdate(clients[i])
+	for i := 0; i < len(messageIDs); i++ {
+		modelUpdate, err := RetrieveModelUpdate(modelID, messageIDs[i])
 		if err != nil {
 			return []string{}, err
 		}
-		clients = append(clients, modelUpdate.Endpoint)
+		clients = append(clients, modelUpdate.Pubkey)
 	}
 
 	return clients, nil
@@ -325,7 +332,7 @@ func GetClientID(pubkey string, modelID string) (uint32, error) {
 	}
 	defer db.Close()
 
-	key := fmt.Sprintf("%s-CL-%s", modelID, pubkey)
+	key := fmt.Sprintf("%s!CL!%s", modelID, pubkey)
 	data, err := db.Get([]byte(key), nil)
 	if err != nil {
 		return INF, err
