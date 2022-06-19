@@ -3,9 +3,12 @@ import utils
 import torch
 import score_pb2
 import verifier
+import ipfsApi
+
 
 def main():
     print("Models Updates Verifier")
+    api = ipfsApi.Client(host='http://0.0.0.0', port=5001)
 
     net = model.Net()
     

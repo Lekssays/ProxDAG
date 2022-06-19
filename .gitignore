@@ -9,3 +9,6 @@ protocol/protocol
 ML/datasets
 proxdagDB/*
 protocol/proxdagDB/*
+simulator/peers/data
+simulator/peers/client/data
+simulator/ipfs

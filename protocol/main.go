@@ -60,7 +60,7 @@ func main() {
 			mupdate := mupb.ModelUpdate{
 				ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
 				Parents:  []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
-				Content:  []float64{1.558, 0.125, -9.458632},
+				Hash:  "SomeIPFSHash",
 				Endpoint: "peer0.proxdag.io:5696",
 				Pubkey:   "pubkey1",
 			}
