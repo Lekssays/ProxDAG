@@ -58,11 +58,12 @@ func main() {
 			fmt.Println("Saved Graph:", graphNew)
 
 			mupdate := mupb.ModelUpdate{
-				ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
-				Parents:  []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
-				Hash:  "SomeIPFSHash",
-				Endpoint: "peer0.proxdag.io:5696",
-				Pubkey:   "pubkey1",
+				ModelID:   "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
+				Parents:   []string{"GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3", "GfnVharJcoV73nT3QiNqm6yXRGkocvw5HoiwwWzu2Dc3"},
+				Weights:   "SomeIPFSWeightsPath",
+				Gradients: "SomeIPFSGradientsPath",
+				Pubkey:    "pubkey1",
+				Timestamp: uint32(time.Now().Unix()),
 			}
 
 			messageID, err := graph.SendModelUpdate(mupdate)

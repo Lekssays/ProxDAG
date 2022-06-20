@@ -14,6 +14,7 @@ import (
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
+	"github.com/sbinet/npyio"
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -24,6 +25,7 @@ const (
 	K                     = 10
 	TRUST_PURPOSE_ID      = 21
 	SIMILARITY_PURPOSE_ID = 22
+	IPFS_ENDPOINT         = "http://0.0.0.0:5001/api/v0"
 )
 
 // ComputeCS returns the cosine similarity of two vectors
@@ -84,6 +86,8 @@ func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
 			if i == j {
+				csMatrix[i][j] = 1.0
+				csMatrix[j][i] = 1.0
 				continue
 			}
 			// todo(lekssays): check multiple updates of the same client
@@ -98,8 +102,16 @@ func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
 				return [][]float64{}, []float64{}
 			}
 
-			a := updates[clientAID].Content
-			b := updates[clientBID].Content
+			a, err := ToVector(updates[clientAID].Gradients)
+			if err != nil {
+				return [][]float64{}, []float64{}
+			}
+
+			b, err := ToVector(updates[clientBID].Gradients)
+			if err != nil {
+				return [][]float64{}, []float64{}
+			}
+
 			csMatrix[i][j], err = ComputeCS(a, b)
 			if err != nil {
 				return [][]float64{}, []float64{}
@@ -327,4 +339,55 @@ func GetTrust(messageID string) (scpb.Trust, error) {
 	}
 
 	return scpb.Trust{}, errors.New("Unknown payload type!")
+}
+
+func GetContentIPFS(path string) ([]byte, error) {
+	url := IPFS_ENDPOINT + "/get?arg=" + path
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte{}))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return []byte{}, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	return body, nil
+}
+
+func AddContentIPFS(content []byte) (string, error) {
+	url := IPFS_ENDPOINT + "/add"
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(content))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	response := string(body)
+	return response, nil
+}
+
+func ToVector(GradientsPath string) ([]float64, error) {
+	gradientsBytes, err := GetContentIPFS(GradientsPath)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(gradientsBytes))
+	if err != nil {
+		return []float64{}, err
+	}
+
+	var gradients []float64
+	err = r.Read(&gradients)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	return gradients, nil
 }

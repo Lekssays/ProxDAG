@@ -220,6 +220,8 @@ for r in range(num_rounds):
 
     print(type(client_gradients[0]))
     print(client_gradients[0].nbytes)
+    print(client_gradients.shape)
+    print(client_gradients[0].shape)
     # compute similarity matrix and alignment scores scores.
     cs_mat = compute_cosine_sim(client_gradients, cs_mat)
     # pardoning the honest clients
