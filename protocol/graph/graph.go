@@ -8,11 +8,10 @@ import (
 )
 
 const (
-	GOSHIMMER_NODE                = "http://0.0.0.0:8080"
-	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
-	REDIS_ENDPOINT                = "http://127.0.0.1:6379"
-	LEVELDB_ENDPOINT              = "./../proxdagDB"
-	INF                           = 1e6
+	GOSHIMMER_NODE   = "http://0.0.0.0:8080"
+	REDIS_ENDPOINT   = "http://127.0.0.1:6379"
+	LEVELDB_ENDPOINT = "./../proxdagDB"
+	INF              = 1e6
 )
 
 type Node struct {
