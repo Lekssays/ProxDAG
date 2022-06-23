@@ -1,6 +1,7 @@
 import pickle
 import json
 import os
+import models
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -9,7 +10,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
-from models import SFMNet, VGG
 from numpy.linalg import norm
 from sklearn.model_selection import train_test_split
 
@@ -72,11 +72,11 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest=True, a
     return loss.item()
 
 
-def weight_aggregate(global_model, client_models, client_gradients, client_idx):
+def weight_aggregate(local_model, client_models, client_gradients, client_idx):
     for i in client_idx:
         model = client_models[i]
         w = model.state_dict()['fc.weight'].cpu().numpy()
-        global_w = global_model.state_dict()['fc.weight'].cpu().numpy()
+        global_w = local_model.state_dict()['fc.weight'].cpu().numpy()
         gradient = global_w - w
         client_gradients[i] =  np.add(client_gradients[i], gradient)
     return client_gradients
@@ -143,17 +143,17 @@ def compute_contribitions(client_scores):
     return phi
 
 
-def aggregate(global_model, client_models, phi, client_idx):
+def aggregate(local_model, client_models, phi, client_idx):
     """
     This function has aggregation method 'mean'
     """
     ### This will take simple mean of the weights of models ###
-    global_dict = global_model.state_dict()
+    global_dict = local_model.state_dict()
     for k in global_dict.keys():
         global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[idx] for idx in client_idx], 0).mean(0)
-    global_model.load_state_dict(global_dict)
+    local_model.load_state_dict(global_dict)
 
-    return global_model
+    return local_model
 
 
 def load_kdd_dataset():
@@ -185,18 +185,22 @@ def load_kdd_dataset():
     return x_train, x_test, y_train, y_test
 
 
-def test(global_model, test_loader, attack):
+def test(local_model, test_loader, attack):
     """This function test the global model on test data and returns test loss and test accuracy """
-    global_model.eval()
+    local_model.eval()
     test_loss = 0
     correct = 0
     dataset = get_parameter(param="dataset")
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data, target
-            output = global_model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
-            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            output = local_model(data)
+            
+            # sum up batch loss
+            test_loss += F.nll_loss(output, target, reduction='sum').item() 
+            
+            # get the index of the max log-probability
+            pred = output.argmax(dim=1, keepdim=True)  
             correct += pred.eq(target.view_as(pred)).sum().item()
 
             if dataset == "MNIST" or dataset == "CIFAR":
@@ -264,43 +268,41 @@ def load_data():
 
 
 def initialize():
-    num_clients = get_parameter(param="num_clients")
-    lr = get_parameter(param="lr")
-
     dataset = get_parameter(param="dataset")
     num_clients = get_parameter(param="num_clients")
 
     if dataset == "MNIST":
         lr = 0.01
-        global_model =  SFMNet(784, 10)
+        local_model =  models.SFMNet(784, 10)
         client_gradients = np.zeros([num_clients, 10, 784])
-        client_models = [SFMNet(784, 10) for _ in range(num_clients)]
+        client_models = [models.SFMNet(784, 10) for _ in range(num_clients)]
     elif dataset == "CIFAR":
         lr = 0.1
-        global_model =  VGG('VGG19')
+        local_model =  models.VGG('VGG19')
         client_gradients = np.zeros([num_clients, 10, 512])   # dimensions of the last layer
-        client_models = [VGG('VGG19') for _ in range(num_clients)]
+        client_models = [models.VGG('VGG19') for _ in range(num_clients)]
     elif dataset == "KDD":
         lr = 0.001
-        global_model =  SFMNet(n_features= 41, n_classes= 23)
+        local_model =  models.SFMNet(n_features= 41, n_classes= 23)
         client_gradients = np.zeros([num_clients, 23, 41])   # dimensions of the last layer
-        client_models = [SFMNet(n_features= 41, n_classes= 23) for _ in range(num_clients)]
-    
+        client_models = [models.SFMNet(n_features= 41, n_classes= 23) for _ in range(num_clients)]
+
+
     # cosine-similarity matrix
     cs_mat = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
 
     # trust scores
-    r = [1 / num_clients for i in range(num_clients)]  
+    r = [1 / num_clients for _ in range(num_clients)]  
 
     for _, model in enumerate(client_models):
-        model.load_state_dict(global_model.state_dict())
+        model.load_state_dict(local_model.state_dict())
 
     opt = [optim.SGD(model.parameters(), lr=lr) for model in client_models]
 
-    return global_model, client_models, client_gradients, opt, cs_mat, r
+    return local_model, client_models, client_gradients, opt, cs_mat, r
 
 
-def run_fl(global_model, client_models, opt, r, cs_mat, client_gradients, alpha="100", attack_type="lf"):
+def run_fl(local_model, client_models, opt, r, cs_mat, client_gradients, alpha="100", attack_type="lf"):
     if attack_type not in ["backdoor", "lf"]:
         print("[x] ERROR: attack type not recognized :)")
         return
@@ -329,7 +331,7 @@ def run_fl(global_model, client_models, opt, r, cs_mat, client_gradients, alpha=
         print(round)
         for j, i in tqdm(enumerate(client_idx)):
             # get the global weights
-            client_models[i].load_state_dict(global_model.state_dict())
+            client_models[i].load_state_dict(local_model.state_dict())
             
             # read the local data
             if dataset == "MNIST" or dataset == "CIFAR":
@@ -356,8 +358,8 @@ def run_fl(global_model, client_models, opt, r, cs_mat, client_gradients, alpha=
                 else:
                     loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
 
-        global_model, r, cs_mat, client_gradients = compute_global_parameters(
-            global_model=global_model,
+        local_model, r, cs_mat, client_gradients = compute_global_parameters(
+            local_model=local_model,
             r=r,
             cs_mat=cs_mat,
             client_gradients=client_gradients,
@@ -368,11 +370,11 @@ def run_fl(global_model, client_models, opt, r, cs_mat, client_gradients, alpha=
     return loss, attack
 
 
-def compute_global_parameters(global_model, client_models, client_idx, r, cs_mat, client_gradients):
+def compute_global_parameters(local_model, client_models, client_idx, r, cs_mat, client_gradients):
     num_clients = get_parameter(param="num_clients")
 
     # historical gradient aggregate.
-    client_gradients = weight_aggregate(global_model, client_models, client_gradients, client_idx)
+    client_gradients = weight_aggregate(local_model, client_models, client_gradients, client_idx)
     
     # compute similarity matrix and alignment scores scores.
     cs_mat = compute_cosine_sim(client_gradients, cs_mat)
@@ -392,12 +394,12 @@ def compute_global_parameters(global_model, client_models, client_idx, r, cs_mat
 
     # server aggregate
     #print(client_scores)
-    global_model = aggregate(global_model, client_models, phi, client_idx)
+    local_model = aggregate(local_model, client_models, phi, client_idx)
 
-    return global_model, r, cs_mat, client_gradients
+    return local_model, r, cs_mat, client_gradients
 
 
-def evaluate(global_model, loss, attack):
+def evaluate(local_model, loss, attack):
     losses_test = []
     acc_test = []
 
@@ -405,7 +407,7 @@ def evaluate(global_model, loss, attack):
     batch_size = get_parameter(param="batch_size")
 
     test_loader, _, _ = load_data()
-    test_loss, acc, attack = test(global_model=global_model, test_loader=test_loader, attack=attack)
+    test_loss, acc, attack = test(local_model=local_model, test_loader=test_loader, attack=attack)
     losses_test.append(test_loss)
     acc_test.append(acc)
 

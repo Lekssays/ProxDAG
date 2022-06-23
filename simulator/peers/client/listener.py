@@ -1,5 +1,4 @@
 import asyncio
-from ctypes import util
 import websockets
 import json
 import utils
