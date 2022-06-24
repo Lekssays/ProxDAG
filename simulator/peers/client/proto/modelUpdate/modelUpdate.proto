@@ -11,4 +11,5 @@ message ModelUpdate {
     string gradients = 4;
     string pubkey = 5;
     uint32 timestamp = 6;
+    float accuracy = 7;
 }

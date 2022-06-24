@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='score',
   syntax='proto3',
   serialized_options=_b('ZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/score'),
-  serialized_pb=_b('\n\x0bscore.proto\x12\x05score\"`\n\x05Trust\x12(\n\x06scores\x18\x01 \x03(\x0b\x32\x18.score.Trust.ScoresEntry\x1a-\n\x0bScoresEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"\x1a\n\x05Score\x12\x11\n\x05items\x18\x01 \x03(\x01\x42\x02\x10\x01\"5\n\nSimilarity\x12\t\n\x01n\x18\x01 \x01(\r\x12\x1c\n\x06scores\x18\x02 \x03(\x0b\x32\x0c.score.ScoreBHZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/scoreb\x06proto3')
+  serialized_pb=_b('\n\x0bscore.proto\x12\x05score\"`\n\x05Trust\x12(\n\x06scores\x18\x01 \x03(\x0b\x32\x18.score.Trust.ScoresEntry\x1a-\n\x0bScoresEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"\x1a\n\x05Score\x12\x11\n\x05items\x18\x01 \x03(\x01\x42\x02\x10\x01\"5\n\nSimilarity\x12\t\n\x01n\x18\x01 \x01(\r\x12\x1c\n\x06scores\x18\x02 \x03(\x0b\x32\x0c.score.Score\"\x1b\n\tAlignment\x12\x0e\n\x06scores\x18\x01 \x03(\x01\x42HZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/scoreb\x06proto3')
 )
 
 
@@ -161,12 +161,44 @@ _SIMILARITY = _descriptor.Descriptor(
   serialized_end=201,
 )
 
+
+_ALIGNMENT = _descriptor.Descriptor(
+  name='Alignment',
+  full_name='score.Alignment',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='scores', full_name='score.Alignment.scores', index=0,
+      number=1, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=203,
+  serialized_end=230,
+)
+
 _TRUST_SCORESENTRY.containing_type = _TRUST
 _TRUST.fields_by_name['scores'].message_type = _TRUST_SCORESENTRY
 _SIMILARITY.fields_by_name['scores'].message_type = _SCORE
 DESCRIPTOR.message_types_by_name['Trust'] = _TRUST
 DESCRIPTOR.message_types_by_name['Score'] = _SCORE
 DESCRIPTOR.message_types_by_name['Similarity'] = _SIMILARITY
+DESCRIPTOR.message_types_by_name['Alignment'] = _ALIGNMENT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Trust = _reflection.GeneratedProtocolMessageType('Trust', (_message.Message,), dict(
@@ -197,6 +229,13 @@ Similarity = _reflection.GeneratedProtocolMessageType('Similarity', (_message.Me
   # @@protoc_insertion_point(class_scope:score.Similarity)
   ))
 _sym_db.RegisterMessage(Similarity)
+
+Alignment = _reflection.GeneratedProtocolMessageType('Alignment', (_message.Message,), dict(
+  DESCRIPTOR = _ALIGNMENT,
+  __module__ = 'score_pb2'
+  # @@protoc_insertion_point(class_scope:score.Alignment)
+  ))
+_sym_db.RegisterMessage(Alignment)
 
 
 DESCRIPTOR._options = None

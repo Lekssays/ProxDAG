@@ -45,9 +45,9 @@ def generate_docker_compose(configs: list):
     write(filename="docker-compose.yaml", content=main_config)
 
 
-def generate_peers():
+def generate_peers(num_peers: int):
     peers = []
-    for p in range(0,150):
+    for p in range(0,num_peers):
         tmp = {
             'pubkey': ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase +  string.digits) for _ in range(25)),
             'id': str(p),
@@ -70,7 +70,7 @@ def main():
     print("docker-compose.yaml Generator for ProxDAG")
     num_peers = int(parse_args().peers)
 
-    peers = generate_peers()
+    peers = generate_peers(num_peers=num_peers)
     configs = generate_peers_configs(peers=peers, num_peers=num_peers)
     generate_docker_compose(configs=configs)
 

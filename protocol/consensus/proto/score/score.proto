@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package score;
 
-option go_package = "github.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/score";
+option go_package = "github.com/Lekssays/ProxDAG/protocol/consensus/proto/score";
 
 message Trust {
     map<string, double> scores = 1;
@@ -15,4 +15,8 @@ message Score {
 message Similarity {
     uint32 n = 1;
     repeated Score scores = 2;
+}
+
+message Alignment {
+    repeated double scores = 1;
 }

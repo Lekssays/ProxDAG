@@ -16,3 +16,7 @@ message Similarity {
     uint32 n = 1;
     repeated Score scores = 2;
 }
+
+message Alignment {
+    repeated double scores = 1;
+}
