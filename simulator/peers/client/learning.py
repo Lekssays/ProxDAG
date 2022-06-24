@@ -232,7 +232,7 @@ def load_data():
                         transforms.Normalize((0.1307,), (0.3081,))
                     ])
         
-        testdata = datasets.MNIST('./data/test/', train=False, transform=transform, download=True)
+        testdata = datasets.MNIST('./../data/test/', train=False, transform=transform, download=True)
         
         # Loading the test data and thus converting them into a test_loader
         test_loader = torch.utils.data.DataLoader(testdata, batch_size=batch_size, shuffle=True)
@@ -247,7 +247,7 @@ def load_data():
 
         # Loading the test iamges and thus converting them into a test_loader
         test_loader = torch.utils.data.DataLoader(datasets.CIFAR10(
-                    './data',
+                    './../data',
                     train=False,
                     transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])),
                     batch_size=batch_size,
@@ -337,7 +337,7 @@ def run_fl(local_model, client_models, opt, r, cs_mat, client_gradients, alpha="
             
             # read the local data
             if dataset == "MNIST" or dataset == "CIFAR":
-                train_obj = pickle.load(open("./data/" + dataset + "/" + str(i) + "/train_" + alpha +"_.pickle", "rb"))
+                train_obj = pickle.load(open("./../data/" + dataset + "/" + str(i) + "/train_" + alpha +"_.pickle", "rb"))
                 x = torch.stack(train_obj.x)
                 y = torch.tensor(train_obj.y)
                 dat = TensorDataset(x, y)

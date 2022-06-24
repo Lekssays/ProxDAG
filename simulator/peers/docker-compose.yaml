@@ -12,17 +12,18 @@ services:
     environment:
     - MY_NAME=peer0.proxdag.io
     - MY_ID=0
-    - MY_PUB_KEY=Jxb9nFYjOWZCvd8e08GkD9foH
-    - GOSHIMMER_API_ENDPOINT=goshimmer.proxdag.io:8081
-    - IPFS_API_ENDPOINT=ipfs.proxdag.io:5001
+    - MY_PUB_KEY=lwY1QHjHZ45ohzSADp6uxHDin
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
-    - PROXDAG_ENDPOINT=goshimmer.proxdag.io:8080/proxdag
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
     - ./../../proxdagDB:/proxdagDB
     - ./../../protocol:/protocol
     - ./client/:/client
+    - ./data/:/data
 
     networks:
     - outside
@@ -33,17 +34,18 @@ services:
     environment:
     - MY_NAME=peer1.proxdag.io
     - MY_ID=1
-    - MY_PUB_KEY=bfWtE3K3WrsDQRpDWadtNOXzr
-    - GOSHIMMER_API_ENDPOINT=goshimmer.proxdag.io:8081
-    - IPFS_API_ENDPOINT=ipfs.proxdag.io:5001
+    - MY_PUB_KEY=K0dzSy7RlmO7ZkcDkZViAi7Om
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
-    - PROXDAG_ENDPOINT=goshimmer.proxdag.io:8080/proxdag
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
     - ./../../proxdagDB:/proxdagDB
     - ./../../protocol:/protocol
     - ./client/:/client
+    - ./data/:/data
 
     networks:
     - outside

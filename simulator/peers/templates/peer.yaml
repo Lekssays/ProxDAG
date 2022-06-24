@@ -5,16 +5,17 @@
     - MY_NAME=peer_name
     - MY_ID=peer_id
     - MY_PUB_KEY=my_pub_key
-    - GOSHIMMER_API_ENDPOINT=goshimmer.proxdag.io:8081
-    - IPFS_API_ENDPOINT=ipfs.proxdag.io:5001
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
-    - PROXDAG_ENDPOINT=goshimmer.proxdag.io:8080/proxdag
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
     - ./../../proxdagDB:/proxdagDB
     - ./../../protocol:/protocol
     - ./client/:/client
+    - ./data/:/data
 
     networks:
     - outside
