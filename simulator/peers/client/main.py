@@ -8,6 +8,7 @@ import verifier
 import time
 
 from learning import client
+from google.protobuf import text_format
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -63,7 +64,7 @@ def parse_args():
                         required = False)
     parser.add_argument('-at', '--attack_type',
                         dest = "attack_type",
-                        help = "Attack type: lf , backdoor",
+                        help = "Attack type: lf , backdoor, untargeted",
                         default = "lf",
                         required = False)
     return parser.parse_args()
@@ -128,16 +129,13 @@ def main():
     messageID = utils.send_model_update(model_update_pb)
     print(messageID)
 
-    weights_from_ipfs = utils.get_content_to_ipfs(path=model_update_pb.weights)
-    weights_from_bytes = utils.from_bytes(weights_from_ipfs)
-    print(weights_from_bytes)
+    print(utils.get_weights(path=model_update_pb.weights))
+    print(utils.get_gradients(path=model_update_pb.gradients))
 
-    gradients_from_ipfs = utils.get_content_to_ipfs(path=model_update_pb.gradients)
-    gradients_from_bytes = utils.from_bytes(gradients_from_ipfs)
-    print(gradients_from_bytes)
+    time.sleep(1)    
+    model_update = utils.get_model_update(messageID=messageID)
+    print("model_update", model_update)
 
-    model_update = utils.get_model_update(messageID="AC7xrBSfwzb3Y2v5qt6u8B3zPiegJAXaAN7yY7tPtEMV")
-    
     # Driver for check_trust
     trust = score_pb2.Trust()
     trust.scores["pk3"] = 0.223

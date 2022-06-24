@@ -1,2 +1,9 @@
 argparse
 plyvel
+torch
+torchvision
+pandas
+sklearn
+numpy
+requests
+protobuf

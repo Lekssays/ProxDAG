@@ -4,10 +4,12 @@ import os
 import models
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+
+from tqdm import tqdm
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
 from numpy.linalg import norm
@@ -35,7 +37,7 @@ class client:
             pickle.dump(self, f)
 
 
-def client_update(client_model, optimizer, train_loader, epoch=5, honest=True, attack_type ='lf'):
+def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=None):
     """
     This function updates/trains client model on client data
     """
@@ -46,7 +48,7 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest=True, a
             data, target = data, target
             optimizer.zero_grad()
             output = client_model(data)
-            if not honest:
+            if attack_type is not None:
                 if dataset == "MNIST" or dataset == "CIFAR":
                     for i, t in enumerate(target):
                         if attack_type == 'lf':  # label flipping
@@ -55,7 +57,7 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest=True, a
                         elif attack_type == 'backdoor':
                             target[i] = 1  # set the label
                             data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
-                        else:
+                        elif attack_type == "untargeted":
                             target[i] = 0
                 elif dataset == "KDD":
                     for i, t in enumerate(target):
@@ -64,7 +66,7 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest=True, a
                                 target[i] = torch.tensor(7)
                         elif attack_type == 'backdoor':
                             pass
-                        else:
+                        elif attack_type == "untargeted":
                             target[i] = 0
             loss = F.nll_loss(output, target)
             loss.backward()
@@ -341,7 +343,7 @@ def run_fl(local_model, client_models, opt, r, cs_mat, client_gradients, alpha="
                 dat = TensorDataset(x, y)
                 train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
                 if j in dishonest_client_idx:
-                    loss += client_update(client_model=client_models[i], optimizer=opt[i], train_loader=train_loader, epoch=epochs, honest=False, attack_type=attack_type)
+                    loss += client_update(client_model=client_models[i], optimizer=opt[i], train_loader=train_loader, epoch=epochs, attack_type=attack_type)
                 else:
                     loss += client_update(client_model=client_models[i], optimizer=opt[i], train_loader=train_loader, epoch=epochs)
             elif dataset == "KDD":
@@ -354,7 +356,7 @@ def run_fl(local_model, client_models, opt, r, cs_mat, client_gradients, alpha="
                 # honest or not honest update
                 if j in dishonest_client_idx:
                     attack += 1
-                    loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs, honest=False)
+                    loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
                 else:
                     loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
 
@@ -399,7 +401,7 @@ def compute_global_parameters(local_model, client_models, client_idx, r, cs_mat,
     return local_model, r, cs_mat, client_gradients
 
 
-def evaluate(local_model, loss, attack):
+def evaluate(local_model, loss, attack=0):
     losses_test = []
     acc_test = []
 
