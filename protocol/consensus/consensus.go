@@ -25,6 +25,9 @@ const (
 	K                     = 10
 	TRUST_PURPOSE_ID      = 21
 	SIMILARITY_PURPOSE_ID = 22
+	ALIGNMENT_PURPOSE_ID  = 23
+	GRADIENTS_PURPOSE_ID  = 24
+	PHI_PURPOSE_ID        = 25
 	IPFS_ENDPOINT         = "http://0.0.0.0:5001/api/v0"
 )
 
@@ -141,7 +144,6 @@ func EvaluatePardoning(clients []string, algnScore []float64, csMatrix [][]float
 func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32 {
 	var trustScores map[string]float32
 	for i := 0; i < len(clients); i++ {
-		trustScores[clients[i]] *= (1 - DECAY_RATE)
 		if algnScore[i] >= THRESHOLD {
 			trustScores[clients[i]] -= DELTA
 		} else {
@@ -151,94 +153,33 @@ func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32
 	return trustScores
 }
 
-func StoreSimilarity(csMatrix scpb.Similarity) error {
+func RetrieveScore(scoreType string) (*scpb.Score, error) {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
-		return err
+		return &scpb.Score{}, err
 	}
 	defer db.Close()
 
-	csMatrixBytes, err := proto.Marshal(&csMatrix)
+	data, err := db.Get([]byte(scoreType), nil)
 	if err != nil {
-		return err
+		return &scpb.Score{}, err
 	}
 
-	err = db.Put([]byte("similarity"), csMatrixBytes, nil)
+	score := &scpb.Score{}
+	err = proto.Unmarshal(data, score)
 	if err != nil {
-		return err
+		return &scpb.Score{}, err
 	}
 
-	return nil
+	return score, nil
 }
 
-func StoreTrust(trustScores scpb.Trust) error {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-
-	trustScoresBytes, err := proto.Marshal(&trustScores)
-	if err != nil {
-		return err
-	}
-
-	err = db.Put([]byte("trust"), trustScoresBytes, nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func RetrieveSimilarity() (*scpb.Similarity, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return &scpb.Similarity{}, err
-	}
-	defer db.Close()
-
-	data, err := db.Get([]byte("similarity"), nil)
-	if err != nil {
-		return &scpb.Similarity{}, err
-	}
-
-	similarity := &scpb.Similarity{}
-	err = proto.Unmarshal(data, similarity)
-	if err != nil {
-		return &scpb.Similarity{}, err
-	}
-
-	return similarity, nil
-}
-
-func RetrieveTrust() (*scpb.Trust, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return &scpb.Trust{}, err
-	}
-	defer db.Close()
-
-	data, err := db.Get([]byte("trust"), nil)
-	if err != nil {
-		return &scpb.Trust{}, err
-	}
-
-	trust := &scpb.Trust{}
-	err = proto.Unmarshal(data, trust)
-	if err != nil {
-		return &scpb.Trust{}, err
-	}
-
-	return trust, nil
-}
-
-func PublishSimilarity(similarity scpb.Similarity) (string, error) {
+func PublishScore(score scpb.Score) (string, error) {
 	url := GOSHIMMER_NODE + "/proxdag"
 
 	payload := Message{
-		Purpose: SIMILARITY_PURPOSE_ID,
-		Data:    []byte(similarity.String()),
+		Purpose: score.Type,
+		Data:    []byte(score.String()),
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -267,78 +208,35 @@ func PublishSimilarity(similarity scpb.Similarity) (string, error) {
 	return "", errors.New(response.Error)
 }
 
-func PublishTrustScore(trustScores scpb.Trust) (string, error) {
-	url := GOSHIMMER_NODE + "/proxdag"
-
-	payload := Message{
-		Purpose: TRUST_PURPOSE_ID,
-		Data:    []byte(trustScores.String()),
+func isScore(purpose uint32) bool {
+	scores_types := []int{SIMILARITY_PURPOSE_ID, PHI_PURPOSE_ID, GRADIENTS_PURPOSE_ID, TRUST_PURPOSE_ID, ALIGNMENT_PURPOSE_ID}
+	for _, v := range scores_types {
+		if v == purpose {
+			return true
+		}
 	}
-
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		return "", err
-	}
-
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payloadBytes))
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	message := string(body)
-	if strings.Contains(message, "messageID") {
-		return message[14:58], nil
-	}
-
-	return "", errors.New(message)
+	return false
 }
 
-func GetSimilarity(messageID string) (scpb.Similarity, error) {
+func GetScore(messageID string) (scpb.Score, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	payload := new(proxdag.Payload)
 	err := payload.FromBytes(messageRaw.Payload)
 	if err != nil {
-		return scpb.Similarity{}, err
+		return scpb.Score{}, err
 	}
 
-	if payload.Purpose() == SIMILARITY_PURPOSE_ID {
-		var similarity scpb.Similarity
-		err := proto.Unmarshal([]byte(payload.Data()), &similarity)
+	if isScore(payload.Purpose()) {
+		var score scpb.Score
+		err := proto.Unmarshal([]byte(payload.Data()), &score)
 		if err != nil {
-			return scpb.Similarity{}, err
+			return scpb.Score{}, err
 		}
-		return similarity, nil
+		return score, nil
 	}
 
-	return scpb.Similarity{}, errors.New("Unknown payload type!")
-}
-
-func GetTrust(messageID string) (scpb.Trust, error) {
-	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
-	messageRaw, _ := goshimAPI.GetMessage(messageID)
-	payload := new(proxdag.Payload)
-	err := payload.FromBytes(messageRaw.Payload)
-	if err != nil {
-		return scpb.Trust{}, err
-	}
-
-	if payload.Purpose() == TRUST_PURPOSE_ID {
-		var trust scpb.Trust
-		err := proto.Unmarshal([]byte(payload.Data()), &trust)
-		if err != nil {
-			return scpb.Trust{}, err
-		}
-		return trust, nil
-	}
-
-	return scpb.Trust{}, errors.New("Unknown payload type!")
+	return scpb.Score{}, errors.New("Unknown payload type!")
 }
 
 func GetContentIPFS(path string) ([]byte, error) {
@@ -390,4 +288,35 @@ func ToVector(GradientsPath string) ([]float64, error) {
 	}
 
 	return gradients, nil
+}
+
+func StoreScore(score scpb.Score) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	scoreBytes, err := proto.Marshal(&score)
+	if err != nil {
+		return err
+	}
+
+	scoreType := ""
+	if score.Type == TRUST_PURPOSE_ID {
+		scoreType = "trust"
+	} else if scoreType == SIMILARITY_PURPOSE_ID {
+		scoreType = "similarity"
+	} else if scoreType == PHI_PURPOSE_ID {
+		scoreType = "phi"
+	} else if score.Type == GRADIENTS_PURPOSE_ID {
+		scoreType = "gradients"
+	}
+
+	err = db.Put([]byte(scoreType), scoreBytes, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
