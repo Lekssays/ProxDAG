@@ -1,7 +1,8 @@
 import pickle
-import json
 import os
 import models
+import utils
+
 import numpy as np
 import pandas as pd
 
@@ -20,6 +21,7 @@ torch.backends.cudnn.benchmark=True
 torch.manual_seed(42)
 np.random.seed(42)
 
+initialized = False
 
 class client:
     def __init__(self, client_id, x, y):
@@ -41,10 +43,10 @@ def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=No
     """
     This function updates/trains client model on client data
     """
-    dataset = get_parameter(param="dataset")
+    dataset = utils.get_parameter(param="dataset")
     client_model.train()
-    for e in range(epoch):
-        for batch_idx, (data, target) in enumerate(train_loader):
+    for _ in range(epoch):
+        for _, (data, target) in enumerate(train_loader):
             data, target = data, target
             optimizer.zero_grad()
             output = client_model(data)
@@ -71,17 +73,7 @@ def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=No
             loss = F.nll_loss(output, target)
             loss.backward()
             optimizer.step()
-    return loss.item()
-
-
-def weight_aggregate(local_model, client_models, client_gradients, client_idx):
-    for i in client_idx:
-        model = client_models[i]
-        w = model.state_dict()['fc.weight'].cpu().numpy()
-        global_w = local_model.state_dict()['fc.weight'].cpu().numpy()
-        gradient = global_w - w
-        client_gradients[i] =  np.add(client_gradients[i], gradient)
-    return client_gradients
+    return loss.item(), client_model
 
 
 def compute_cosine_sim(client_gradients, cs_mat):
@@ -114,9 +106,9 @@ def pardoning_fun(cs_mat):
 
 
 def compute_trust_scores(client_scores, r):
-    threshold = get_parameter(param="threshold")
-    delta = get_parameter(param="delta")
-    delta = get_parameter(param="delta")
+    threshold = utils.get_parameter(param="threshold")
+    delta = utils.get_parameter(param="delta")
+    delta = utils.get_parameter(param="delta")
 
     # compute/update trust scores
     for i in range(len(client_scores)):
@@ -145,17 +137,14 @@ def compute_contribitions(client_scores):
     return phi
 
 
-def aggregate(local_model, client_models, phi, client_idx):
-    """
-    This function has aggregation method 'mean'
-    """
-    ### This will take simple mean of the weights of models ###
-    global_dict = local_model.state_dict()
+def aggregate(peers_indices, peers_weights=[]):
+    phi = utils.get_phi()
+    global_dict = peers_weights[-1].state_dict()
     for k in global_dict.keys():
-        global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[idx] for idx in client_idx], 0).mean(0)
-    local_model.load_state_dict(global_dict)
-
-    return local_model
+        global_dict[k] = torch.stack([peers_weights[idx].state_dict()[k].float()* phi[idx] for idx in peers_indices], 0).mean(0)
+    
+    peers_weights[-1].load_state_dict(global_dict)
+    return peers_weights[-1]
 
 
 def load_kdd_dataset():
@@ -192,7 +181,7 @@ def test(local_model, test_loader, attack):
     local_model.eval()
     test_loss = 0
     correct = 0
-    dataset = get_parameter(param="dataset")
+    dataset = utils.get_parameter(param="dataset")
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data, target
@@ -222,8 +211,8 @@ def test(local_model, test_loader, attack):
 
 def load_data():
     train_x, train_y, test_loader = None, None, None
-    dataset = get_parameter(param="dataset")
-    batch_size = get_parameter(param="batch_size")
+    dataset = utils.get_parameter(param="dataset")
+    batch_size = utils.get_parameter(param="batch_size")
 
     if dataset == "MNIST":
         transform = transforms.Compose(
@@ -270,143 +259,36 @@ def load_data():
 
 
 def initialize():
-    dataset = get_parameter(param="dataset")
-    num_clients = get_parameter(param="num_clients")
+    dataset = utils.get_parameter(param="dataset")
+    num_clients = utils.get_parameter(param="num_clients")
 
     if dataset == "MNIST":
         lr = 0.01
         local_model =  models.SFMNet(784, 10)
-        client_gradients = np.zeros([num_clients, 10, 784])
-        client_models = [models.SFMNet(784, 10) for _ in range(num_clients)]
+        peers_weights = [models.SFMNet(784, 10) for _ in range(num_clients)]
     elif dataset == "CIFAR":
         lr = 0.1
         local_model =  models.VGG('VGG19')
-        client_gradients = np.zeros([num_clients, 10, 512])   # dimensions of the last layer
-        client_models = [models.VGG('VGG19') for _ in range(num_clients)]
+        peers_weights = [models.VGG('VGG19') for _ in range(num_clients)]
     elif dataset == "KDD":
         lr = 0.001
         local_model =  models.SFMNet(n_features= 41, n_classes= 23)
-        client_gradients = np.zeros([num_clients, 23, 41])   # dimensions of the last layer
-        client_models = [models.SFMNet(n_features= 41, n_classes= 23) for _ in range(num_clients)]
+        peers_weights = [models.SFMNet(n_features= 41, n_classes= 23) for _ in range(num_clients)]
 
-
-    # cosine-similarity matrix
-    cs_mat = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
-
-    # trust scores
-    r = [1 / num_clients for _ in range(num_clients)]  
-
-    for _, model in enumerate(client_models):
+    for _, model in enumerate(peers_weights):
         model.load_state_dict(local_model.state_dict())
 
-    opt = [optim.SGD(model.parameters(), lr=lr) for model in client_models]
+    opt = [optim.SGD(model.parameters(), lr=lr) for model in peers_weights]
 
-    return local_model, client_models, client_gradients, opt, cs_mat, r
-
-
-def run_fl(local_model, client_models, opt, r, cs_mat, client_gradients, alpha="100", attack_type="lf"):
-    if attack_type not in ["backdoor", "lf"]:
-        print("[x] ERROR: attack type not recognized :)")
-        return
-
-    if alpha not in ["100","0.05","10"]:
-        print("[x] ERROR: alpha not recognized :)")
-        return
-
-    dataset = get_parameter(param="dataset")
-    num_rounds = get_parameter(param="num_rounds")
-    num_clients = get_parameter(param="num_clients")
-    num_selected = get_parameter(param="num_selected")
-    epochs = get_parameter(param="epochs")
-    batch_size = get_parameter(param="batch_size")
-
-    clients = np.arange(num_clients)
-    dishonest_client_idx = np.random.permutation(num_clients)[:int(0.9 * num_selected)]
-
-    attack = 0
-    for round in range(num_rounds):
-        probs = [r[i] / sum(r) for i in range(num_clients)]
-        client_idx = np.random.choice(clients, size=num_selected, replace=False, p=probs)
-        
-        # client update
-        loss = 0
-        print(round)
-        for j, i in tqdm(enumerate(client_idx)):
-            # get the global weights
-            client_models[i].load_state_dict(local_model.state_dict())
-            
-            # read the local data
-            if dataset == "MNIST" or dataset == "CIFAR":
-                train_obj = pickle.load(open("./../data/" + dataset + "/" + str(i) + "/train_" + alpha +"_.pickle", "rb"))
-                x = torch.stack(train_obj.x)
-                y = torch.tensor(train_obj.y)
-                dat = TensorDataset(x, y)
-                train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
-                if j in dishonest_client_idx:
-                    loss += client_update(client_model=client_models[i], optimizer=opt[i], train_loader=train_loader, epoch=epochs, attack_type=attack_type)
-                else:
-                    loss += client_update(client_model=client_models[i], optimizer=opt[i], train_loader=train_loader, epoch=epochs)
-            elif dataset == "KDD":
-                _, train_x, train_y = load_data(dataset="KDD")
-                x = torch.tensor(train_x[int(i* len(train_x)/num_clients):int((i+1)*len(train_x)/num_clients)])
-                y = torch.tensor(train_y[int(i* len(train_x)/num_clients):int((i+1)*len(train_x)/num_clients)])
-                dat = TensorDataset(x, y)
-                train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
-                
-                # honest or not honest update
-                if j in dishonest_client_idx:
-                    attack += 1
-                    loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
-                else:
-                    loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
-
-        local_model, r, cs_mat, client_gradients = compute_global_parameters(
-            local_model=local_model,
-            r=r,
-            cs_mat=cs_mat,
-            client_gradients=client_gradients,
-            client_models=client_models,
-            client_idx=client_idx
-        )
-
-    return loss, attack
-
-
-def compute_global_parameters(local_model, client_models, client_idx, r, cs_mat, client_gradients):
-    num_clients = get_parameter(param="num_clients")
-
-    # historical gradient aggregate.
-    client_gradients = weight_aggregate(local_model, client_models, client_gradients, client_idx)
-    
-    # compute similarity matrix and alignment scores scores.
-    cs_mat = compute_cosine_sim(client_gradients, cs_mat)
-    
-    # pardoning the honest clients
-    cs_mat = pardoning_fun(cs_mat)
-    
-    # alignment scores
-    client_scores = np.mean(cs_mat, axis=1)
-
-    # compute and normalize trust scores
-    r = compute_trust_scores(client_scores, r)
-    r = [r[i] / max(r) for i in range(num_clients)]
-
-    # update the contribution rates
-    phi = compute_contribitions(client_scores)
-
-    # server aggregate
-    #print(client_scores)
-    local_model = aggregate(local_model, client_models, phi, client_idx)
-
-    return local_model, r, cs_mat, client_gradients
+    return local_model, peers_weights, opt
 
 
 def evaluate(local_model, loss, attack=0):
     losses_test = []
     acc_test = []
 
-    num_selected = get_parameter(param="num_selected")
-    batch_size = get_parameter(param="batch_size")
+    num_selected = utils.get_parameter(param="num_selected")
+    batch_size = utils.get_parameter(param="batch_size")
 
     test_loader, _, _ = load_data()
     test_loss, acc, attack = test(local_model=local_model, test_loader=test_loader, attack=attack)
@@ -417,8 +299,80 @@ def evaluate(local_model, loss, attack=0):
     asr = attack/(len(test_loader)*batch_size)
     print('attack success rate %0.3g' %(asr))
 
+    return acc, asr
 
-def get_parameter(param: str):
-    with open("config.json", "r") as f:
-        config = json.load(f)
-    return config[param]
+
+def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], alpha="100", attack_type="lf"):
+    if attack_type not in ["backdoor", "lf"]:
+        print("[x] ERROR: attack type not recognized :)")
+        return
+
+    if alpha not in ["100","0.05","10"]:
+        print("[x] ERROR: alpha not recognized :)")
+        return
+
+    dataset = utils.get_parameter(param="dataset")
+    num_clients = utils.get_parameter(param="num_clients")
+    epochs = utils.get_parameter(param="epochs")
+    batch_size = utils.get_parameter(param="batch_size")
+
+    weights = peers_weights.append(local_model)
+    indices = peers_indices.append(int(os.getenv("MY_ID")))
+    local_model = aggregate(peers_weights=weights, peers_indices=indices)
+
+    attack = 0
+
+    # client update
+    loss = 0
+
+    my_id = int(os.getenv("MY_ID"))
+
+    # read the local data
+    if dataset == "MNIST" or dataset == "CIFAR":
+        train_obj = pickle.load(open("./../data/" + dataset + "/" + str(my_id) + "/train_" + alpha +"_.pickle", "rb"))
+        x = torch.stack(train_obj.x)
+        y = torch.tensor(train_obj.y)
+        dat = TensorDataset(x, y)
+        train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
+
+    elif dataset == "KDD":
+        _, train_x, train_y = load_data(dataset="KDD")
+        x = torch.tensor(train_x[int(my_id* len(train_x)/num_clients):int((my_id+1)*len(train_x)/num_clients)])
+        y = torch.tensor(train_y[int(my_id* len(train_x)/num_clients):int((my_id+1)*len(train_x)/num_clients)])
+        dat = TensorDataset(x, y)
+        train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
+
+    if int(os.getenv("MY_ID")) in dishonest_peers:
+        attack += 1
+        loss, local_model = client_update(client_model=local_model, optimizer=opt, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
+    else:
+        loss, local_model = client_update(client_model=local_model, optimizer=opt, train_loader=train_loader, epoch=epochs)
+
+    return loss, attack, local_model
+
+
+def learn(modelID: str):
+    if not initialized:
+        local_model, opt = initialize()
+        initialized = True
+
+    weights, indices, parents = utils.get_weights_to_train(modelID=modelID)
+
+    loss, attack, local_model = train(
+        local_model=local_model,
+        opt=opt,
+        alpha=utils.get_parameter(param="alpha"),
+        attack_type=utils.get_parameter(param="attack_type"),
+        peers_indices=indices,
+        peers_weights=weights,
+    )
+
+    acc, asr = evaluate(local_model=local_model, loss=loss, attack=attack)
+
+    if acc >= utils.get_my_latest_accuracy():
+        utils.publish_model_update(
+            modelID=modelID,
+            weights=local_model.state_dict()['fc.weight'].cpu().numpy(),
+            accuracy=acc,
+            parents=parents,
+        )

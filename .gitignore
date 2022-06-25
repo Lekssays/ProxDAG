@@ -14,3 +14,5 @@ simulator/peers/client/data
 simulator/ipfs
 ML/FederatedLearning/data
 simulator/peers/client/.env
+simulator/peers/client/*.dat
+simulator/peers/client/test.py

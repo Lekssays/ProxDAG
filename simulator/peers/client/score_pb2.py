@@ -19,78 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='score',
   syntax='proto3',
   serialized_options=_b('ZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/score'),
-  serialized_pb=_b('\n\x0bscore.proto\x12\x05score\"`\n\x05Trust\x12(\n\x06scores\x18\x01 \x03(\x0b\x32\x18.score.Trust.ScoresEntry\x1a-\n\x0bScoresEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01:\x02\x38\x01\"\x1a\n\x05Score\x12\x11\n\x05items\x18\x01 \x03(\x01\x42\x02\x10\x01\"5\n\nSimilarity\x12\t\n\x01n\x18\x01 \x01(\r\x12\x1c\n\x06scores\x18\x02 \x03(\x0b\x32\x0c.score.Score\"\x1b\n\tAlignment\x12\x0e\n\x06scores\x18\x01 \x03(\x01\x42HZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/scoreb\x06proto3')
+  serialized_pb=_b('\n\x0bscore.proto\x12\x05score\"#\n\x05Score\x12\x0c\n\x04type\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\tBHZFgithub.com/Lekssays/ProxDAG/network/simulator/peers/client/proto/scoreb\x06proto3')
 )
 
 
-
-
-_TRUST_SCORESENTRY = _descriptor.Descriptor(
-  name='ScoresEntry',
-  full_name='score.Trust.ScoresEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='score.Trust.ScoresEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='score.Trust.ScoresEntry.value', index=1,
-      number=2, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=_b('8\001'),
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=73,
-  serialized_end=118,
-)
-
-_TRUST = _descriptor.Descriptor(
-  name='Trust',
-  full_name='score.Trust',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='scores', full_name='score.Trust.scores', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[_TRUST_SCORESENTRY, ],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=22,
-  serialized_end=118,
-)
 
 
 _SCORE = _descriptor.Descriptor(
@@ -101,47 +33,16 @@ _SCORE = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='items', full_name='score.Score.items', index=0,
-      number=1, type=1, cpp_type=5, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=_b('\020\001'), file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=120,
-  serialized_end=146,
-)
-
-
-_SIMILARITY = _descriptor.Descriptor(
-  name='Similarity',
-  full_name='score.Similarity',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='n', full_name='score.Similarity.n', index=0,
-      number=1, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
+      name='type', full_name='score.Score.type', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='scores', full_name='score.Similarity.scores', index=1,
-      number=2, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
+      name='path', full_name='score.Score.path', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -157,64 +58,12 @@ _SIMILARITY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=148,
-  serialized_end=201,
+  serialized_start=22,
+  serialized_end=57,
 )
 
-
-_ALIGNMENT = _descriptor.Descriptor(
-  name='Alignment',
-  full_name='score.Alignment',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='scores', full_name='score.Alignment.scores', index=0,
-      number=1, type=1, cpp_type=5, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=203,
-  serialized_end=230,
-)
-
-_TRUST_SCORESENTRY.containing_type = _TRUST
-_TRUST.fields_by_name['scores'].message_type = _TRUST_SCORESENTRY
-_SIMILARITY.fields_by_name['scores'].message_type = _SCORE
-DESCRIPTOR.message_types_by_name['Trust'] = _TRUST
 DESCRIPTOR.message_types_by_name['Score'] = _SCORE
-DESCRIPTOR.message_types_by_name['Similarity'] = _SIMILARITY
-DESCRIPTOR.message_types_by_name['Alignment'] = _ALIGNMENT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-Trust = _reflection.GeneratedProtocolMessageType('Trust', (_message.Message,), dict(
-
-  ScoresEntry = _reflection.GeneratedProtocolMessageType('ScoresEntry', (_message.Message,), dict(
-    DESCRIPTOR = _TRUST_SCORESENTRY,
-    __module__ = 'score_pb2'
-    # @@protoc_insertion_point(class_scope:score.Trust.ScoresEntry)
-    ))
-  ,
-  DESCRIPTOR = _TRUST,
-  __module__ = 'score_pb2'
-  # @@protoc_insertion_point(class_scope:score.Trust)
-  ))
-_sym_db.RegisterMessage(Trust)
-_sym_db.RegisterMessage(Trust.ScoresEntry)
 
 Score = _reflection.GeneratedProtocolMessageType('Score', (_message.Message,), dict(
   DESCRIPTOR = _SCORE,
@@ -223,22 +72,6 @@ Score = _reflection.GeneratedProtocolMessageType('Score', (_message.Message,), d
   ))
 _sym_db.RegisterMessage(Score)
 
-Similarity = _reflection.GeneratedProtocolMessageType('Similarity', (_message.Message,), dict(
-  DESCRIPTOR = _SIMILARITY,
-  __module__ = 'score_pb2'
-  # @@protoc_insertion_point(class_scope:score.Similarity)
-  ))
-_sym_db.RegisterMessage(Similarity)
-
-Alignment = _reflection.GeneratedProtocolMessageType('Alignment', (_message.Message,), dict(
-  DESCRIPTOR = _ALIGNMENT,
-  __module__ = 'score_pb2'
-  # @@protoc_insertion_point(class_scope:score.Alignment)
-  ))
-_sym_db.RegisterMessage(Alignment)
-
 
 DESCRIPTOR._options = None
-_TRUST_SCORESENTRY._options = None
-_SCORE.fields_by_name['items']._options = None
 # @@protoc_insertion_point(module_scope)

@@ -1,4 +1,5 @@
 import asyncio
+from ctypes import util
 import websockets
 import json
 import utils
@@ -10,8 +11,6 @@ from google.protobuf import text_format
 
 GOSHIMMER_WEBSOCKETS_ENDPOINT = "ws://0.0.0.0:8081/ws"
 
-
-model_updates = defaultdict(list)
 
 async def hello():
     async with websockets.connect(GOSHIMMER_WEBSOCKETS_ENDPOINT, ping_interval=None) as websocket:
@@ -25,9 +24,7 @@ async def hello():
                     payload_bytes = bytes(text_format.MessageToString(payload), encoding='utf8')
                     t = threading.Thread(target=utils.store_resource_on_leveldb, args=(messageID, payload_bytes,))
                     t.start()
-                    model_updates[payload.modelID].append(messageID)
-                print(model_updates)
-
+                    utils.store_weight_id(modelID=payload.modelID, messageID=messageID)
 
 asyncio.get_event_loop().run_until_complete(hello())
 asyncio.get_event_loop().run_forever()

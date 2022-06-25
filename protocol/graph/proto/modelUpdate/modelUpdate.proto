@@ -8,8 +8,7 @@ message ModelUpdate {
     string modelID = 1;
     repeated string parents = 2;
     string weights = 3;
-    string gradients = 4;
-    string pubkey = 5;
-    uint32 timestamp = 6;
-    float accuracy = 7;
+    string pubkey = 4;
+    uint32 timestamp = 5;
+    float accuracy = 6;
 }

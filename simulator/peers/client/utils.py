@@ -7,6 +7,10 @@ import requests
 import plyvel
 import json
 import os
+import pickle
+import time
+
+import numpy as np
 
 from collections import OrderedDict, defaultdict
 from google.protobuf import text_format
@@ -25,8 +29,14 @@ TRUST_PURPOSE_ID = 21
 SIMILARITY_PURPOSE_ID = 22
 
 
-# Chosen Weights to Train From
-K = 5
+# Limit of Weights to Choose to Analyze and Train From
+LIMIT_CHOOSE = 5
+
+# Number of Weights to Train From
+LIMIT_SELECTED = 2
+
+
+ALGN_THRESHOLD = 0.1
 
 def to_protobuf(modelID: str, parents: list, weights: str, gradients: str, pubkey: str, timestamp: int):
     model_update = modelUpdate_pb2.ModelUpdate()
@@ -116,21 +126,31 @@ def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
     return model_update
 
 
-def get_similarity() -> score_pb2.Similarity:
-    similarity_bytes = get_resource_from_leveldb(key="similarity")
-    if similarity_bytes is None:
-        return None
-    similarity = score_pb2.Similarity()
-    similarity.ParseFromString(similarity_bytes)
+def get_similarity():
+    similarity_path = get_resource_from_leveldb(key="similarity")
+    
+    if similarity_path is None:
+        num_clients = get_parameter(param="num_clients")
+        similarity = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
+        return similarity
+
+    similarity_bytes = get_content_from_ipfs(path=similarity_path)
+    similarity = pickle.loads(similarity_bytes)
+
     return similarity
 
 
-def get_trust() -> score_pb2.Trust:
-    trust_bytes = get_resource_from_leveldb(key="trust")
-    if trust_bytes is None:
-        return None
-    trust = score_pb2.Trust()
-    trust.ParseFromString(trust_bytes)
+def get_trust():
+    trust_path = get_resource_from_leveldb(key="trust")
+    
+    if trust_path is None:
+        num_clients = get_parameter(param="num_clients")
+        trust = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
+        return trust
+
+    trust_bytes = get_content_from_ipfs(path=trust_path)
+    trust = pickle.loads(trust_bytes)
+
     return trust
 
 
@@ -168,15 +188,43 @@ def get_gradients(path: str) -> torch.Tensor:
     return from_bytes(gradients_from_ipfs)
 
 
-def get_weights_to_train(modelID: str, weights_ids: defaultdict):
+def get_weights_ids(modelID, limit):
     weights = []
-    chosen_weights =  weights_ids[modelID][0:K]
+    with open(modelID + ".dat", "r") as f:
+        content = f.readlines()
+        for line in content:
+            line = line.strip()
+            weights.append(line)
 
+    if limit >= len(weights):
+        return weights
+
+    return weights[:limit]
+
+
+def store_weight_id(modelID, messageID):
+    f = open(modelID + ".dat", "a")
+    f.write(messageID + "\n")
+    f.close()
+
+
+def clear_weights_ids(modelID):
+    f = open(modelID + ".dat", "w")
+    f.write("")
+    f.close()
+
+
+def get_weights_to_train(modelID: str):
+    weights = []
+    indices = []
+    parents = []
+
+    chosen_weights_ids = get_weights_ids(modelID=modelID, limit=LIMIT_CHOOSE)
     trust_score = get_trust()
     similarity = get_similarity()
 
     metrics = []
-    for messageID in chosen_weights:
+    for messageID in chosen_weights_ids:
         mu = get_model_update(messageID=m['messageID'])
         tmp = {
             'trust_score': trust_score[mu.pubkey],
@@ -185,17 +233,65 @@ def get_weights_to_train(modelID: str, weights_ids: defaultdict):
         }
         metrics.append(tmp)
     
-    metrics = sorted(metrics.items(), key=lambda x: x[1], reverse=True)
+    metrics = sorted(metrics, key=lambda x: x['similarity'], reverse=True)
 
     for m in metrics:
+        if 1 - m['trust_score'] > ALGN_THRESHOLD:
+            metrics.remove(m)
+            continue
         mu = get_model_update(messageID=m['messageID'])
-        w = get_weights(path=mu.weights)
-        weights.append(w)
+        idx = get_client_id(pubkey=mu.pubkey)
+        if idx != int(os.getenv("MY_ID")):
+            w = get_weights(path=mu.weights)
+            weights.append(w)
+            indices.append(idx)
+            parents.append(m['messageID'])
 
-    return weights
+    clear_weights_ids(modelID=modelID)
+
+    if len(weights) <= LIMIT_SELECTED - 1:
+        return weights, indices, parents
+    
+    return weights[:LIMIT_SELECTED], indices[:LIMIT_SELECTED], parents[:LIMIT_SELECTED]
 
 
 def get_client_id(pubkey: str):
     with open('clients.json', "r") as f:
         clients = json.load(f)
         return clients[pubkey]
+
+
+def get_parameter(param: str):
+    with open("config.json", "r") as f:
+        config = json.load(f)
+    return config[param]
+
+
+def publish_model_update(modelID, weights, accuracy, parents):
+    weights_bytes = to_bytes(weights)
+    weights_path = add_content_to_ipfs(content=weights_bytes)
+
+    model_update_pb = to_protobuf(
+        modelID=modelID,
+        parents=parents,
+        weights=weights_path,
+        pubkey=os.getenv("MY_PUB_KEY"),
+        accuracy=accuracy,
+        timestamp=int(time.time())
+    )
+
+    return send_model_update(model_update_pb)
+
+
+def get_phi():
+    phi_path = get_resource_from_leveldb(key="phi")
+    
+    if phi_path is None:
+        num_clients = get_parameter(param="num_clients")
+        phi = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
+        return phi
+
+    phi_bytes = get_content_from_ipfs(path=phi_path)
+    phi = pickle.loads(phi_bytes)
+
+    return phi

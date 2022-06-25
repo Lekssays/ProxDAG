@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='modelUpdate',
   syntax='proto3',
   serialized_options=_b('Z<github.com/Lekssays/ProxDAG/protocol/graph/proto/modelUpdate'),
-  serialized_pb=_b('\n\x11modelUpdate.proto\x12\x0bmodelUpdate\"\x88\x01\n\x0bModelUpdate\x12\x0f\n\x07modelID\x18\x01 \x01(\t\x12\x0f\n\x07parents\x18\x02 \x03(\t\x12\x0f\n\x07weights\x18\x03 \x01(\t\x12\x11\n\tgradients\x18\x04 \x01(\t\x12\x0e\n\x06pubkey\x18\x05 \x01(\t\x12\x11\n\ttimestamp\x18\x06 \x01(\r\x12\x10\n\x08\x61\x63\x63uracy\x18\x07 \x01(\x02\x42>Z<github.com/Lekssays/ProxDAG/protocol/graph/proto/modelUpdateb\x06proto3')
+  serialized_pb=_b('\n\x11modelUpdate.proto\x12\x0bmodelUpdate\"u\n\x0bModelUpdate\x12\x0f\n\x07modelID\x18\x01 \x01(\t\x12\x0f\n\x07parents\x18\x02 \x03(\t\x12\x0f\n\x07weights\x18\x03 \x01(\t\x12\x0e\n\x06pubkey\x18\x04 \x01(\t\x12\x11\n\ttimestamp\x18\x05 \x01(\r\x12\x10\n\x08\x61\x63\x63uracy\x18\x06 \x01(\x02\x42>Z<github.com/Lekssays/ProxDAG/protocol/graph/proto/modelUpdateb\x06proto3')
 )
 
 
@@ -54,29 +54,22 @@ _MODELUPDATE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gradients', full_name='modelUpdate.ModelUpdate.gradients', index=3,
+      name='pubkey', full_name='modelUpdate.ModelUpdate.pubkey', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='pubkey', full_name='modelUpdate.ModelUpdate.pubkey', index=4,
-      number=5, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='timestamp', full_name='modelUpdate.ModelUpdate.timestamp', index=5,
-      number=6, type=13, cpp_type=3, label=1,
+      name='timestamp', full_name='modelUpdate.ModelUpdate.timestamp', index=4,
+      number=5, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='accuracy', full_name='modelUpdate.ModelUpdate.accuracy', index=6,
-      number=7, type=2, cpp_type=6, label=1,
+      name='accuracy', full_name='modelUpdate.ModelUpdate.accuracy', index=5,
+      number=6, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -93,8 +86,8 @@ _MODELUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=35,
-  serialized_end=171,
+  serialized_start=34,
+  serialized_end=151,
 )
 
 DESCRIPTOR.message_types_by_name['ModelUpdate'] = _MODELUPDATE

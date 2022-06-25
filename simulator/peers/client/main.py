@@ -7,7 +7,7 @@ import score_pb2
 import verifier
 import time
 
-from learning import client
+from learning import client, learn
 from google.protobuf import text_format
 
 def parse_args():
@@ -110,71 +110,24 @@ def main():
     weights = torch.tensor([1,2,3])
     gradients = torch.tensor([5,6,7,102])
     weights_bytes = utils.to_bytes(weights)
-    gradients_bytes = utils.to_bytes(gradients)
     weights_path = utils.add_content_to_ipfs(content=weights_bytes)
-    gradients_path = utils.add_content_to_ipfs(content=gradients_bytes)
+    accuracy = 0.911
 
     modelID = "CNN1"
     parents = ["HckSwavfZ5gceB58aMCYd6wc9Qd5VE2cRhqujiXBfVRv", "CkmuFbBXLgu11PXySQSmdeyodS13TQj67Zse5M6cuDTh"]
-    pubkey = "SomePubKey"
-    model_update_pb = utils.to_protobuf(
+
+    messageID = utils.publish_model_update(
         modelID=modelID,
         parents=parents,
         weights=weights_path,
-        gradients=gradients_path,
-        pubkey=pubkey,
-        timestamp=int(time.time())
+        accuracy=accuracy,
     )
-
-    messageID = utils.send_model_update(model_update_pb)
-    print(messageID)
-
-    print(utils.get_weights(path=model_update_pb.weights))
-    print(utils.get_gradients(path=model_update_pb.gradients))
 
     time.sleep(1)    
     model_update = utils.get_model_update(messageID=messageID)
     print("model_update", model_update)
 
-    # Driver for check_trust
-    trust = score_pb2.Trust()
-    trust.scores["pk3"] = 0.223
-    trust.scores["pk1"] = 0.853
-    trust.scores["pk2"] = 0.991
-    trust.scores["pk4"] = 0.441
-    issuers = ["pk4", "pk2"]
-    issuers_trust_scores = verifier.check_trust(trust=trust, issuers=issuers)
-
-    # Driver for check_similarity
-    similarity = score_pb2.Similarity()
-    similarity.n = len(trust.scores)
-
-    for i in range(0, len(trust.scores)):
-        score = score_pb2.Score()
-        for j in range(0, len(trust.scores)):
-            if i == j:
-                score.items.append(0.0)
-            else:
-                score.items.append((i * 10.0) + j)
-        similarity.scores.append(score)
-    
-    print(similarity.scores[2].items[1])
-    sorted_similarities = verifier.check_similarity(similarity=similarity, issuers=issuers_trust_scores)
-    print(sorted_similarities)
-
-
-    local_model, client_models, client_gradients, opt, cs_mat, r = learning.initialize()
-    loss, attack = learning.run_fl(
-        local_model=local_model,
-        client_models=client_models,
-        opt=opt,
-        r=r,
-        alpha=learning.get_parameter(param="alpha"),
-        attack_type=learning.get_parameter(param="attack_type"),
-        cs_mat=cs_mat,
-        client_gradients=client_gradients
-    )
-    learning.evaluate(local_model=local_model, loss=loss, attack=attack)
+    learning.learn(modelID=modelID)
 
 
 if __name__ == "__main__":
