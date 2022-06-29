@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	peerpb "github.com/Lekssays/ProxDAG/protocol/committee/proto/peer"
+	peerpb "github.com/Lekssays/ProxDAG/protocol/proto/peer"
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 )

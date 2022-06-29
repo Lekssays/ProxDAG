@@ -4,14 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"encoding/gob"
 	"io/ioutil"
 	"math"
 	"net/http"
 	"strings"
+	"time"
+	"strconv"
+	"math/rand"
+	"io"
 
-	scpb "github.com/Lekssays/ProxDAG/protocol/consensus/proto/score"
 	"github.com/Lekssays/ProxDAG/protocol/graph"
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
+	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
+	scpb "github.com/Lekssays/ProxDAG/protocol/proto/score"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/sbinet/npyio"
@@ -19,6 +26,7 @@ import (
 )
 
 const (
+	INF                   = 1000
 	THRESHOLD             = 0.1
 	DECAY_RATE            = 0.0001
 	DELTA                 = 0.01
@@ -30,6 +38,10 @@ const (
 	PHI_PURPOSE_ID        = 25
 	IPFS_ENDPOINT         = "http://0.0.0.0:5001/api/v0"
 )
+
+type Gradients struct {
+	Content map[string][][]float64
+}
 
 // ComputeCS returns the cosine similarity of two vectors
 func ComputeCS(a []float64, b []float64) (float64, error) {
@@ -73,58 +85,51 @@ func getAverage(a []float64) float64 {
 	return (float64(sum) / float64(len(a)))
 }
 
-func ComputeCSMatrix(modelID string) ([][]float64, []float64) {
+func ComputeCSMatrix(modelID string) [][]float64 {
 	var csMatrix [][]float64
-	var algnScore []float64
-	updates, err := graph.GetModelUpdates(modelID)
-	if err != nil {
-		return [][]float64{}, []float64{}
-	}
 
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
-		return [][]float64{}, []float64{}
+		return [][]float64{}
 	}
 
+	gradients, err := GetLatestGradients(modelID)
+	if err != nil {
+		return [][]float64{}
+	}
+	
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
-			if i == j {
+			if clients[i] == clients[j] {
 				csMatrix[i][j] = 1.0
 				csMatrix[j][i] = 1.0
 				continue
 			}
-			// todo(lekssays): check multiple updates of the same client
-			// get the latest one for the moment
-			clientAID, err := graph.GetClientID(clients[i], modelID)
+
+			flattenedGradientsA := flatten(gradients[clients[i]])
+			flattenedGradientsB := flatten(gradients[clients[j]])
+			csMatrix[i][j], err = ComputeCS(flattenedGradientsA, flattenedGradientsB)
 			if err != nil {
-				return [][]float64{}, []float64{}
+				return [][]float64{}
 			}
 
-			clientBID, err := graph.GetClientID(clients[j], modelID)
-			if err != nil {
-				return [][]float64{}, []float64{}
-			}
-
-			a, err := ToVector(updates[clientAID].Gradients)
-			if err != nil {
-				return [][]float64{}, []float64{}
-			}
-
-			b, err := ToVector(updates[clientBID].Gradients)
-			if err != nil {
-				return [][]float64{}, []float64{}
-			}
-
-			csMatrix[i][j], err = ComputeCS(a, b)
-			if err != nil {
-				return [][]float64{}, []float64{}
-			}
 			csMatrix[j][i] = csMatrix[i][j]
 		}
+	}
+	return csMatrix
+}
+
+func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
+	var algnScore []float64
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return []float64{}
+	}
+	for i := 0; i < len(clients); i++ {
 		// warning(lekssays): not sure about the alignment score
 		algnScore[i] = getAverage(csMatrix[i])
 	}
-	return csMatrix, algnScore
+	return algnScore
 }
 
 func EvaluatePardoning(clients []string, algnScore []float64, csMatrix [][]float64) ([][]float64, []float64) {
@@ -153,14 +158,15 @@ func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32
 	return trustScores
 }
 
-func RetrieveScore(scoreType string) (*scpb.Score, error) {
+func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return &scpb.Score{}, err
 	}
 	defer db.Close()
 
-	data, err := db.Get([]byte(scoreType), nil)
+	key := fmt.Sprintf("%s!%s", modelID, scoreType)
+	data, err := db.Get([]byte(key), nil)
 	if err != nil {
 		return &scpb.Score{}, err
 	}
@@ -211,14 +217,14 @@ func PublishScore(score scpb.Score) (string, error) {
 func isScore(purpose uint32) bool {
 	scores_types := []int{SIMILARITY_PURPOSE_ID, PHI_PURPOSE_ID, GRADIENTS_PURPOSE_ID, TRUST_PURPOSE_ID, ALIGNMENT_PURPOSE_ID}
 	for _, v := range scores_types {
-		if v == purpose {
+		if uint32(v) == purpose {
 			return true
 		}
 	}
 	return false
 }
 
-func GetScore(messageID string) (scpb.Score, error) {
+func GetScoreByMessageID(messageID string) (scpb.Score, error) {
 	goshimAPI := client.NewGoShimmerAPI(GOSHIMMER_NODE)
 	messageRaw, _ := goshimAPI.GetMessage(messageID)
 	payload := new(proxdag.Payload)
@@ -270,27 +276,7 @@ func AddContentIPFS(content []byte) (string, error) {
 	return response, nil
 }
 
-func ToVector(GradientsPath string) ([]float64, error) {
-	gradientsBytes, err := GetContentIPFS(GradientsPath)
-	if err != nil {
-		return []float64{}, err
-	}
-
-	r, err := npyio.NewReader(bytes.NewReader(gradientsBytes))
-	if err != nil {
-		return []float64{}, err
-	}
-
-	var gradients []float64
-	err = r.Read(&gradients)
-	if err != nil {
-		return []float64{}, err
-	}
-
-	return gradients, nil
-}
-
-func StoreScore(score scpb.Score) error {
+func StoreScore(modelID string, score scpb.Score) error {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return err
@@ -305,18 +291,386 @@ func StoreScore(score scpb.Score) error {
 	scoreType := ""
 	if score.Type == TRUST_PURPOSE_ID {
 		scoreType = "trust"
-	} else if scoreType == SIMILARITY_PURPOSE_ID {
+	} else if score.Type == SIMILARITY_PURPOSE_ID {
 		scoreType = "similarity"
-	} else if scoreType == PHI_PURPOSE_ID {
+	} else if score.Type == PHI_PURPOSE_ID {
 		scoreType = "phi"
 	} else if score.Type == GRADIENTS_PURPOSE_ID {
 		scoreType = "gradients"
 	}
 
-	err = db.Put([]byte(scoreType), scoreBytes, nil)
+	key := fmt.Sprintf("%s!%s", modelID, scoreType)
+	err = db.Put([]byte(key), scoreBytes, nil)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func GetPhiFromNumpy(path string) ([]float64, error) {
+	phiBytes, err := GetContentIPFS(path)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(phiBytes))
+	if err != nil {
+		return []float64{}, err
+	}
+
+	var phi []float64
+	err = r.Read(&phi)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	return phi, nil
+}
+
+func GetAlignmentFromNumpy(path string) ([]float64, error) {
+	algnBytes, err := GetContentIPFS(path)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(algnBytes))
+	if err != nil {
+		return []float64{}, err
+	}
+
+	var algn []float64
+	err = r.Read(&algn)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	return algn, nil
+}
+
+func GetTrustFromNumpy(path string) ([]float64, error) {
+	trustBytes, err := GetContentIPFS(path)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(trustBytes))
+	if err != nil {
+		return []float64{}, err
+	}
+
+	var trust []float64
+	err = r.Read(&trust)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	return trust, nil
+}
+
+func GetSimilarityFromNumpy(path string) ([][]float64, error) {
+	similarityBytes, err := GetContentIPFS(path)
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(similarityBytes))
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	var similarity [][]float64
+	err = r.Read(&similarity)
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	return similarity, nil
+}
+
+func GetWeightsFromNumpy(path string) ([][]float64, error) {
+	weightsBytes, err := GetContentIPFS(path)
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	r, err := npyio.NewReader(bytes.NewReader(weightsBytes))
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	var weights [][]float64
+	err = r.Read(&weights)
+	if err != nil {
+		return [][]float64{}, err
+	}
+
+	return weights, nil
+}
+
+func GetLatestGradients(modelID string) (map[string][][]float64, error) {
+	var gradients Gradients
+	scoreType := "gradients"
+	latestGradient, err := GetScorePath(modelID, scoreType)
+	if err != nil {
+		return gradients.Content, err
+	}
+
+	latestGradientBytes, err := GetContentIPFS(latestGradient.Path)
+	if err != nil {
+		return gradients.Content, err
+	}
+
+	reader := bytes.NewReader(latestGradientBytes)
+	dec := gob.NewDecoder(reader)
+	err = dec.Decode(&gradients)
+	if err != nil {
+		return gradients.Content, err
+	}
+
+	return gradients.Content, nil
+}
+
+func GetLatestRoundTimestamp(modelID string) (uint32, error) {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return uint32(time.Now().Unix()), err
+	}
+	defer db.Close()
+
+	key := fmt.Sprintf("%s!timestamp", modelID)
+	timestampStr, err := db.Get([]byte(key), nil)
+	if err != nil {
+		return uint32(time.Now().Unix()), err
+	}
+
+	timestamp, err := strconv.ParseUint(string(timestampStr), 10, 32)
+	if err != nil {
+		return uint32(time.Now().Unix()), err
+	}
+
+	return uint32(timestamp), nil
+}
+
+func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
+	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	key := fmt.Sprintf("%s!timestamp", modelID)
+	var timestampStr = strconv.FormatUint(uint64(timestamp), 10)
+
+	err = db.Put([]byte(key), []byte(timestampStr), nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func StoreGradientsIPFS(gradients map[string][][]float64) (string, error) {
+	gradientsStruct := Gradients{Content: gradients}
+	var network bytes.Buffer
+
+	enc := gob.NewEncoder(&network)
+	err := enc.Encode(gradientsStruct)
+	if err != nil {
+		return "", err
+	}
+
+	path, err := AddContentIPFS(network.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	return path, nil
+}
+
+func substractMatrix(a [][]float64, b [][]float64) [][]float64 {
+	var result [][]float64
+	for i := 0; i < len(a); i++ {
+		for j := 0; j < len(a[i]); j++ {
+			result[i][j] = a[i][j] - a[i][j]
+		}
+	}
+	return result
+}
+
+func addMatrix(a [][]float64, b [][]float64) [][]float64 {
+	var result [][]float64
+	for i := 0; i < len(a); i++ {
+		for j := 0; j < len(a[i]); j++ {
+			result[i][j] = a[i][j] + a[i][j]
+		}
+	}
+	return result
+}
+
+func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]float64, error) {
+	latestTimstamp, err := GetLatestRoundTimestamp(modelID)
+	if err != nil {
+		return [][]float64{}, [][]float64{}, err
+	}
+
+	updates, err := graph.GetModelUpdates(modelID)
+	if err != nil {
+		return [][]float64{}, [][]float64{}, err
+	}
+
+	var updatesToProcess []*mupb.ModelUpdate
+	for i := 0; i < len(updates); i++ {
+		if updates[i].Timestamp > latestTimstamp && updates[i].Pubkey == clientPubkey {
+			updatesToProcess = append(updatesToProcess, updates[i])
+		}
+	}
+
+	if len(updatesToProcess) < 2 {
+		w1, err := GetWeightsFromNumpy(updatesToProcess[0].Weights)
+		if err != nil {
+			return [][]float64{}, [][]float64{}, err
+		}
+		return w1, [][]float64{}, nil
+	} else {
+		fst := rand.Intn(len(updatesToProcess))
+		var scd int
+		for {
+			scd = rand.Intn(len(updatesToProcess))
+			if scd != fst {
+				break
+			}
+		}
+		w1, err := GetWeightsFromNumpy(updatesToProcess[fst].Weights)
+		if err != nil {
+			return [][]float64{}, [][]float64{}, err
+		}
+
+		w2, err := GetWeightsFromNumpy(updatesToProcess[scd].Weights)
+		if err != nil {
+			return [][]float64{}, [][]float64{}, err
+		}
+
+		if fst > scd {
+			return w1, w2, nil
+		} else {
+			return w2, w1, nil
+		}
+	}
+}
+
+func ComputeGradients(modelID string) (map[string][][]float64, error) {
+	var gradients map[string][][]float64
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return gradients, err
+	}
+
+	// get the latest gradients for this client
+	latestGradient, err := GetLatestGradients(modelID)
+	if err != nil {
+		return gradients, err
+	}
+
+	for i := 0; i < len(clients); i++ {
+		for j := 0; j < len(clients[i]); i++ {
+			// get randomly two weights of this client
+			w1, w2, err := GetLatestWeights(modelID, clients[i])
+			if err != nil {
+				return gradients, err
+			}
+
+			// substract the two weights
+			substractWeights := substractMatrix(w1, w2)
+
+			// add the substraction result to the latest gradients
+			gradients[clients[i]] = addMatrix(latestGradient[clients[i]], substractWeights)
+		}
+	}
+
+	// publish the new gradients
+	gradientsPath, err := StoreGradientsIPFS(gradients)
+	if err != nil {
+		return gradients, err
+	}
+
+	score := scpb.Score{
+		Type: GRADIENTS_PURPOSE_ID,
+		Path: gradientsPath,
+	}
+
+	_, err = PublishScore(score)
+	if err != nil {
+		return gradients, err
+	}
+
+	return gradients, nil
+}
+
+func ComputePhi(algnScores []float64) []float64 {
+	var phi []float64
+	max := float64(-1.0)
+	for i := 0; i < len(algnScores); i++ {
+		phi[i] = 1 - algnScores[i]
+
+		if phi[i] < 0 {
+			phi[i] = 0
+		}
+
+		if phi[i] > 1 {
+			phi[i] = 1
+		}
+
+		if phi[i] >= max {
+			max = phi[i]
+		}
+	}
+
+	for i := 0; i < len(algnScores); i++ {
+		phi[i] = phi[i] / max
+		if phi[i] == 1 {
+			phi[i] = 0.99
+		}
+	}
+
+	for i := 0; i < len(algnScores); i++ {
+		phi[i] = math.Log(phi[i]/(1-phi[i])+0.000001) + 0.5
+		if phi[i] > INF || phi[i] > 1 {
+			phi[i] = 1
+		}
+		if phi[i] < 0 {
+			phi[i] = 0
+		}
+	}
+
+	return phi
+}
+
+func ConvertScoreToNumpy(score interface{}) (string, error) {
+	var f io.Reader
+	err := npyio.Read(f, &score)
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(f)
+	path, err := AddContentIPFS(buf.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	return path, err
+}
+
+func flatten(matrix [][]float64) []float64 {
+	var result []float64
+
+	for i := 0; i < len(matrix); i++ {
+		for j := 0; j < len(matrix[i]); j++ {
+			result = append(result, matrix[i][j])
+		}
+	}
+
+	return result
 }

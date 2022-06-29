@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package modelUpdate;
 
-option go_package = "github.com/Lekssays/ProxDAG/protocol/graph/proto/modelUpdate";
+option go_package = "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate";
 
 message ModelUpdate {
     string modelID = 1;

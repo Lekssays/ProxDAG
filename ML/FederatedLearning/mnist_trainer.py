@@ -186,7 +186,7 @@ transform = transforms.Compose(
                 transforms.Normalize((0.1307,), (0.3081,))
             ])
 
-testdata = datasets.MNIST('../data', train=False, transform=transform)
+testdata = datasets.MNIST('../data', train=False, transform=transform, download=True)
 
 
 # Loading the test data and thus converting them into a test_loader

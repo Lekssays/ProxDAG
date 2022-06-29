@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	vpb "github.com/Lekssays/ProxDAG/protocol/consensus/proto/vote"
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
+	vpb "github.com/Lekssays/ProxDAG/protocol/proto/vote"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
