@@ -2,18 +2,18 @@ package consensus
 
 import (
 	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"encoding/gob"
+	"io"
 	"io/ioutil"
 	"math"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
-	"math/rand"
-	"io"
 
 	"github.com/Lekssays/ProxDAG/protocol/graph"
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
@@ -97,7 +97,7 @@ func ComputeCSMatrix(modelID string) [][]float64 {
 	if err != nil {
 		return [][]float64{}
 	}
-	
+
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
 			if clients[i] == clients[j] {

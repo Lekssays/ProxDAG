@@ -8,9 +8,9 @@ import (
 
 	"github.com/Lekssays/ProxDAG/protocol/committee"
 	"github.com/Lekssays/ProxDAG/protocol/consensus"
-	vpb "github.com/Lekssays/ProxDAG/protocol/proto/vote"
 	"github.com/Lekssays/ProxDAG/protocol/graph"
 	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
+	vpb "github.com/Lekssays/ProxDAG/protocol/proto/vote"
 )
 
 func main() {
@@ -63,7 +63,7 @@ func main() {
 				Weights:   "SomeIPFSWeightsPath",
 				Pubkey:    "pubkey1",
 				Timestamp: uint32(time.Now().Unix()),
-				Accuracy: 97.0212,
+				Accuracy:  97.0212,
 			}
 
 			messageID, err := graph.SendModelUpdate(mupdate)
