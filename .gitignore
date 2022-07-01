@@ -6,6 +6,7 @@ protocol/listener/listener
 protocol/proxdagDB
 protocol/consensus/consensus
 protocol/protocol
+protocol/tmp
 ML/datasets
 proxdagDB/*
 protocol/proxdagDB/*

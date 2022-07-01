@@ -11,6 +11,7 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -38,6 +39,20 @@ const (
 	PHI_PURPOSE_ID        = 25
 	IPFS_ENDPOINT         = "http://0.0.0.0:5001/api/v0"
 )
+
+type Peers struct {
+	Peers []Peer `json:"peers"`
+}
+
+type Peer struct {
+	Pubkey string `json:"pubkey"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+}
+
+type Payload struct {
+	File []byte `json:"file"`
+}
 
 type Gradients struct {
 	Content map[string][][]float64
@@ -85,17 +100,17 @@ func getAverage(a []float64) float64 {
 	return (float64(sum) / float64(len(a)))
 }
 
-func ComputeCSMatrix(modelID string) [][]float64 {
+func ComputeCSMatrix(modelID string) ([][]float64, error) {
 	var csMatrix [][]float64
 
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
-		return [][]float64{}
+		return [][]float64{}, err
 	}
 
 	gradients, err := GetLatestGradients(modelID)
 	if err != nil {
-		return [][]float64{}
+		return [][]float64{}, err
 	}
 
 	for i := 0; i < len(clients); i++ {
@@ -110,13 +125,14 @@ func ComputeCSMatrix(modelID string) [][]float64 {
 			flattenedGradientsB := flatten(gradients[clients[j]])
 			csMatrix[i][j], err = ComputeCS(flattenedGradientsA, flattenedGradientsB)
 			if err != nil {
-				return [][]float64{}
+				return [][]float64{}, err
 			}
 
 			csMatrix[j][i] = csMatrix[i][j]
 		}
 	}
-	return csMatrix
+
+	return csMatrix, nil
 }
 
 func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
@@ -132,7 +148,12 @@ func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
 	return algnScore
 }
 
-func EvaluatePardoning(clients []string, algnScore []float64, csMatrix [][]float64) ([][]float64, []float64) {
+func EvaluatePardoning(modelID string, algnScore []float64, csMatrix [][]float64) ([][]float64, []float64, error) {
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return [][]float64{}, []float64{}, err
+	}
+
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
 			if algnScore[i] > algnScore[j] {
@@ -143,11 +164,17 @@ func EvaluatePardoning(clients []string, algnScore []float64, csMatrix [][]float
 		// warning(lekssays): not sure about the alignment score
 		algnScore[i] = getAverage(csMatrix[i])
 	}
-	return csMatrix, algnScore
+	return csMatrix, algnScore, nil
 }
 
-func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32 {
+func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, error) {
 	var trustScores map[string]float32
+
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return map[string]float32{}, err
+	}
+
 	for i := 0; i < len(clients); i++ {
 		if algnScore[i] >= THRESHOLD {
 			trustScores[clients[i]] -= DELTA
@@ -155,7 +182,8 @@ func UpdateTrustScores(clients []string, algnScore []float64) map[string]float32
 			trustScores[clients[i]] += DELTA
 		}
 	}
-	return trustScores
+
+	return trustScores, nil
 }
 
 func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
@@ -180,7 +208,7 @@ func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
 	return score, nil
 }
 
-func PublishScore(score scpb.Score) (string, error) {
+func StoreScoreOnTangle(score scpb.Score) (string, error) {
 	url := GOSHIMMER_NODE + "/proxdag"
 
 	payload := Message{
@@ -261,8 +289,17 @@ func GetContentIPFS(path string) ([]byte, error) {
 }
 
 func AddContentIPFS(content []byte) (string, error) {
+	// TODO(ahmed): Fix "file argument 'path' is required" Bug
 	url := IPFS_ENDPOINT + "/add"
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(content))
+
+	payload := Payload{
+		File: content,
+	}
+
+	buf := new(bytes.Buffer)
+	json.NewEncoder(buf).Encode(payload)
+
+	req, err := http.NewRequest("POST", url, buf)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -273,10 +310,11 @@ func AddContentIPFS(content []byte) (string, error) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	response := string(body)
+
 	return response, nil
 }
 
-func StoreScore(modelID string, score scpb.Score) error {
+func StoreScoreOnLevelDB(modelID string, score scpb.Score) error {
 	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
 	if err != nil {
 		return err
@@ -472,8 +510,8 @@ func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
 
 func StoreGradientsIPFS(gradients map[string][][]float64) (string, error) {
 	gradientsStruct := Gradients{Content: gradients}
-	var network bytes.Buffer
 
+	var network bytes.Buffer
 	enc := gob.NewEncoder(&network)
 	err := enc.Encode(gradientsStruct)
 	if err != nil {
@@ -599,7 +637,12 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 		Path: gradientsPath,
 	}
 
-	_, err = PublishScore(score)
+	_, err = StoreScoreOnTangle(score)
+	if err != nil {
+		return gradients, err
+	}
+
+	err = StoreScoreOnLevelDB(modelID, score)
 	if err != nil {
 		return gradients, err
 	}
@@ -647,14 +690,14 @@ func ComputePhi(algnScores []float64) []float64 {
 }
 
 func ConvertScoreToNumpy(score interface{}) (string, error) {
-	var f io.Reader
-	err := npyio.Read(f, &score)
+	var f io.Writer
+	err := npyio.Write(f, &score)
 	if err != nil {
 		return "", err
 	}
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(f)
+	buf.WriteTo(f)
 	path, err := AddContentIPFS(buf.Bytes())
 	if err != nil {
 		return "", err
@@ -673,4 +716,186 @@ func flatten(matrix [][]float64) []float64 {
 	}
 
 	return result
+}
+
+func PublishScore(modelID string, content interface{}, purpose uint32) error {
+	if !isScore(purpose) {
+		return errors.New("Undefined purpose.")
+	}
+
+	path, err := ConvertScoreToNumpy(content)
+	if err != nil {
+		return err
+	}
+
+	score := scpb.Score{
+		Type: purpose,
+		Path: path,
+	}
+
+	_, err = StoreScoreOnTangle(score)
+	if err != nil {
+		return err
+	}
+
+	err = StoreScoreOnLevelDB(modelID, score)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Run(modelID string) error {
+	csMatrix, err := ComputeCSMatrix(modelID)
+	if err != nil {
+		return err
+	}
+
+	algnScore := ComputeAlignmentScore(modelID, csMatrix)
+
+	csMatrix, algnScore, err = EvaluatePardoning(modelID, algnScore, csMatrix)
+	if err != nil {
+		return err
+	}
+
+	err = PublishScore(modelID, csMatrix, SIMILARITY_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	err = PublishScore(modelID, algnScore, ALIGNMENT_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	phiScore := ComputePhi(algnScore)
+	err = PublishScore(modelID, phiScore, PHI_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	trustScore, err := ComputeTrust(modelID, algnScore)
+	err = PublishScore(modelID, trustScore, TRUST_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = ComputeGradients(modelID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LoadClients() ([]string, error) {
+	jsonFile, err := os.Open("./consensus/peers.json")
+
+	if err != nil {
+		return []string{}, err
+	}
+
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var peers Peers
+	json.Unmarshal(byteValue, &peers)
+
+	var pubkeys []string
+	for i := 0; i < len(peers.Peers); i++ {
+		pubkeys = append(pubkeys, peers.Peers[i].Pubkey)
+	}
+
+	return pubkeys, nil
+}
+
+func Initialize(modelID string, x int, y int) error {
+	clients, err := LoadClients()
+	if err != nil {
+		return err
+	}
+
+	empty2DSlice := make([][]float64, y)
+	for i := range empty2DSlice {
+		empty2DSlice[i] = make([]float64, x)
+	}
+
+	empty1DSlice := make([]float64, len(clients))
+	for i := 0; i < len(clients); i++ {
+		empty1DSlice[i] = 0.0000
+
+	}
+
+	gradients := make(map[string][][]float64)
+	for i := 0; i < len(clients); i++ {
+		// initialize empty2DSlice with dimensions of the model (r and c)
+		gradients[clients[i]] = empty2DSlice
+	}
+
+	gradientsPath, err := StoreGradientsIPFS(gradients)
+	if err != nil {
+		return err
+	}
+
+	score := scpb.Score{
+		Type: GRADIENTS_PURPOSE_ID,
+		Path: gradientsPath,
+	}
+
+	_, err = StoreScoreOnTangle(score)
+	if err != nil {
+		return err
+	}
+
+	err = StoreScoreOnLevelDB(modelID, score)
+	if err != nil {
+		return err
+	}
+
+	err = PublishScore(modelID, empty2DSlice, SIMILARITY_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	err = PublishScore(modelID, empty1DSlice, ALIGNMENT_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	phiScore := ComputePhi(empty1DSlice)
+	err = PublishScore(modelID, phiScore, PHI_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	trustScore := make(map[string]float32)
+	for i := 0; i < len(clients); i++ {
+		trustScore[clients[i]] = 0.00
+	}
+
+	err = PublishScore(modelID, trustScore, TRUST_PURPOSE_ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Test(modelID string) error {
+	clients, err := graph.GetClients(modelID)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Clients", clients)
+
+	gradients, err := GetLatestGradients(modelID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Gradients", gradients)
+
+	return nil
 }

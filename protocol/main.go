@@ -147,12 +147,11 @@ func main() {
 
 			fmt.Println("Retrieved Vote:", rvote)
 
-			// get gradients
-			// compute && store cosine similarity
-			// compute && store phi
-			// compute&& store  algnscore
-			// compute && store trust
-			// compute && store gradients
+			modelID := "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
+			err = consensus.Run(modelID)
+			if err != nil {
+				fmt.Errorf(err.Error())
+			}
 		} else if args[0] == "committee" {
 			fmt.Println("Running Dynamic Committee")
 			_, _, err := committee.GenerateVRFKeys()
@@ -175,6 +174,23 @@ func main() {
 				fmt.Println("Output is verified :)")
 			} else {
 				fmt.Println("Output is NOT verified :)")
+			}
+		} else if args[0] == "init" {
+			modelID := "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
+			var modelX int
+			var modelY int
+
+			modelX = 768
+			modelY = 1223
+
+			err := consensus.Initialize(modelID, modelX, modelY)
+			if err != nil {
+				fmt.Errorf(err.Error())
+			}
+
+			err = consensus.Test(modelID)
+			if err != nil {
+				fmt.Errorf(err.Error())
 			}
 		} else {
 			fmt.Errorf("Invalid Operation!")
