@@ -38,13 +38,13 @@ LIMIT_SELECTED = 2
 
 ALGN_THRESHOLD = 0.1
 
-def to_protobuf(modelID: str, parents: list, weights: str, gradients: str, pubkey: str, timestamp: int):
+def to_protobuf(modelID: str, parents: list, weights: str, pubkey: str, timestamp: int, accuracy: float):
     model_update = modelUpdate_pb2.ModelUpdate()
     model_update.modelID = modelID
     for parent in parents:
         model_update.parents.append(parent)
     model_update.weights = weights
-    model_update.gradients = gradients
+    model_update.accuracy = accuracy
     model_update.pubkey = pubkey
     model_update.timestamp = timestamp
     return model_update
@@ -190,7 +190,7 @@ def get_gradients(path: str) -> torch.Tensor:
 
 def get_weights_ids(modelID, limit):
     weights = []
-    with open(modelID + ".dat", "r") as f:
+    with open("./tmp/" + modelID + ".dat", "r") as f:
         content = f.readlines()
         for line in content:
             line = line.strip()
@@ -256,7 +256,7 @@ def get_weights_to_train(modelID: str):
 
 
 def get_client_id(pubkey: str):
-    with open('clients.json', "r") as f:
+    with open('peers.json', "r") as f:
         clients = json.load(f)
         return clients[pubkey]
 

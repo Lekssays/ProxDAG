@@ -20,8 +20,6 @@ torch.backends.cudnn.benchmark=True
 torch.manual_seed(42)
 np.random.seed(42)
 
-initialized = False
-
 class client:
     def __init__(self, client_id, x, y):
         self.client_id = client_id
@@ -351,11 +349,6 @@ def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], al
 
 
 def learn(modelID: str):
-    global initialized
-    if not initialized:
-        local_model, _, opt = initialize()
-        initialized = True
-
     weights, indices, parents = utils.get_weights_to_train(modelID=modelID)
 
     loss, attack, local_model = train(

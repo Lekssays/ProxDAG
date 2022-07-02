@@ -1,6 +1,10 @@
 import argparse
 import json
 import learning
+import utils
+
+from os.path import exists
+
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -120,6 +124,18 @@ def main():
     # print("model_update", model_update)
 
     modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
+    if not exists("./tmp/" + modelID + ".dat"):
+        local_model, peers_weights, opt = learning.initialize()
+        weights_bytes = utils.to_bytes(peers_weights)
+        weights_path = utils.add_content_to_ipfs(content=weights_bytes)
+        messageID = utils.publish_model_update(
+            modelID=modelID,
+            parents=[],
+            weights=weights_path,
+            accuracy=0.0,
+        )
+        utils.store_weight_id(modelID=modelID, messageID=messageID)
+    
     learning.learn(modelID=modelID)
 
 
