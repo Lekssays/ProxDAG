@@ -1,15 +1,14 @@
 import asyncio
-from ctypes import util
 import websockets
 import json
 import utils
 import threading
+import os
 
-from collections import defaultdict
 from google.protobuf import text_format
 
 
-GOSHIMMER_WEBSOCKETS_ENDPOINT = "ws://0.0.0.0:8081/ws"
+GOSHIMMER_WEBSOCKETS_ENDPOINT = os.getenv("GOSHIMMER_WEBSOCKETS_ENDPOINT")
 
 
 async def hello():

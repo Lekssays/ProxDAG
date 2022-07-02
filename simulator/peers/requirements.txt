@@ -7,3 +7,5 @@ sklearn
 numpy
 requests
 protobuf
+websockets
+asyncio

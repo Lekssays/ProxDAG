@@ -187,11 +187,6 @@ func main() {
 			if err != nil {
 				fmt.Errorf(err.Error())
 			}
-
-			err = consensus.Test(modelID)
-			if err != nil {
-				fmt.Errorf(err.Error())
-			}
 		} else {
 			fmt.Errorf("Invalid Operation!")
 		}

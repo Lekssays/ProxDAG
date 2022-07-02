@@ -14,6 +14,7 @@ services:
     - MY_ID=0
     - MY_PUB_KEY=lwY1QHjHZ45ohzSADp6uxHDin
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
@@ -36,6 +37,7 @@ services:
     - MY_ID=1
     - MY_PUB_KEY=K0dzSy7RlmO7ZkcDkZViAi7Om
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag

@@ -10,7 +10,6 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from tqdm import tqdm
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
 from numpy.linalg import norm
@@ -352,8 +351,9 @@ def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], al
 
 
 def learn(modelID: str):
+    global initialized
     if not initialized:
-        local_model, opt = initialize()
+        local_model, _, opt = initialize()
         initialized = True
 
     weights, indices, parents = utils.get_weights_to_train(modelID=modelID)

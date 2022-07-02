@@ -6,6 +6,7 @@
     - MY_ID=peer_id
     - MY_PUB_KEY=my_pub_key
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
     - LEVEL_DB_PATH=/proxdagDB
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag

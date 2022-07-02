@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"math"
 	"math/rand"
@@ -22,8 +21,10 @@ import (
 	scpb "github.com/Lekssays/ProxDAG/protocol/proto/score"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
+	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/sbinet/npyio"
 	"github.com/syndtr/goleveldb/leveldb"
+	"gonum.org/v1/gonum/mat"
 )
 
 const (
@@ -37,7 +38,7 @@ const (
 	ALIGNMENT_PURPOSE_ID  = 23
 	GRADIENTS_PURPOSE_ID  = 24
 	PHI_PURPOSE_ID        = 25
-	IPFS_ENDPOINT         = "http://0.0.0.0:5001/api/v0"
+	IPFS_ENDPOINT         = "http://0.0.0.0:5001"
 )
 
 type Peers struct {
@@ -274,7 +275,7 @@ func GetScoreByMessageID(messageID string) (scpb.Score, error) {
 }
 
 func GetContentIPFS(path string) ([]byte, error) {
-	url := IPFS_ENDPOINT + "/get?arg=" + path
+	url := IPFS_ENDPOINT + "/api/v0/get?arg=" + path
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte{}))
 
 	client := &http.Client{}
@@ -289,28 +290,12 @@ func GetContentIPFS(path string) ([]byte, error) {
 }
 
 func AddContentIPFS(content []byte) (string, error) {
-	// TODO(ahmed): Fix "file argument 'path' is required" Bug
-	url := IPFS_ENDPOINT + "/add"
-
-	payload := Payload{
-		File: content,
-	}
-
-	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(payload)
-
-	req, err := http.NewRequest("POST", url, buf)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	sh := shell.NewShell(IPFS_ENDPOINT)
+	reader := bytes.NewReader(content)
+	response, err := sh.Add(reader)
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	response := string(body)
-
 	return response, nil
 }
 
@@ -335,6 +320,8 @@ func StoreScoreOnLevelDB(modelID string, score scpb.Score) error {
 		scoreType = "phi"
 	} else if score.Type == GRADIENTS_PURPOSE_ID {
 		scoreType = "gradients"
+	} else if score.Type == ALIGNMENT_PURPOSE_ID {
+		scoreType = "algnscore"
 	}
 
 	key := fmt.Sprintf("%s!%s", modelID, scoreType)
@@ -651,7 +638,7 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 }
 
 func ComputePhi(algnScores []float64) []float64 {
-	var phi []float64
+	phi := make([]float64, len(algnScores))
 	max := float64(-1.0)
 	for i := 0; i < len(algnScores); i++ {
 		phi[i] = 1 - algnScores[i]
@@ -689,15 +676,64 @@ func ComputePhi(algnScores []float64) []float64 {
 	return phi
 }
 
-func ConvertScoreToNumpy(score interface{}) (string, error) {
-	var f io.Writer
-	err := npyio.Write(f, &score)
+func getClientIDLocally(pubkey string) (int, error) {
+	pubkeys, err := LoadClients()
 	if err != nil {
-		return "", err
+		return -1, err
 	}
 
+	for i := 0; i < len(pubkeys); i++ {
+		if pubkey == pubkeys[i] {
+			return i, nil
+		}
+	}
+
+	return -1, errors.New("id not found")
+}
+
+func converTrustToSlice(modelID string, trust map[string]float32) ([]float32, error) {
+	trustScores := make([]float32, len(trust))
+	for pubkey, score := range trust {
+		id, err := getClientIDLocally(pubkey)
+		if err != nil {
+			return []float32{}, err
+		}
+		trustScores[id] = score
+	}
+	return trustScores, nil
+}
+
+func ConvertScoreToNumpy(modelID string, score interface{}, purpose uint32) (string, error) {
 	buf := new(bytes.Buffer)
-	buf.WriteTo(f)
+	if purpose == ALIGNMENT_PURPOSE_ID || purpose == PHI_PURPOSE_ID {
+		content := score.([]float64)
+		err := npyio.Write(buf, content)
+		if err != nil {
+			return "", err
+		}
+	} else if purpose == SIMILARITY_PURPOSE_ID {
+		content := score.([][]float64)
+		flattenedContent := flatten(content)
+		m := mat.NewDense(len(content), len(content[0]), flattenedContent)
+		err := npyio.Write(buf, m)
+		if err != nil {
+			return "", err
+		}
+	} else if purpose == TRUST_PURPOSE_ID {
+		content := score.(map[string]float32)
+		trustScores, err := converTrustToSlice(modelID, content)
+		if err != nil {
+			return "", err
+		}
+
+		err = npyio.Write(buf, trustScores)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		return "", errors.New("Undefined purpose!")
+	}
+
 	path, err := AddContentIPFS(buf.Bytes())
 	if err != nil {
 		return "", err
@@ -723,7 +759,7 @@ func PublishScore(modelID string, content interface{}, purpose uint32) error {
 		return errors.New("Undefined purpose.")
 	}
 
-	path, err := ConvertScoreToNumpy(content)
+	path, err := ConvertScoreToNumpy(modelID, content, purpose)
 	if err != nil {
 		return err
 	}
@@ -854,7 +890,12 @@ func Initialize(modelID string, x int, y int) error {
 		return err
 	}
 
-	err = PublishScore(modelID, empty2DSlice, SIMILARITY_PURPOSE_ID)
+	csMatrix := make([][]float64, len(clients))
+	for i := range csMatrix {
+		csMatrix[i] = make([]float64, len(clients))
+	}
+
+	err = PublishScore(modelID, csMatrix, SIMILARITY_PURPOSE_ID)
 	if err != nil {
 		return err
 	}
@@ -879,23 +920,6 @@ func Initialize(modelID string, x int, y int) error {
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func Test(modelID string) error {
-	clients, err := graph.GetClients(modelID)
-	if err != nil {
-		return err
-	}
-	fmt.Println("Clients", clients)
-
-	gradients, err := GetLatestGradients(modelID)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Gradients", gradients)
 
 	return nil
 }
