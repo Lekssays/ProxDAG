@@ -23,11 +23,13 @@ LEVEL_DB_PATH = os.getenv("LEVEL_DB_PATH") # "./../../../proxdagDB"
 PROXDAG_ENDPOINT = os.getenv("PROXDAG_ENDPOINT") # "http://0.0.0.0:8080/proxdag"
 MY_PUB_KEY = os.getenv("MY_PUB_KEY")
 
-
-MODEL_UPDATE_PURPOSE_ID = 17
-TRUST_PURPOSE_ID = 21
-SIMILARITY_PURPOSE_ID = 22
-
+MODEL_UPDATE_PYTHON_PURPOSE_ID = 16
+MODEL_UPDATE_GOLANG_PURPOSE_ID = 17
+TRUST_PURPOSE_ID        = 21
+SIMILARITY_PURPOSE_ID   = 22
+ALIGNMENT_PURPOSE_ID    = 23
+GRADIENTS_PURPOSE_ID    = 24
+PHI_PURPOSE_ID          = 25
 
 # Limit of Weights to Choose to Analyze and Train From
 LIMIT_CHOOSE = 5
@@ -64,11 +66,9 @@ def from_bytes(content: bytes) -> torch.Tensor:
 
 
 def send_model_update(model_update: modelUpdate_pb2.ModelUpdate):
-    data = text_format.MessageToString(model_update)
-
     payload = {
-        'purpose': 17,
-        'data': data,
+        'purpose': MODEL_UPDATE_PYTHON_PURPOSE_ID,
+        'data': text_format.MessageToString(model_update),
     }
 
     res = requests.post(PROXDAG_ENDPOINT, json=payload)
@@ -76,18 +76,6 @@ def send_model_update(model_update: modelUpdate_pb2.ModelUpdate):
     if "error" not in res.json():
         return res.json()['messageID']  
     return None
-
-
-def parse_model_update(payload: bytes):
-    return text_format.Parse(payload, modelUpdate_pb2.ModelUpdate())
-
-
-def parse_trust(payload: bytes):
-    return text_format.Parse(payload, score_pb2.Trust())
-
-
-def parse_similarity(payload: bytes):
-    return text_format.Parse(payload, score_pb2.Similarity())
 
 
 def add_content_to_ipfs(content: bytes) -> str:
@@ -118,10 +106,10 @@ def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
     model_update_bytes = get_resource_from_leveldb(key=messageID)
     model_update = None
     if model_update_bytes is None:
-        print("not local")
         model_update, _ = parse_payload(messageID=messageID)
     else:
-        model_update = parse_model_update(model_update_bytes)
+        model_update = modelUpdate_pb2.ModelUpdate()
+        model_update.ParseFromString(model_update_bytes)
 
     return model_update
 
@@ -168,13 +156,16 @@ def parse_payload(messageID: str):
     purpose = get_purpose(res.json()['payload']['content'])
     parsed_payload = None
 
-    if purpose == MODEL_UPDATE_PURPOSE_ID:
-        parsed_payload = parse_model_update(payload=payload)
-    elif purpose == TRUST_PURPOSE_ID:
-        parsed_payload = parse_trust(payload=payload)
-    elif purpose == SIMILARITY_PURPOSE_ID:
-        parsed_payload = parse_similarity(payload=payload)
-    
+    if purpose == MODEL_UPDATE_GOLANG_PURPOSE_ID:
+        payload = base64.b64decode(payload)
+        parsed_payload = modelUpdate_pb2.ModelUpdate()
+        parsed_payload.ParseFromString(payload)
+    elif purpose == MODEL_UPDATE_PYTHON_PURPOSE_ID:
+        parsed_payload = text_format.Parse(payload, modelUpdate_pb2.ModelUpdate())
+    elif purpose in [TRUST_PURPOSE_ID, SIMILARITY_PURPOSE_ID, GRADIENTS_PURPOSE_ID, PHI_PURPOSE_ID, ALIGNMENT_PURPOSE_ID]:
+        payload = base64.b64decode(payload)
+        parsed_payload = score_pb2.Score()
+        parsed_payload.ParseFromString(payload)
     return parsed_payload, purpose
 
 
@@ -203,7 +194,7 @@ def get_weights_ids(modelID, limit):
 
 
 def store_weight_id(modelID, messageID):
-    f = open(modelID + ".dat", "a")
+    f = open("./tmp/" + modelID + ".dat", "a")
     f.write(messageID + "\n")
     f.close()
 

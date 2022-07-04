@@ -17,6 +17,7 @@ require (
 	github.com/ipfs/go-ipfs-api v0.3.0
 	github.com/sbinet/npyio v0.6.0
 	github.com/syndtr/goleveldb v1.0.0
+	gonum.org/v1/gonum v0.9.3
 )
 
 require (
@@ -174,7 +175,6 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	gonum.org/v1/gonum v0.9.3 // indirect
 	google.golang.org/genproto v0.0.0-20210624195500-8bfb893ecb84 // indirect
 	google.golang.org/grpc v1.40.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect

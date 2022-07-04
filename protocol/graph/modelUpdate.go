@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
+	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	"github.com/syndtr/goleveldb/leveldb"
@@ -128,9 +128,14 @@ func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, e
 func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	url := GOSHIMMER_NODE + "/proxdag"
 
+	modelUpdateBytes, err := proto.Marshal(&mupdate)
+	if err != nil {
+		return "", err
+	}
+
 	payload := Message{
 		Purpose: MODEL_UPDATE_PURPOSE_ID,
-		Data:    []byte(mupdate.String()),
+		Data:    modelUpdateBytes,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -242,13 +247,18 @@ func GetClients(modelID string) ([]string, error) {
 		return []string{}, err
 	}
 
+	set := make(map[string]bool)
 	var clients []string
 	for i := 0; i < len(messageIDs); i++ {
 		modelUpdate, err := RetrieveModelUpdate(modelID, messageIDs[i])
 		if err != nil {
 			return []string{}, err
 		}
-		clients = append(clients, modelUpdate.Pubkey)
+		_, exists := set[modelUpdate.Pubkey]
+		if !exists {
+			clients = append(clients, modelUpdate.Pubkey)
+			set[modelUpdate.Pubkey] = true
+		}
 	}
 
 	return clients, nil

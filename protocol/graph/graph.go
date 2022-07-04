@@ -9,8 +9,7 @@ import (
 
 const (
 	GOSHIMMER_NODE   = "http://0.0.0.0:8080"
-	REDIS_ENDPOINT   = "http://127.0.0.1:6379"
-	LEVELDB_ENDPOINT = "./../proxdagDB"
+	LEVELDB_ENDPOINT = "./../ldb"
 	INF              = 1e6
 )
 
