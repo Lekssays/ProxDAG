@@ -7,8 +7,8 @@ import requests
 import plyvel
 import json
 import os
-import pickle
 import time
+import threading
 
 import numpy as np
 
@@ -115,31 +115,31 @@ def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
 
 
 def get_similarity():
-    similarity_path = get_resource_from_leveldb(key="similarity")
+    similarity_bytes = get_resource_from_leveldb(key="similarity")
     
-    if similarity_path is None:
+    if similarity_bytes is None:
         num_clients = get_parameter(param="num_clients")
         similarity = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
         return similarity
 
-    similarity_bytes = get_content_from_ipfs(path=similarity_path)
-    similarity = pickle.loads(similarity_bytes)
-
-    return similarity
+    similarity_path = str(similarity_bytes).split('"')
+    similarity_bytes = get_content_from_ipfs(path=similarity_path[1])
+    
+    return torch.from_numpy(np.load(BytesIO(similarity_bytes)))
 
 
 def get_trust():
-    trust_path = get_resource_from_leveldb(key="trust")
+    trust_bytes = get_resource_from_leveldb(key="trust")
     
-    if trust_path is None:
+    if trust_bytes is None:
         num_clients = get_parameter(param="num_clients")
         trust = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
         return trust
 
-    trust_bytes = get_content_from_ipfs(path=trust_path)
-    trust = pickle.loads(trust_bytes)
-
-    return trust
+    trust_path = str(trust_bytes).split('"')
+    trust_bytes = get_content_from_ipfs(path=trust_path[1])
+    
+    return torch.from_numpy(np.load(BytesIO(trust_bytes)))
 
 
 def get_purpose(payload: str):
@@ -180,16 +180,17 @@ def get_gradients(path: str) -> torch.Tensor:
 
 
 def get_weights_ids(modelID, limit):
-    weights = []
+    weights = set()
     with open("./tmp/" + modelID + ".dat", "r") as f:
         content = f.readlines()
         for line in content:
             line = line.strip()
-            weights.append(line)
+            weights.add(line)
 
     if limit >= len(weights):
         return weights
 
+    weights = list(weights)
     return weights[:limit]
 
 
@@ -216,9 +217,9 @@ def get_weights_to_train(modelID: str):
 
     metrics = []
     for messageID in chosen_weights_ids:
-        mu = get_model_update(messageID=m['messageID'])
+        mu = get_model_update(messageID=messageID)
         tmp = {
-            'trust_score': trust_score[mu.pubkey],
+            'trust_score': trust_score[get_client_id(pubkey=mu.pubkey)],
             'similarity': similarity[get_client_id(pubkey=mu.pubkey)][MY_PUB_KEY],
             'messageID': messageID
         }
@@ -282,7 +283,34 @@ def get_phi():
         phi = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
         return phi
 
-    phi_bytes = get_content_from_ipfs(path=phi_path)
-    phi = pickle.loads(phi_bytes)
+    phi_path = str(phi_bytes).split('"')
+    phi_bytes = get_content_from_ipfs(path=phi_path[1])
+    return torch.from_numpy(np.load(BytesIO(phi_bytes)))
 
-    return phi
+
+def process_message(message):
+    message = json.loads(message)
+    messageID = message['data']['id']
+    payload, purpose = parse_payload(messageID=messageID)
+    print(purpose, payload)
+    payload_bytes = bytes(text_format.MessageToString(payload), encoding='utf8')
+    if int(purpose) in [MODEL_UPDATE_PYTHON_PURPOSE_ID, MODEL_UPDATE_GOLANG_PURPOSE_ID]:
+        t = threading.Thread(target=store_resource_on_leveldb, args=(messageID, payload_bytes,))
+        t.start()
+        store_weight_id(modelID=payload.modelID, messageID=messageID)
+    elif int(purpose) in [TRUST_PURPOSE_ID, SIMILARITY_PURPOSE_ID, GRADIENTS_PURPOSE_ID, PHI_PURPOSE_ID, ALIGNMENT_PURPOSE_ID]:
+        if int(purpose) == TRUST_PURPOSE_ID:
+            t = threading.Thread(target=store_resource_on_leveldb, args=("trust", payload_bytes,))
+            t.start()
+        elif int(purpose) == SIMILARITY_PURPOSE_ID:
+            t = threading.Thread(target=store_resource_on_leveldb, args=("similarity", payload_bytes,))
+            t.start()                
+        elif int(purpose) == GRADIENTS_PURPOSE_ID:
+            t = threading.Thread(target=store_resource_on_leveldb, args=("gradients", payload_bytes,))
+            t.start()
+        elif int(purpose) == ALIGNMENT_PURPOSE_ID:
+            t = threading.Thread(target=store_resource_on_leveldb, args=("algnscore", payload_bytes,))
+            t.start()
+        elif int(purpose) == PHI_PURPOSE_ID:
+            t = threading.Thread(target=store_resource_on_leveldb, args=("phi", payload_bytes,))
+            t.start()

@@ -106,40 +106,40 @@ def main():
     print("Learn :)")
     generate_config()
 
-    weights = torch.tensor([1,2,3])
-    gradients = torch.tensor([5,6,7,102])
-    weights_bytes = utils.to_bytes(weights)
-    weights_path = utils.add_content_to_ipfs(content=weights_bytes)
-    accuracy = 0.911
-
-    modelID = "CNN1"
-    parents = ["HckSwavfZ5gceB58aMCYd6wc9Qd5VE2cRhqujiXBfVRv", "CkmuFbBXLgu11PXySQSmdeyodS13TQj67Zse5M6cuDTh"]
-
-    messageID = utils.publish_model_update(
-        modelID=modelID,
-        parents=parents,
-        weights=weights_path,
-        accuracy=accuracy,
-    )
-
-    time.sleep(1)    
-    model_update = utils.get_model_update(messageID=messageID)
-    print("model_update", model_update)
+    # weights = torch.tensor([1,2,3])
+    # gradients = torch.tensor([5,6,7,102])
+    # weights_bytes = utils.to_bytes(weights)
+    # weights_path = utils.add_content_to_ipfs(content=weights_bytes)
+    # accuracy = 0.911
 
     # modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
-    # if not exists("./tmp/" + modelID + ".dat"):
-    #     local_model, peers_weights, opt = learning.initialize()
-    #     weights_bytes = utils.to_bytes(peers_weights)
-    #     weights_path = utils.add_content_to_ipfs(content=weights_bytes)
-    #     messageID = utils.publish_model_update(
-    #         modelID=modelID,
-    #         parents=[],
-    #         weights=weights_path,
-    #         accuracy=0.0,
-    #     )
-    #     utils.store_weight_id(modelID=modelID, messageID=messageID)
+    # parents = ["HckSwavfZ5gceB58aMCYd6wc9Qd5VE2cRhqujiXBfVRv", "CkmuFbBXLgu11PXySQSmdeyodS13TQj67Zse5M6cuDTh"]
+
+    # messageID = utils.publish_model_update(
+    #     modelID=modelID,
+    #     parents=parents,
+    #     weights=weights_path,
+    #     accuracy=accuracy,
+    # )
+
+    # time.sleep(1)    
+    # model_update = utils.get_model_update(messageID=messageID)
+    # print("model_update", model_update)
+
+    modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
+    if not exists("./tmp/" + modelID + ".dat"):
+        local_model, peers_weights, opt = learning.initialize()
+        weights_bytes = utils.to_bytes(peers_weights)
+        weights_path = utils.add_content_to_ipfs(content=weights_bytes)
+        messageID = utils.publish_model_update(
+            modelID=modelID,
+            parents=[],
+            weights=weights_path,
+            accuracy=0.0,
+        )
+        utils.store_weight_id(modelID=modelID, messageID=messageID)
     
-    # learning.learn(modelID=modelID)
+    learning.learn(modelID=modelID)
 
 
 if __name__ == "__main__":

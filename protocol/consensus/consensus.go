@@ -212,9 +212,14 @@ func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
 func StoreScoreOnTangle(score scpb.Score) (string, error) {
 	url := GOSHIMMER_NODE + "/proxdag"
 
+	scoreBytes, err := proto.Marshal(&score)
+	if err != nil {
+		return "", err
+	}
+
 	payload := Message{
 		Purpose: score.Type,
-		Data:    []byte(score.String()),
+		Data:    scoreBytes,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
