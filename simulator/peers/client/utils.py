@@ -8,7 +8,7 @@ import plyvel
 import json
 import os
 import time
-import threading
+import random 
 
 import numpy as np
 
@@ -40,12 +40,13 @@ LIMIT_SELECTED = 2
 
 ALGN_THRESHOLD = 0.1
 
-def to_protobuf(modelID: str, parents: list, weights: str, pubkey: str, timestamp: int, accuracy: float):
+def to_protobuf(modelID: str, parents: list, weights: str, model: str, pubkey: str, timestamp: int, accuracy: float):
     model_update = modelUpdate_pb2.ModelUpdate()
     model_update.modelID = modelID
     for parent in parents:
         model_update.parents.append(parent)
     model_update.weights = weights
+    model_update.model = model
     model_update.accuracy = accuracy
     model_update.pubkey = pubkey
     model_update.timestamp = timestamp
@@ -93,13 +94,33 @@ def get_content_from_ipfs(path: str):
 
 
 def get_resource_from_leveldb(key: str):
-    db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-    return db.get(bytes(key, encoding='utf8'))
+    try:
+        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
+        resource =  db.get(bytes(key, encoding='utf8'))
+        db.close()
+        return resource
+    except Exception as e:
+        print("ERROR", str(e))
+        time.sleep(2)
+        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
+        resource =  db.get(bytes(key, encoding='utf8'))
+        db.close()
+        print("FIXED", str(e))
+        return resource
 
 
 def store_resource_on_leveldb(key: str, content: bytes):
-    db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-    db.put(bytes(key, encoding='utf8'), content)
+    try:
+        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
+        db.put(bytes(key, encoding='utf8'), content)
+        db.close()
+    except Exception as e:
+        print("ERROR", str(e))
+        time.sleep(2)
+        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
+        db.put(bytes(key, encoding='utf8'), content)
+        db.close()
+        print("FIXED", str(e))
 
 
 def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
@@ -108,9 +129,7 @@ def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
     if model_update_bytes is None:
         model_update, _ = parse_payload(messageID=messageID)
     else:
-        model_update = modelUpdate_pb2.ModelUpdate()
-        model_update.ParseFromString(model_update_bytes)
-
+        model_update = text_format.Parse(model_update_bytes, modelUpdate_pb2.ModelUpdate())
     return model_update
 
 
@@ -125,7 +144,7 @@ def get_similarity():
     similarity_path = str(similarity_bytes).split('"')
     similarity_bytes = get_content_from_ipfs(path=similarity_path[1])
     
-    return torch.from_numpy(np.load(BytesIO(similarity_bytes)))
+    return np.load(BytesIO(similarity_bytes))
 
 
 def get_trust():
@@ -139,7 +158,7 @@ def get_trust():
     trust_path = str(trust_bytes).split('"')
     trust_bytes = get_content_from_ipfs(path=trust_path[1])
     
-    return torch.from_numpy(np.load(BytesIO(trust_bytes)))
+    return np.load(BytesIO(trust_bytes))
 
 
 def get_purpose(payload: str):
@@ -181,7 +200,7 @@ def get_gradients(path: str) -> torch.Tensor:
 
 def get_weights_ids(modelID, limit):
     weights = set()
-    with open("./tmp/" + modelID + ".dat", "r") as f:
+    with open(os.getenv("TMP_FOLDER") + modelID + ".dat", "r") as f:
         content = f.readlines()
         for line in content:
             line = line.strip()
@@ -195,13 +214,13 @@ def get_weights_ids(modelID, limit):
 
 
 def store_weight_id(modelID, messageID):
-    f = open("./tmp/" + modelID + ".dat", "a")
+    f = open(os.getenv("TMP_FOLDER") + modelID + ".dat", "a")
     f.write(messageID + "\n")
     f.close()
 
 
 def clear_weights_ids(modelID):
-    f = open(modelID + ".dat", "w")
+    f = open(os.getenv("TMP_FOLDER") + modelID + ".dat", "w")
     f.write("")
     f.close()
 
@@ -220,37 +239,54 @@ def get_weights_to_train(modelID: str):
         mu = get_model_update(messageID=messageID)
         tmp = {
             'trust_score': trust_score[get_client_id(pubkey=mu.pubkey)],
-            'similarity': similarity[get_client_id(pubkey=mu.pubkey)][MY_PUB_KEY],
+            'similarity': similarity[get_client_id(pubkey=mu.pubkey)][get_client_id(pubkey=MY_PUB_KEY)],
             'messageID': messageID
         }
         metrics.append(tmp)
     
-    metrics = sorted(metrics, key=lambda x: x['similarity'], reverse=True)
+    metrics = sorted(metrics, key=lambda x: (x['trust_score'], x['similarity']), reverse=True)
 
     for m in metrics:
-        if 1 - m['trust_score'] > ALGN_THRESHOLD:
-            metrics.remove(m)
-            continue
         mu = get_model_update(messageID=m['messageID'])
         idx = get_client_id(pubkey=mu.pubkey)
         if idx != int(os.getenv("MY_ID")):
-            w = get_weights(path=mu.weights)
+            w = get_weights(path=mu.model)
             weights.append(w)
             indices.append(idx)
             parents.append(m['messageID'])
 
-    clear_weights_ids(modelID=modelID)
-
-    if len(weights) <= LIMIT_SELECTED - 1:
+    if len(weights) <= LIMIT_SELECTED:
         return weights, indices, parents
     
-    return weights[:LIMIT_SELECTED], indices[:LIMIT_SELECTED], parents[:LIMIT_SELECTED]
+    final_weights = []
+    final_indices = []
+    final_parents = []
+
+    w1 = random. randint(0,len(weights)-1)
+    while True:
+        w2 = random. randint(0,len(weights)-1)
+        if w2 != w1:
+            break
+
+    final_weights.append(weights[w1])
+    final_indices.append(indices[w1])
+    final_parents.append(parents[w1])
+    final_weights.append(weights[w2])
+    final_indices.append(indices[w2])
+    final_parents.append(parents[w2])
+
+    return final_weights, final_indices, final_parents
 
 
 def get_client_id(pubkey: str):
     with open('peers.json', "r") as f:
-        clients = json.load(f)
-        return clients[pubkey]
+        peers = json.load(f)
+    
+    for peer in peers['peers']:
+        if peer["pubkey"] == pubkey:
+            return int(peer["id"])
+
+    return None
 
 
 def get_parameter(param: str):
@@ -259,7 +295,10 @@ def get_parameter(param: str):
     return config[param]
 
 
-def publish_model_update(modelID, weights, accuracy, parents):
+def publish_model_update(modelID, accuracy, parents, model, weights):
+    model_bytes = to_bytes(model)
+    model_path = add_content_to_ipfs(content=model_bytes)
+
     weights_bytes = to_bytes(weights)
     weights_path = add_content_to_ipfs(content=weights_bytes)
 
@@ -269,7 +308,8 @@ def publish_model_update(modelID, weights, accuracy, parents):
         weights=weights_path,
         pubkey=os.getenv("MY_PUB_KEY"),
         accuracy=accuracy,
-        timestamp=int(time.time())
+        timestamp=int(time.time()),
+        model=model_path
     )
 
     return send_model_update(model_update_pb)
@@ -283,9 +323,9 @@ def get_phi():
         phi = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
         return phi
 
-    phi_path = str(phi_bytes).split('"')
+    phi_path = str(phi_path).split('"')
     phi_bytes = get_content_from_ipfs(path=phi_path[1])
-    return torch.from_numpy(np.load(BytesIO(phi_bytes)))
+    return np.load(BytesIO(phi_bytes))
 
 
 def process_message(message):
@@ -295,22 +335,28 @@ def process_message(message):
     print(purpose, payload)
     payload_bytes = bytes(text_format.MessageToString(payload), encoding='utf8')
     if int(purpose) in [MODEL_UPDATE_PYTHON_PURPOSE_ID, MODEL_UPDATE_GOLANG_PURPOSE_ID]:
-        t = threading.Thread(target=store_resource_on_leveldb, args=(messageID, payload_bytes,))
-        t.start()
+        store_resource_on_leveldb(messageID, payload_bytes)
         store_weight_id(modelID=payload.modelID, messageID=messageID)
     elif int(purpose) in [TRUST_PURPOSE_ID, SIMILARITY_PURPOSE_ID, GRADIENTS_PURPOSE_ID, PHI_PURPOSE_ID, ALIGNMENT_PURPOSE_ID]:
         if int(purpose) == TRUST_PURPOSE_ID:
-            t = threading.Thread(target=store_resource_on_leveldb, args=("trust", payload_bytes,))
-            t.start()
+            store_resource_on_leveldb("trust", payload_bytes)
         elif int(purpose) == SIMILARITY_PURPOSE_ID:
-            t = threading.Thread(target=store_resource_on_leveldb, args=("similarity", payload_bytes,))
-            t.start()                
+            store_resource_on_leveldb("similarity", payload_bytes)             
         elif int(purpose) == GRADIENTS_PURPOSE_ID:
-            t = threading.Thread(target=store_resource_on_leveldb, args=("gradients", payload_bytes,))
-            t.start()
+            store_resource_on_leveldb("gradients", payload_bytes)
         elif int(purpose) == ALIGNMENT_PURPOSE_ID:
-            t = threading.Thread(target=store_resource_on_leveldb, args=("algnscore", payload_bytes,))
-            t.start()
+            store_resource_on_leveldb("algnscore", payload_bytes)
         elif int(purpose) == PHI_PURPOSE_ID:
-            t = threading.Thread(target=store_resource_on_leveldb, args=("phi", payload_bytes,))
-            t.start()
+            store_resource_on_leveldb("phi", payload_bytes)
+
+
+def get_my_latest_accuracy():
+    acc_bytes = get_resource_from_leveldb(key='accuracy')
+    if acc_bytes == None:
+        return 0.00
+    return float(str(acc_bytes.decode("utf-8")))
+
+
+def store_my_latest_accuracy(accuracy: float):
+    content = bytes(str(accuracy), encoding="utf-8")
+    store_resource_on_leveldb(key="accuracy", content=content)

@@ -11,4 +11,5 @@ message ModelUpdate {
     string pubkey = 4;
     uint32 timestamp = 5;
     float accuracy = 6;
+    string model = 7;
 }
