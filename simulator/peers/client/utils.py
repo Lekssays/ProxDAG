@@ -38,7 +38,7 @@ PHI_PURPOSE_ID          = 25
 LIMIT_CHOOSE = 10
 
 # Number of Weights to Train From
-LIMIT_SELECTED = 8
+LIMIT_SELECTED = 2
 
 ALGN_THRESHOLD = 0.1
 
