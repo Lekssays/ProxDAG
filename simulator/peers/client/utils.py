@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import modelUpdate_pb2
 import score_pb2
@@ -9,10 +10,12 @@ import json
 import os
 import time
 import random 
+import websockets
 
 import numpy as np
 
 from collections import OrderedDict, defaultdict
+from datetime import datetime
 from google.protobuf import text_format
 from io import BytesIO
 
@@ -100,12 +103,12 @@ def get_resource_from_leveldb(key: str):
         db.close()
         return resource
     except Exception as e:
-        print("ERROR", str(e))
+        print("ERROR" + str(e.decode("utf-8")))
         time.sleep(2)
         db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
         resource =  db.get(bytes(key, encoding='utf8'))
         db.close()
-        print("FIXED", str(e))
+        print("ERROR" + str(e.decode("utf-8")))
         return resource
 
 
@@ -251,6 +254,8 @@ def get_weights_to_train(modelID: str):
         idx = get_client_id(pubkey=mu.pubkey)
         if idx != int(os.getenv("MY_ID")):
             w = get_weights(path=mu.model)
+            if len(w) == 46:
+                w = get_weights(path=w)
             weights.append(w)
             indices.append(idx)
             parents.append(m['messageID'])
@@ -360,3 +365,11 @@ def get_my_latest_accuracy():
 def store_my_latest_accuracy(accuracy: float):
     content = bytes(str(accuracy), encoding="utf-8")
     store_resource_on_leveldb(key="accuracy", content=content)
+
+
+async def send_log(message: str):
+    uri = "ws://172.17.0.1:7777"
+    dt = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    message = dt + " - [" + os.getenv("MY_NAME") + "] " + message
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(message)

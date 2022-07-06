@@ -145,7 +145,7 @@ def main():
     modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
     if not exists(os.getenv("TMP_FOLDER") + modelID + ".dat"):
         local_model = learning.initialize(modelID)
-        weights_bytes = utils.to_bytes(local_model.state_dict()['fc.weight'])
+        weights_bytes = utils.to_bytes(local_model.state_dict()['fc.weight'].cpu().numpy())
         weights_path = utils.add_content_to_ipfs(content=weights_bytes)
         model_bytes = utils.to_bytes(local_model.state_dict())
         model_path = utils.add_content_to_ipfs(content=model_bytes)
@@ -159,7 +159,6 @@ def main():
         utils.store_my_latest_accuracy(accuracy=0.00)
         utils.store_weight_id(modelID=modelID, messageID=messageID)
 
-    print(os.getenv("MY_NAME"), "Learning")
     learning.learn(modelID=modelID)
 
 

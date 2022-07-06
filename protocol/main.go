@@ -176,6 +176,7 @@ func main() {
 				fmt.Println("Output is NOT verified :)")
 			}
 		} else if args[0] == "init" {
+			fmt.Println("Initializing the system")
 			modelID := "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
 			var modelX int
 			var modelY int

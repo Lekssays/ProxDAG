@@ -1,1 +1,1 @@
-{"dataset": "MNIST", "num_clients": 100, "num_selected": 10, "num_rounds": 1, "epochs": 5, "batch_size": 50, "alpha": "100", "delta": 0.5, "decay": 0.001, "threshold": 0.1, "attack_type": "lf"}
+{"dataset": "MNIST", "num_clients": 100, "num_selected": 10, "num_rounds": 100, "epochs": 5, "batch_size": 50, "alpha": "100", "delta": 0.5, "decay": 0.001, "threshold": 0.1, "attack_type": "lf"}

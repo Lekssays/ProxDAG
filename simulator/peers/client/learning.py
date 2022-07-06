@@ -1,6 +1,6 @@
+import asyncio
 import pickle
 import os
-from statistics import mode
 import models
 import utils
 
@@ -58,67 +58,6 @@ def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=No
             loss.backward()
             optimizer.step()
     return loss.item(), client_model
-
-
-def compute_cosine_sim(client_gradients, cs_mat):
-    # compute cosine similarities matrix
-    for j, w1 in enumerate(client_gradients):
-        for k, w2 in enumerate(client_gradients):
-            if j == k:
-                continue
-            if np.all(w1==0) or np.all(w2==0):
-                cs_mat[j][k] = 0
-            else:
-                cs_mat[j][k] = (w1 * w2).sum()/(norm(w1)*norm(w2))
-    return cs_mat
-
-
-def pardoning_fun(cs_mat):
-    # pardoning function
-    client_scores = np.mean(cs_mat, axis=1)
-    for j, score1 in enumerate(client_scores):
-        for k, score2 in enumerate(client_scores):
-            if score2 == 0 and score1 > 0:
-                scale = 1
-            elif score2 == 0 and score1<=0:
-                scale = 0
-            else:
-                scale = min(1, abs(score1 / score2))
-            cs_mat[j][k] *= scale
-
-    return cs_mat
-
-
-def compute_trust_scores(client_scores, r):
-    threshold = utils.get_parameter(param="threshold")
-    delta = utils.get_parameter(param="delta")
-    delta = utils.get_parameter(param="delta")
-
-    # compute/update trust scores
-    for i in range(len(client_scores)):
-        #r[i] -= delta
-        if client_scores[i] > threshold:
-            r[i] -= delta
-            r[i] = max(1e-6, r[i])
-            continue
-        r[i] += delta
-    return r
-
-
-def compute_contribitions(client_scores):
-    phi = np.array([1 - client_scores[i] for i in range(len(client_scores))])
-    phi[phi > 1] = 1;
-    phi[phi < 0] = 0
-    # Rescale so that max value is wv
-    phi = phi / np.max(phi)
-    phi[(phi == 1)] = .99
-    # Logit function
-    phi = (np.log((phi / (1 - phi)) + 0.000001) + 0.5)
-    # phi[(np.isinf(phi))] = 1
-    #return [phi[i] / max(phi) for i in range(len(client_scores))]
-    phi[(np.isinf(phi) + phi > 1)] = 1
-    phi[(phi < 0)] = 0
-    return phi
 
 
 def aggregate(peers_indices, peers_weights=[]):
@@ -259,6 +198,8 @@ def initialize(modelID):
 
 
 def evaluate(local_model, loss, attack=0):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     losses_test = []
     acc_test = []
 
@@ -270,20 +211,30 @@ def evaluate(local_model, loss, attack=0):
     losses_test.append(test_loss)
     acc_test.append(acc)
 
-    print('average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / num_selected, test_loss, acc))
+    message = 'average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / num_selected, test_loss, acc)
+    print(message)
+    loop.run_until_complete(utils.send_log(message))
     asr = attack/(len(test_loader)*batch_size)
-    print('attack success rate %0.3g' %(asr))
-
+    message = 'attack success rate %0.3g' %(asr)
+    print(message)
+    loop.run_until_complete(utils.send_log(message))
     return acc, asr
 
 
 def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], alpha="100", attack_type="lf"):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     if attack_type not in ["backdoor", "lf"]:
-        print("[x] ERROR: attack type not recognized :)")
+        message = "[x] ERROR: attack type not recognized :)"
+        print(message)
+        loop.run_until_complete(utils.send_log(message))
         return
 
     if alpha not in ["100","0.05","10"]:
-        print("[x] ERROR: alpha not recognized :)")
+        message = "[x] ERROR: alpha not recognized :)"
+        print(message)
+        loop.run_until_complete(utils.send_log(message))
         return
 
     dataset = utils.get_parameter(param="dataset")
@@ -386,6 +337,11 @@ def load_local_model():
 
 
 def learn(modelID):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    
+    print(os.getenv("MY_NAME"), "Learning")
+    loop.run_until_complete(utils.send_log("Learning"))
     if not exists(os.getenv("TMP_FOLDER") + modelID + ".pt"):
         local_model = initialize(modelID)
     else:
@@ -394,7 +350,9 @@ def learn(modelID):
     
     weights, indices, parents = utils.get_weights_to_train(modelID=modelID)
 
-    print(os.getenv("MY_NAME"), "len(weights)", len(weights))
+    message = "Weights to Train From = " + str(len(weights))
+    print(message)
+    loop.run_until_complete(utils.send_log(message))
     if len(weights) > 0:
         print(os.getenv("MY_NAME"), "Training")
         loss, attack, local_model = train(
@@ -408,10 +366,12 @@ def learn(modelID):
         utils.clear_weights_ids(modelID)
 
         print(os.getenv("MY_NAME"), "Evaluating")
+        loop.run_until_complete(utils.send_log("Evaluating"))
         acc, asr = evaluate(local_model=local_model, loss=loss, attack=attack)    
         
         if acc >= utils.get_my_latest_accuracy():
             print(os.getenv("MY_NAME"), "Publishing")
+            loop.run_until_complete(utils.send_log("Publishing"))
             torch.save(local_model.state_dict(), os.getenv("TMP_FOLDER") + modelID + ".pt")
             messageID = utils.publish_model_update(
                 modelID=modelID,
@@ -422,5 +382,7 @@ def learn(modelID):
             )
             print(os.getenv("MY_NAME"), acc, messageID)
             utils.store_my_latest_accuracy(accuracy=acc)
+            loop.run_until_complete(utils.send_log(str(acc) + " " + str(messageID)))
     else:
         print(os.getenv("MY_NAME"), "No weights to train from!")
+        loop.run_until_complete(utils.send_log("No weights to train from!"))

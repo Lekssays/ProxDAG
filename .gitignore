@@ -20,3 +20,4 @@ simulator/peers/client/.env
 simulator/peers/client/*.dat
 simulator/peers/client/test.py
 simulator/peers/tmp
+logs/system.log
