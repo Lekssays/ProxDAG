@@ -38,9 +38,8 @@ PHI_PURPOSE_ID          = 25
 LIMIT_CHOOSE = 10
 
 # Number of Weights to Train From
-LIMIT_SELECTED = 2
+LIMIT_SELECTED = 8
 
-ALGN_THRESHOLD = 0.1
 
 def to_protobuf(modelID: str, parents: list, weights: str, model: str, pubkey: str, timestamp: int, accuracy: float):
     model_update = modelUpdate_pb2.ModelUpdate()
@@ -201,17 +200,17 @@ def get_gradients(path: str) -> torch.Tensor:
 
 
 def get_weights_ids(modelID, limit):
-    weights = set()
+    weights = []
     with open(os.getenv("TMP_FOLDER") + modelID + ".dat", "r") as f:
         content = f.readlines()
         for line in content:
             line = line.strip()
-            weights.add(line)
+            if line not in weights:
+                weights.append(line)
 
     if limit >= len(weights):
-        return list(weights)
+        return weights
 
-    weights = list(weights)
     weights.reverse()
     return weights[:limit]
 
@@ -226,6 +225,7 @@ def get_weights_to_train(modelID: str):
     weights = []
     indices = []
     parents = []
+    timestamps = []
 
     chosen_weights_ids = get_weights_ids(modelID=modelID, limit=LIMIT_CHOOSE)
     trust_score = get_trust()
@@ -254,32 +254,14 @@ def get_weights_to_train(modelID: str):
             weights.append(w)
             indices.append(idx)
             parents.append(m['messageID'])
-
-    # final_weights = []
-    # final_indices = []
-    # final_parents = []
-
-    # w1 = random. randint(0,len(weights)-1)
-    # while True:
-    #     w2 = random. randint(0,len(weights)-1)
-    #     if w2 != w1:
-    #         break
-
-    # final_weights.append(weights[w1])
-    # final_indices.append(indices[w1])
-    # final_parents.append(parents[w1])
-    # final_weights.append(weights[w2])
-    # final_indices.append(indices[w2])
-    # final_parents.append(parents[w2])
-
-    # return final_weights, final_indices, final_parents
+            timestamps.append(m['timestamp'])
 
     if len(weights) <= LIMIT_SELECTED:
         return weights, indices, parents
 
-    c = list(zip(weights, indices, parents))
+    c = list(zip(weights, indices, parents, timestamps))
     random.shuffle(c)
-    weights, indices, parents = zip(*c)
+    weights, indices, parents, timestamps = zip(*c)
 
     return weights[:LIMIT_SELECTED], indices[:LIMIT_SELECTED], parents[:LIMIT_SELECTED]
 

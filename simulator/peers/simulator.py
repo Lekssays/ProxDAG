@@ -1,3 +1,4 @@
+import asyncio
 import json
 import subprocess
 import time
@@ -5,6 +6,9 @@ import os
 import argparse
 import random
 import string
+import websockets
+
+from datetime import datetime
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -147,8 +151,18 @@ def copy_peers():
     subprocess.call(command, shell=True)
 
 
+async def send_log(message: str):
+    uri = "ws://0.0.0.0:7777"
+    dt = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    message = dt + " - [" + os.getenv("MY_NAME") + "] " + message
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(message)
+
+
 def main():
     print("Simulator :)")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
 
     remove = parse_args().remove
     alpha = parse_args().alpha
@@ -177,6 +191,8 @@ def main():
 
     for i in range(0, iterations):
         print("\n\n\nIteration #{}".format(str(i)))
+        log_message = "\n\n\nlog!iteration #" + str(i) + "#\n\n\n"
+        loop.run_until_complete(send_log(log_message))
         if len(attack_type) > 0:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
         else:
@@ -184,7 +200,6 @@ def main():
 
     stop_containers(peers=peers, peers_len=peers_len)
 
-    
 
 if __name__ == "__main__":
     main()

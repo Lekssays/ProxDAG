@@ -215,7 +215,7 @@ def evaluate(local_model, loss, attack=0):
     message = 'attack success rate %0.3g' %(asr)
     print(message)
     loop.run_until_complete(utils.send_log(message))
-    log_message = "log!" + str(loss / num_selected) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
+    log_message = "log!" + os.getenv("MY_NAME") + "," + str(loss / num_selected) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
     loop.run_until_complete(utils.send_log(log_message))
     return acc, asr
 
