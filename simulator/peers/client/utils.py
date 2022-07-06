@@ -35,11 +35,10 @@ GRADIENTS_PURPOSE_ID    = 24
 PHI_PURPOSE_ID          = 25
 
 # Limit of Weights to Choose to Analyze and Train From
-LIMIT_CHOOSE = 5
+LIMIT_CHOOSE = 10
 
 # Number of Weights to Train From
-LIMIT_SELECTED = 2
-
+LIMIT_SELECTED = 8
 
 ALGN_THRESHOLD = 0.1
 
@@ -210,21 +209,16 @@ def get_weights_ids(modelID, limit):
             weights.add(line)
 
     if limit >= len(weights):
-        return weights
+        return list(weights)
 
     weights = list(weights)
+    weights.reverse()
     return weights[:limit]
 
 
 def store_weight_id(modelID, messageID):
     f = open(os.getenv("TMP_FOLDER") + modelID + ".dat", "a")
     f.write(messageID + "\n")
-    f.close()
-
-
-def clear_weights_ids(modelID):
-    f = open(os.getenv("TMP_FOLDER") + modelID + ".dat", "w")
-    f.write("")
     f.close()
 
 
@@ -243,11 +237,12 @@ def get_weights_to_train(modelID: str):
         tmp = {
             'trust_score': trust_score[get_client_id(pubkey=mu.pubkey)],
             'similarity': similarity[get_client_id(pubkey=mu.pubkey)][get_client_id(pubkey=MY_PUB_KEY)],
-            'messageID': messageID
+            'messageID': messageID,
+            'timestamp': mu.timestamp,
         }
         metrics.append(tmp)
     
-    metrics = sorted(metrics, key=lambda x: (x['trust_score'], x['similarity']), reverse=True)
+    metrics = sorted(metrics, key=lambda x: (x['timestamp'], x['trust_score'], x['similarity']), reverse=True)
 
     for m in metrics:
         mu = get_model_update(messageID=m['messageID'])
@@ -260,27 +255,33 @@ def get_weights_to_train(modelID: str):
             indices.append(idx)
             parents.append(m['messageID'])
 
+    # final_weights = []
+    # final_indices = []
+    # final_parents = []
+
+    # w1 = random. randint(0,len(weights)-1)
+    # while True:
+    #     w2 = random. randint(0,len(weights)-1)
+    #     if w2 != w1:
+    #         break
+
+    # final_weights.append(weights[w1])
+    # final_indices.append(indices[w1])
+    # final_parents.append(parents[w1])
+    # final_weights.append(weights[w2])
+    # final_indices.append(indices[w2])
+    # final_parents.append(parents[w2])
+
+    # return final_weights, final_indices, final_parents
+
     if len(weights) <= LIMIT_SELECTED:
         return weights, indices, parents
-    
-    final_weights = []
-    final_indices = []
-    final_parents = []
 
-    w1 = random. randint(0,len(weights)-1)
-    while True:
-        w2 = random. randint(0,len(weights)-1)
-        if w2 != w1:
-            break
+    c = list(zip(weights, indices, parents))
+    random.shuffle(c)
+    weights, indices, parents = zip(*c)
 
-    final_weights.append(weights[w1])
-    final_indices.append(indices[w1])
-    final_parents.append(parents[w1])
-    final_weights.append(weights[w2])
-    final_indices.append(indices[w2])
-    final_parents.append(parents[w2])
-
-    return final_weights, final_indices, final_parents
+    return weights[:LIMIT_SELECTED], indices[:LIMIT_SELECTED], parents[:LIMIT_SELECTED]
 
 
 def get_client_id(pubkey: str):

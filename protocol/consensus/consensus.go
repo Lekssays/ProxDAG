@@ -910,12 +910,6 @@ func Initialize(modelID string, x int, y int) error {
 		return err
 	}
 
-	empty1DSlice = make([]float64, len(clients))
-	for i := 0; i < len(clients); i++ {
-		empty1DSlice[i] = 1.0000
-
-	}
-
 	phiScore := ComputePhi(empty1DSlice)
 	err = PublishScore(modelID, phiScore, PHI_PURPOSE_ID)
 	if err != nil {

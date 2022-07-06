@@ -14,7 +14,6 @@ import torch.optim as optim
 from os.path import exists
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, TensorDataset
-from numpy.linalg import norm
 from sklearn.model_selection import train_test_split
 from models import VGG, SFMNet
 
@@ -23,17 +22,15 @@ torch.manual_seed(42)
 np.random.seed(42)
 
 
-def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=None):
-    """
-    This function updates/trains client model on client data
-    """
+def client_update(local_model, train_loader, epoch=5, attack_type=None):
     dataset = utils.get_parameter(param="dataset")
-    client_model.train()
+    optimizer = get_optimizer(local_model)
+    local_model.train()
     for _ in range(epoch):
         for _, (data, target) in enumerate(train_loader):
             data, target = data, target
             optimizer.zero_grad()
-            output = client_model(data)
+            output = local_model(data)
             if attack_type is not None:
                 if dataset == "MNIST" or dataset == "CIFAR":
                     for i, t in enumerate(target):
@@ -57,15 +54,16 @@ def client_update(client_model, optimizer, train_loader, epoch=5, attack_type=No
             loss = F.nll_loss(output, target)
             loss.backward()
             optimizer.step()
-    return loss.item(), client_model
+    return loss.item(), local_model
 
 
 def aggregate(peers_indices, peers_weights=[]):
+    if len(peers_weights) == 0:
+        return
     phi = utils.get_phi()
     global_dict = peers_weights[-1].state_dict()
     for k in global_dict.keys():
         global_dict[k] = torch.stack([peers_weights[idx].state_dict()[k].float()* phi[peers_indices[idx]] for idx in range(0, len(peers_indices))], 0).mean(0)
-    
     peers_weights[-1].load_state_dict(global_dict)
     return peers_weights[-1]
 
@@ -191,8 +189,7 @@ def initialize(modelID):
     elif dataset == "KDD":
         local_model =  models.SFMNet(n_features= 41, n_classes= 23)
 
-    if not exists(os.getenv("TMP_FOLDER") + modelID + ".pt"):
-        torch.save(local_model.state_dict(), os.getenv("TMP_FOLDER") + modelID + ".pt")
+    torch.save(local_model.state_dict(), os.getenv("TMP_FOLDER") + modelID + ".pt")
 
     return local_model
 
@@ -218,10 +215,12 @@ def evaluate(local_model, loss, attack=0):
     message = 'attack success rate %0.3g' %(asr)
     print(message)
     loop.run_until_complete(utils.send_log(message))
+    log_message = "log!" + str(loss / num_selected) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
+    loop.run_until_complete(utils.send_log(log_message))
     return acc, asr
 
 
-def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], alpha="100", attack_type="lf"):
+def train(local_model, dishonest_peers=[], alpha="100", attack_type="lf"):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -242,16 +241,17 @@ def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], al
     epochs = utils.get_parameter(param="epochs")
     batch_size = utils.get_parameter(param="batch_size")
     
-    weights = []
+    # weights = []
 
-    for w in peers_weights:
-        # w = utils.get_weights(path=path)
-        m = load_weights_into_model(w)
-        weights.append(m)
-       
-    weights.append(local_model)
-    peers_indices.append(int(os.getenv("MY_ID")))
-    local_model = aggregate(peers_weights=weights, peers_indices=peers_indices)
+    # for w in peers_weights:
+    #     # w = utils.get_weights(path=path)
+    #     m = load_weights_into_model(w)
+    #     weights.append(m)
+    
+    # if not initial:
+    #     weights.append(local_model)
+    #     peers_indices.append(int(os.getenv("MY_ID")))
+    # local_model = aggregate(peers_weights=weights, peers_indices=peers_indices)
 
     attack = 0
 
@@ -276,9 +276,9 @@ def train(local_model, opt, peers_weights, peers_indices, dishonest_peers=[], al
 
     if int(os.getenv("MY_ID")) in dishonest_peers:
         attack += 1
-        loss, local_model = client_update(client_model=local_model, optimizer=opt, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
+        loss, local_model = client_update(local_model=local_model, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
     else:
-        loss, local_model = client_update(client_model=local_model, optimizer=opt, train_loader=train_loader, epoch=epochs)
+        loss, local_model = client_update(local_model=local_model, train_loader=train_loader, epoch=epochs)
 
     return loss, attack, local_model
 
@@ -307,20 +307,18 @@ def load_weights_into_model(weights):
     return local_model
 
 
-def get_optimizer():
+def get_optimizer(local_model):
     dataset = utils.get_parameter(param="dataset")
+    opt = None
     if dataset == "MNIST":
         lr = 0.01
-        model = SFMNet(784, 10)
-        opt = optim.SGD(model.parameters(), lr=lr)
+        opt = optim.SGD(local_model.parameters(), lr=lr)
     elif dataset == "CIFAR":
         lr = 0.1
-        model = VGG('VGG19')
-        opt = optim.SGD(model.parameters(), lr=lr)
+        opt = optim.SGD(local_model.parameters(), lr=lr)
     elif dataset == "KDD":
         lr = 0.001
-        model = SFMNet(n_features= 41, n_classes= 23)
-        opt = optim.SGD(model.parameters(), lr=lr)
+        opt = optim.SGD(local_model.parameters(), lr=lr)
     return opt
 
 
@@ -342,28 +340,31 @@ def learn(modelID):
     
     print(os.getenv("MY_NAME"), "Learning")
     loop.run_until_complete(utils.send_log("Learning"))
-    if not exists(os.getenv("TMP_FOLDER") + modelID + ".pt"):
-        local_model = initialize(modelID)
-    else:
-        local_model = load_local_model()
-        local_model.load_state_dict(torch.load(os.getenv("TMP_FOLDER") + modelID + ".pt"))
     
-    weights, indices, parents = utils.get_weights_to_train(modelID=modelID)
+    weights_ids, indices, parents = utils.get_weights_to_train(modelID=modelID)
 
-    message = "Weights to Train From = " + str(len(weights))
+    peers_weights = []
+    for wid in weights_ids:
+        m = load_weights_into_model(wid)
+        peers_weights.append(m)
+
+    if exists(os.getenv("TMP_FOLDER") + modelID + ".pt") and len(weights_ids) > 0:
+        w = torch.load(os.getenv("TMP_FOLDER") + modelID + ".pt")
+        m = load_weights_into_model(w)
+        peers_weights.append(m)
+
+    local_model = aggregate(peers_weights=peers_weights, peers_indices=indices)
+
+    message = "Weights to Train From = " + str(len(weights_ids))
     print(message)
     loop.run_until_complete(utils.send_log(message))
-    if len(weights) > 0:
+    if len(weights_ids) > 0:
         print(os.getenv("MY_NAME"), "Training")
         loss, attack, local_model = train(
             local_model=local_model,
-            opt=get_optimizer(),
             alpha=utils.get_parameter(param="alpha"),
             attack_type=utils.get_parameter(param="attack_type"),
-            peers_indices=indices,
-            peers_weights=weights,
         )
-        utils.clear_weights_ids(modelID)
 
         print(os.getenv("MY_NAME"), "Evaluating")
         loop.run_until_complete(utils.send_log("Evaluating"))

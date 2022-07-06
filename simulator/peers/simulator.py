@@ -1,9 +1,9 @@
 import json
 import subprocess
 import time
-import random
 import os
 import argparse
+
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -42,23 +42,20 @@ def start_containers(peers, limit=100):
     command = "docker-compose up -d " + peers_to_run
     subprocess.call(command, shell=True)
 
+
 def start_learning(dataset, peers, limit=100):
     if limit > len(peers):
         limit = len(peers)
 
     for peer in peers[:limit]:
-        command = "docker exec -it {} python3 /client/main.py -d {}".format(peer, dataset)
+        command = "docker exec -it {} python3 /client/main.py -d {} -al 0.05".format(peer, dataset)
         print("Learning ", peer)
         subprocess.call(command, shell=True)
-        w = random.randint(1, 10)
-        print("Sleeping for {} seconds".format(str(w)))
-        time.sleep(w)
 
 
 def initialize_protocol():
     command = "cd " + os.getenv("PROTOCOL_PATH") +  " && ./protocol init"
     subprocess.call(command, shell=True)
-
 
 
 def main():
@@ -68,7 +65,7 @@ def main():
 
     peers = load_peers()
     dataset = "MNIST"
-    limit = 10
+    limit = 100
 
     if clear == "true":
         stop_containers(peers=peers, limit=limit)
@@ -80,7 +77,11 @@ def main():
 
     initialize_protocol()
 
-    start_learning(peers=peers, dataset=dataset, limit=limit)
+    for i in range(0, 5):
+        print("\n\n\nIteration #{}".format(str(i)))
+        start_learning(peers=peers, dataset=dataset, limit=limit)
+
+    stop_containers(peers=peers, limit=limit)
 
     
 
