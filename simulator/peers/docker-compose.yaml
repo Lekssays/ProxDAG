@@ -12,7 +12,7 @@ services:
     environment:
     - MY_NAME=peer0.proxdag.io
     - MY_ID=0
-    - MY_PUB_KEY=MlaRTTCiRiQG2X7E0VODOMZ78
+    - MY_PUB_KEY=lOd3a0QTgkQMMSsm1RnWKmH1s
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -20,7 +20,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -36,7 +36,7 @@ services:
     environment:
     - MY_NAME=peer1.proxdag.io
     - MY_ID=1
-    - MY_PUB_KEY=2ltIFHhXySmdddmDRU9Aid7WZ
+    - MY_PUB_KEY=I5w1X8CjfiYQPt4HDexg9jVCy
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -44,7 +44,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -60,7 +60,7 @@ services:
     environment:
     - MY_NAME=peer2.proxdag.io
     - MY_ID=2
-    - MY_PUB_KEY=I9gzafBt7lmvNlC7tu4KPXWPd
+    - MY_PUB_KEY=s1kDN07aJBJKVtCl12NMH4NWJ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -68,7 +68,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -84,7 +84,7 @@ services:
     environment:
     - MY_NAME=peer3.proxdag.io
     - MY_ID=3
-    - MY_PUB_KEY=lLdyNGj15unNErwXcYHu4SQA9
+    - MY_PUB_KEY=8r6Qd35yCdpWyfxOpQgyRwEXD
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -92,7 +92,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -108,7 +108,7 @@ services:
     environment:
     - MY_NAME=peer4.proxdag.io
     - MY_ID=4
-    - MY_PUB_KEY=wkbaa8PFnHs4VChyOVBt9DAUn
+    - MY_PUB_KEY=HiwhxNlAyneCkGbqgzrh3rzSu
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -116,7 +116,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -132,7 +132,7 @@ services:
     environment:
     - MY_NAME=peer5.proxdag.io
     - MY_ID=5
-    - MY_PUB_KEY=PBiGvqH1Gcvu7NCrevoviEb07
+    - MY_PUB_KEY=JxvtWmVVu1jFBpLBLaVQ0aFvn
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -140,7 +140,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -156,7 +156,7 @@ services:
     environment:
     - MY_NAME=peer6.proxdag.io
     - MY_ID=6
-    - MY_PUB_KEY=d6WT48OPGGTFw14IdoomMds3k
+    - MY_PUB_KEY=ja53hcYb4X03ozF5xLquKbKcM
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -164,7 +164,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -180,7 +180,7 @@ services:
     environment:
     - MY_NAME=peer7.proxdag.io
     - MY_ID=7
-    - MY_PUB_KEY=B5qEj0BnVxWZSs8ZLZOwcyWo1
+    - MY_PUB_KEY=SnJcOGoNBsaiiE5fSCAzotaXe
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -188,7 +188,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -204,7 +204,7 @@ services:
     environment:
     - MY_NAME=peer8.proxdag.io
     - MY_ID=8
-    - MY_PUB_KEY=yXool1OOU0tpyzY6H5IJ1CZ8o
+    - MY_PUB_KEY=Sr0zWqWUBME8Te8oDIeJLKhmh
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -212,7 +212,7 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:
@@ -228,7 +228,7 @@ services:
     environment:
     - MY_NAME=peer9.proxdag.io
     - MY_ID=9
-    - MY_PUB_KEY=d2al8ja8atE2p2EDxxcfaNQme
+    - MY_PUB_KEY=eGUBiF9S7GFNwRsAWLV3tABvk
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -236,7 +236,2167 @@ services:
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
-    - DISHONEST_PEERS=6,4,7,8,1
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer10.proxdag.io:
+    container_name: peer10.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer10.proxdag.io
+    - MY_ID=10
+    - MY_PUB_KEY=TPGY7Z9vNb22Wiw8ktjEWkaOe
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer11.proxdag.io:
+    container_name: peer11.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer11.proxdag.io
+    - MY_ID=11
+    - MY_PUB_KEY=lMjeQyukowB8Sw39CSGUy8S97
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer12.proxdag.io:
+    container_name: peer12.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer12.proxdag.io
+    - MY_ID=12
+    - MY_PUB_KEY=EgprQRtOyPNroZI1sul7OXCYW
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer13.proxdag.io:
+    container_name: peer13.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer13.proxdag.io
+    - MY_ID=13
+    - MY_PUB_KEY=zEqd9qngJi8caUFE9CD1RCiCJ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer14.proxdag.io:
+    container_name: peer14.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer14.proxdag.io
+    - MY_ID=14
+    - MY_PUB_KEY=sDcv1apFhTJQmKafMuXKbrcCv
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer15.proxdag.io:
+    container_name: peer15.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer15.proxdag.io
+    - MY_ID=15
+    - MY_PUB_KEY=EfByk2PYJOIBiPxe8JYts9HcI
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer16.proxdag.io:
+    container_name: peer16.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer16.proxdag.io
+    - MY_ID=16
+    - MY_PUB_KEY=CEvVO14ZlVWWfyfQC3uJNmwWN
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer17.proxdag.io:
+    container_name: peer17.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer17.proxdag.io
+    - MY_ID=17
+    - MY_PUB_KEY=fL2V0YbGkjN9kvGHIhS9CsbKM
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer18.proxdag.io:
+    container_name: peer18.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer18.proxdag.io
+    - MY_ID=18
+    - MY_PUB_KEY=R1Ui1K15BsiLCHricOs50uFti
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer19.proxdag.io:
+    container_name: peer19.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer19.proxdag.io
+    - MY_ID=19
+    - MY_PUB_KEY=ZWNyAZOPfGVPqdY7xFEBMbHmh
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer20.proxdag.io:
+    container_name: peer20.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer20.proxdag.io
+    - MY_ID=20
+    - MY_PUB_KEY=tAGA3Zel6bvftdmnQlaaO40bD
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer21.proxdag.io:
+    container_name: peer21.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer21.proxdag.io
+    - MY_ID=21
+    - MY_PUB_KEY=zVHq3y8QcqytvEFUwO5o5kEPQ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer22.proxdag.io:
+    container_name: peer22.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer22.proxdag.io
+    - MY_ID=22
+    - MY_PUB_KEY=SUcWnXBBRpiM2YRAzKlINvLB0
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer23.proxdag.io:
+    container_name: peer23.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer23.proxdag.io
+    - MY_ID=23
+    - MY_PUB_KEY=wz1hEl6aYmGyuATScLV43Z0tC
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer24.proxdag.io:
+    container_name: peer24.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer24.proxdag.io
+    - MY_ID=24
+    - MY_PUB_KEY=DGFkO4xp9eyjEIzVvzNqqb7WB
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer25.proxdag.io:
+    container_name: peer25.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer25.proxdag.io
+    - MY_ID=25
+    - MY_PUB_KEY=kaNXsv9WpAWWG0nYi7xwP4E51
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer26.proxdag.io:
+    container_name: peer26.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer26.proxdag.io
+    - MY_ID=26
+    - MY_PUB_KEY=Sr6CPyBfrSoZudggK2IDI5SPJ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer27.proxdag.io:
+    container_name: peer27.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer27.proxdag.io
+    - MY_ID=27
+    - MY_PUB_KEY=8F73Bm09UHI9Hu2BWey5Duu60
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer28.proxdag.io:
+    container_name: peer28.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer28.proxdag.io
+    - MY_ID=28
+    - MY_PUB_KEY=U658es9YjDPejGKArgfaxOlyg
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer29.proxdag.io:
+    container_name: peer29.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer29.proxdag.io
+    - MY_ID=29
+    - MY_PUB_KEY=WDX0Xx727SgUFbZyhgYNQhr9e
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer30.proxdag.io:
+    container_name: peer30.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer30.proxdag.io
+    - MY_ID=30
+    - MY_PUB_KEY=dOS69OGoJAPri5v3x5rZ106hC
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer31.proxdag.io:
+    container_name: peer31.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer31.proxdag.io
+    - MY_ID=31
+    - MY_PUB_KEY=LsNOhIWQ40AqPW0yjDAK9fr8j
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer32.proxdag.io:
+    container_name: peer32.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer32.proxdag.io
+    - MY_ID=32
+    - MY_PUB_KEY=FyDYpJqH7UBRjc6ZkDXwOCH0C
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer33.proxdag.io:
+    container_name: peer33.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer33.proxdag.io
+    - MY_ID=33
+    - MY_PUB_KEY=29t4SAYzNxCI1v2aQQkdagPgm
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer34.proxdag.io:
+    container_name: peer34.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer34.proxdag.io
+    - MY_ID=34
+    - MY_PUB_KEY=AUOX5v0QpDu1q2D1GHtqjjyPV
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer35.proxdag.io:
+    container_name: peer35.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer35.proxdag.io
+    - MY_ID=35
+    - MY_PUB_KEY=RWJYoF40WSCIz6u6a8OkdCspW
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer36.proxdag.io:
+    container_name: peer36.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer36.proxdag.io
+    - MY_ID=36
+    - MY_PUB_KEY=FGNFl6hIPaSbkCNd0LXbGghBR
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer37.proxdag.io:
+    container_name: peer37.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer37.proxdag.io
+    - MY_ID=37
+    - MY_PUB_KEY=jxVAvj9DLpD2PqjLiyAJ5185f
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer38.proxdag.io:
+    container_name: peer38.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer38.proxdag.io
+    - MY_ID=38
+    - MY_PUB_KEY=ZpErr5uF6Ktd2tRYqX6qf7wH0
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer39.proxdag.io:
+    container_name: peer39.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer39.proxdag.io
+    - MY_ID=39
+    - MY_PUB_KEY=h5En9OyAgNr6zVIal204GImNr
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer40.proxdag.io:
+    container_name: peer40.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer40.proxdag.io
+    - MY_ID=40
+    - MY_PUB_KEY=TRUEISoqtoJzF3twgC5GowUsx
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer41.proxdag.io:
+    container_name: peer41.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer41.proxdag.io
+    - MY_ID=41
+    - MY_PUB_KEY=TZNWvAukV18wnS7yhAWWoqql7
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer42.proxdag.io:
+    container_name: peer42.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer42.proxdag.io
+    - MY_ID=42
+    - MY_PUB_KEY=5TY9V6wbgrY55kf2oZDB89RMF
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer43.proxdag.io:
+    container_name: peer43.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer43.proxdag.io
+    - MY_ID=43
+    - MY_PUB_KEY=KM7LurzroZb5mapw5kPeesNg7
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer44.proxdag.io:
+    container_name: peer44.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer44.proxdag.io
+    - MY_ID=44
+    - MY_PUB_KEY=UKWiYDFHawplzAdxlwTquRIrN
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer45.proxdag.io:
+    container_name: peer45.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer45.proxdag.io
+    - MY_ID=45
+    - MY_PUB_KEY=irgwKXft2ndryxuo3JZ07irZ7
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer46.proxdag.io:
+    container_name: peer46.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer46.proxdag.io
+    - MY_ID=46
+    - MY_PUB_KEY=Rf8VHJVpRdTfAumaTxxX6Onwj
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer47.proxdag.io:
+    container_name: peer47.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer47.proxdag.io
+    - MY_ID=47
+    - MY_PUB_KEY=roqeAnTz2W0Byl4gZ4uWoWgPp
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer48.proxdag.io:
+    container_name: peer48.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer48.proxdag.io
+    - MY_ID=48
+    - MY_PUB_KEY=ftPxxwLNdfRnd3oZTOi7g541p
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer49.proxdag.io:
+    container_name: peer49.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer49.proxdag.io
+    - MY_ID=49
+    - MY_PUB_KEY=zxZmvDQ3ps3LoZBXvFC4WdxF2
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer50.proxdag.io:
+    container_name: peer50.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer50.proxdag.io
+    - MY_ID=50
+    - MY_PUB_KEY=mrVT1Bs4DJ5g6P8kEUdQdWfoF
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer51.proxdag.io:
+    container_name: peer51.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer51.proxdag.io
+    - MY_ID=51
+    - MY_PUB_KEY=rRV45HN3UKPJp73d5Pi0Vt2pE
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer52.proxdag.io:
+    container_name: peer52.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer52.proxdag.io
+    - MY_ID=52
+    - MY_PUB_KEY=jA0PyVs6R8GAfEfBLiw6NqyQY
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer53.proxdag.io:
+    container_name: peer53.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer53.proxdag.io
+    - MY_ID=53
+    - MY_PUB_KEY=bkVSuI9zW0i2Axhib7hNZmgw9
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer54.proxdag.io:
+    container_name: peer54.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer54.proxdag.io
+    - MY_ID=54
+    - MY_PUB_KEY=cQzyTJXLuBNQMBWN2T1MIMx8K
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer55.proxdag.io:
+    container_name: peer55.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer55.proxdag.io
+    - MY_ID=55
+    - MY_PUB_KEY=azvvAfUmDhINN6ARDH6KzGvIY
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer56.proxdag.io:
+    container_name: peer56.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer56.proxdag.io
+    - MY_ID=56
+    - MY_PUB_KEY=FKgWo14unL9TnwVfrL0web0qb
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer57.proxdag.io:
+    container_name: peer57.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer57.proxdag.io
+    - MY_ID=57
+    - MY_PUB_KEY=PV0dW04Nj81HwHOYHMgNveyed
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer58.proxdag.io:
+    container_name: peer58.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer58.proxdag.io
+    - MY_ID=58
+    - MY_PUB_KEY=kRem1CWghbZSGV9VLH8mLYR8d
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer59.proxdag.io:
+    container_name: peer59.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer59.proxdag.io
+    - MY_ID=59
+    - MY_PUB_KEY=PpQlmWfkoJgV48caCt8DJsQ0u
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer60.proxdag.io:
+    container_name: peer60.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer60.proxdag.io
+    - MY_ID=60
+    - MY_PUB_KEY=iy2FxMZ03kD7aepRBtDAemrAA
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer61.proxdag.io:
+    container_name: peer61.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer61.proxdag.io
+    - MY_ID=61
+    - MY_PUB_KEY=mDDoPHHFW6JosId8RWvEANwe5
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer62.proxdag.io:
+    container_name: peer62.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer62.proxdag.io
+    - MY_ID=62
+    - MY_PUB_KEY=GnEZvnV0DIUxRA8T0oForNQvz
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer63.proxdag.io:
+    container_name: peer63.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer63.proxdag.io
+    - MY_ID=63
+    - MY_PUB_KEY=5o93x1K1bBEB65qK3hiNHXJi2
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer64.proxdag.io:
+    container_name: peer64.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer64.proxdag.io
+    - MY_ID=64
+    - MY_PUB_KEY=PLpWTRtGnvkzjAbMFrD5BtzTH
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer65.proxdag.io:
+    container_name: peer65.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer65.proxdag.io
+    - MY_ID=65
+    - MY_PUB_KEY=9T6vLhMH9uysJRuswdYyBv5pZ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer66.proxdag.io:
+    container_name: peer66.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer66.proxdag.io
+    - MY_ID=66
+    - MY_PUB_KEY=S1UNxiaFQAg9O9QSyTnPAuGxk
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer67.proxdag.io:
+    container_name: peer67.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer67.proxdag.io
+    - MY_ID=67
+    - MY_PUB_KEY=PdsCRd5Xi5ie1LqLJKahbqVDM
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer68.proxdag.io:
+    container_name: peer68.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer68.proxdag.io
+    - MY_ID=68
+    - MY_PUB_KEY=eKpiTEMf668IPV8V2Vshgwwnk
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer69.proxdag.io:
+    container_name: peer69.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer69.proxdag.io
+    - MY_ID=69
+    - MY_PUB_KEY=JGgLZyzKzjwIoEjB5JaygkjI3
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer70.proxdag.io:
+    container_name: peer70.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer70.proxdag.io
+    - MY_ID=70
+    - MY_PUB_KEY=rPdDxs9TW88QTAGipGgvwKws1
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer71.proxdag.io:
+    container_name: peer71.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer71.proxdag.io
+    - MY_ID=71
+    - MY_PUB_KEY=ZmcT4ltE8d2cwWv1eju3GVMMa
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer72.proxdag.io:
+    container_name: peer72.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer72.proxdag.io
+    - MY_ID=72
+    - MY_PUB_KEY=C4t946TtFeE9LbTkT3qQZaf2L
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer73.proxdag.io:
+    container_name: peer73.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer73.proxdag.io
+    - MY_ID=73
+    - MY_PUB_KEY=YmGTAxCjmSvlkktHXG4HFhEPz
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer74.proxdag.io:
+    container_name: peer74.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer74.proxdag.io
+    - MY_ID=74
+    - MY_PUB_KEY=GOTA5pxsM6vOAzwEGzZfi2rqb
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer75.proxdag.io:
+    container_name: peer75.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer75.proxdag.io
+    - MY_ID=75
+    - MY_PUB_KEY=KagL2kgVGP3ssdqXqcHe9zpo7
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer76.proxdag.io:
+    container_name: peer76.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer76.proxdag.io
+    - MY_ID=76
+    - MY_PUB_KEY=CVxLJ3DpwzPJdpf5VBkdIu6XK
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer77.proxdag.io:
+    container_name: peer77.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer77.proxdag.io
+    - MY_ID=77
+    - MY_PUB_KEY=sHM0iOoLKnubMJfle1tQmFe1p
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer78.proxdag.io:
+    container_name: peer78.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer78.proxdag.io
+    - MY_ID=78
+    - MY_PUB_KEY=Gaj49FDYnNu83x7lSjJTumsV5
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer79.proxdag.io:
+    container_name: peer79.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer79.proxdag.io
+    - MY_ID=79
+    - MY_PUB_KEY=YpGFrwlx4VMaVkPZibUbsET0B
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer80.proxdag.io:
+    container_name: peer80.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer80.proxdag.io
+    - MY_ID=80
+    - MY_PUB_KEY=5Qd12yTihFlEiWCUund91NjBk
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer81.proxdag.io:
+    container_name: peer81.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer81.proxdag.io
+    - MY_ID=81
+    - MY_PUB_KEY=X1drK2wTXU2n7xmbaolM68kPq
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer82.proxdag.io:
+    container_name: peer82.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer82.proxdag.io
+    - MY_ID=82
+    - MY_PUB_KEY=r31j0QDFOAUSi3N8lSYlKRaBH
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer83.proxdag.io:
+    container_name: peer83.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer83.proxdag.io
+    - MY_ID=83
+    - MY_PUB_KEY=cRhrHwXMlueUCNk98m85psaqk
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer84.proxdag.io:
+    container_name: peer84.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer84.proxdag.io
+    - MY_ID=84
+    - MY_PUB_KEY=zAyciQpgqWvNRDEfGpyUniFh3
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer85.proxdag.io:
+    container_name: peer85.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer85.proxdag.io
+    - MY_ID=85
+    - MY_PUB_KEY=xkXrkKpN40II68guBiwlGaL7O
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer86.proxdag.io:
+    container_name: peer86.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer86.proxdag.io
+    - MY_ID=86
+    - MY_PUB_KEY=c9ZthZ7vYBIci5EV0ogqOYYdZ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer87.proxdag.io:
+    container_name: peer87.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer87.proxdag.io
+    - MY_ID=87
+    - MY_PUB_KEY=CdFz2Qj0On9duRkutjtTprQgw
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer88.proxdag.io:
+    container_name: peer88.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer88.proxdag.io
+    - MY_ID=88
+    - MY_PUB_KEY=AJxBqRDLnoIrKpMGG6T8VOOsO
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer89.proxdag.io:
+    container_name: peer89.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer89.proxdag.io
+    - MY_ID=89
+    - MY_PUB_KEY=1RQdlwG8hXdGfQ4GtaDm2cfkH
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer90.proxdag.io:
+    container_name: peer90.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer90.proxdag.io
+    - MY_ID=90
+    - MY_PUB_KEY=dT3WKyZaOKEkeIdkwGczdWWUw
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer91.proxdag.io:
+    container_name: peer91.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer91.proxdag.io
+    - MY_ID=91
+    - MY_PUB_KEY=UNC3ax4IwevOTw8W9WLi3Asia
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer92.proxdag.io:
+    container_name: peer92.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer92.proxdag.io
+    - MY_ID=92
+    - MY_PUB_KEY=4soYE58ZdGaHsEijB5nSl0Eri
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer93.proxdag.io:
+    container_name: peer93.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer93.proxdag.io
+    - MY_ID=93
+    - MY_PUB_KEY=81OkqD1bur3htUPJsSnouAzc5
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer94.proxdag.io:
+    container_name: peer94.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer94.proxdag.io
+    - MY_ID=94
+    - MY_PUB_KEY=mNQCPcbWAxvR4Etob0dDcSw4H
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer95.proxdag.io:
+    container_name: peer95.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer95.proxdag.io
+    - MY_ID=95
+    - MY_PUB_KEY=T9CR0k8f73anaGPZD4KW8gDW2
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer96.proxdag.io:
+    container_name: peer96.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer96.proxdag.io
+    - MY_ID=96
+    - MY_PUB_KEY=1EGoDzbGPBQIRRfJ0zEv94CED
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer97.proxdag.io:
+    container_name: peer97.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer97.proxdag.io
+    - MY_ID=97
+    - MY_PUB_KEY=u3C2HmxJbOn4HKOS9ilYCUJXL
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer98.proxdag.io:
+    container_name: peer98.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer98.proxdag.io
+    - MY_ID=98
+    - MY_PUB_KEY=QHYOopovZFHyqX0pwbUz2Kjrk
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
+    command: /bin/bash /client/hello.sh
+    working_dir: /client
+    volumes:
+    - ./../../protocol:/protocol
+    - ./client/:/client
+    - ./data/:/data
+    networks:
+    - outside
+
+  peer99.proxdag.io:
+    container_name: peer99.proxdag.io
+    image: lekssays/proxdag:latest
+    environment:
+    - MY_NAME=peer99.proxdag.io
+    - MY_ID=99
+    - MY_PUB_KEY=b2gLf6qsZHEfMM727hF5fwLQQ
+    - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
+    - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
+    - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
+    - LEVEL_DB_PATH=/ldb
+    - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
+    - TMP_FOLDER=/temp/
+    - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=28,31,42,66,83,69,77,15,3,40,21,19,41,27,59,46,39,36,12,89,43,10,30,37,58,35,63,17,53,71,90,34,88,57,8,91,62,95,65,85,0,97,5,26,76,4,74,16,50,25
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:

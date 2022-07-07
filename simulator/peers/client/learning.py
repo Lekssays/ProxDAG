@@ -23,6 +23,7 @@ np.random.seed(42)
 
 
 def client_update(local_model, train_loader, epoch=5, attack_type=None):
+    print(os.getenv("MY_NAME"), "attack_type", attack_type)
     dataset = utils.get_parameter(param="dataset")
     optimizer = get_optimizer(local_model)
     local_model.train()
