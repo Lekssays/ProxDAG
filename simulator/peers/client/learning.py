@@ -222,7 +222,7 @@ def evaluate(local_model, loss, attack=0):
     return acc, asr
 
 
-def train(local_model, dishonest_peers=[], alpha="100", attack_type="lf"):
+def train(local_model, alpha="100", attack_type="lf"):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -259,7 +259,8 @@ def train(local_model, dishonest_peers=[], alpha="100", attack_type="lf"):
         dat = TensorDataset(x, y)
         train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
 
-    if int(os.getenv("MY_ID")) in dishonest_peers:
+    dishonest_peers = utils.get_dishonest_peers()
+    if os.getenv("MY_ID") in dishonest_peers:
         attack += 1
         loss, local_model = client_update(local_model=local_model, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
     else:

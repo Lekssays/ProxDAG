@@ -8,6 +8,7 @@ import random
 import string
 import websockets
 import redis
+import math
 
 from datetime import datetime
 
@@ -43,12 +44,18 @@ def parse_args():
                         help = "Attack type: lf , backdoor, untargeted",
                         default = "",
                         required = False)
+    parser.add_argument('-ap', '--attack_percentage',
+                        dest = "attack_percentage",
+                        help = "Attack percentage",
+                        default = "0",
+                        required = False)
     parser.add_argument('-dc', '--dynamic_committee',
                         dest = "dc",
                         help = "Enable dynamic committee",
                         default = "true",
                         required = False)
     return parser.parse_args()
+
 
 def load_peers():
     peers = []
@@ -108,7 +115,7 @@ def write(filename: str, content: str):
     writing_file.close()
 
 
-def generate_peers_configs(peers: list, num_peers: int) -> list:
+def generate_peers_configs(peers: list, num_peers: int, dishonest_peers: list) -> list:
     configs = []
     base_filename = "./templates/peer.yaml"
     for i in range (0, num_peers):
@@ -117,6 +124,8 @@ def generate_peers_configs(peers: list, num_peers: int) -> list:
         content = content.replace("peer_name", peers[i]['name'])
         content = content.replace("peer_id", peers[i]['id'])
         content = content.replace("my_pub_key", peers[i]['pubkey'])
+        if len(dishonest_peers) > 0:
+            content = content.replace("dishonest_peers", ",".join(dishonest_peers))
         config_file.close()
         configs.append(content)
     return configs
@@ -174,6 +183,17 @@ def clear_host_state():
     r.flushall()
 
 
+def generate_dishonest_peers(peers_len, percentage):
+    dishonest_peers = []
+    if percentage > 0:
+        for i in range(0, peers_len):
+            dishonest_peers.append(str(i))
+        random.shuffle(dishonest_peers)
+        limit = math.ceil((percentage/100.0) * peers_len)
+        return dishonest_peers[:limit]
+    return dishonest_peers
+
+
 def main():
     print("Simulator :)")
     loop = asyncio.new_event_loop()
@@ -185,11 +205,18 @@ def main():
     dataset = parse_args().dataset
     iterations = int(parse_args().iterations)
     attack_type = parse_args().attack_type
+    attack_percentage = int(parse_args().attack_percentage)
     dc = parse_args().dc
 
     print("Generating docker-compose.yaml")
     peers = generate_peers(num_peers=peers_len)
-    configs = generate_peers_configs(peers=peers, num_peers=peers_len)
+    
+    dishonest_peers = []
+    if len(attack_type) > 0:
+        dishonest_peers = generate_dishonest_peers(peers_len, attack_percentage)
+        print("Dishonest Peers", dishonest_peers)
+
+    configs = generate_peers_configs(peers=peers, num_peers=peers_len, dishonest_peers=dishonest_peers)
     generate_docker_compose(configs=configs)
     copy_peers()
 

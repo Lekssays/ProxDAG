@@ -12,6 +12,7 @@
     - PROXDAG_ENDPOINT=http://172.17.0.1:8080/proxdag
     - TMP_FOLDER=/temp/
     - DATA_FOLDER=/data/
+    - DISHONEST_PEERS=dishonest_peers
     command: /bin/bash /client/hello.sh
     working_dir: /client
     volumes:

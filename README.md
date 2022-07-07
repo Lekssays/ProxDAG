@@ -59,3 +59,7 @@ A DAG-based Personalized Fully-Decentralized Learning Framework
 - Install golang dependencies 
 
 ```cd $HOME/ProxDAG/protocol/ && go mod tidy && go build```
+
+- Start ProxDAG Host Listener
+
+```cd $HOME/ProxDAG/protocol/ && ./protocol listener```

@@ -23,3 +23,8 @@ simulator/peers/tmp
 logs/system.log
 logs/metrics.log
 logs/results/*.log
+simulator/peers/peers.json
+.gitignore
+protocol/consensus/peers.json
+simulator/peers/client/peers.json
+*.log

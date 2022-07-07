@@ -323,3 +323,11 @@ async def send_log(message: str):
     message = dt + " - [" + os.getenv("MY_NAME") + "] " + message
     async with websockets.connect(uri) as websocket:
         await websocket.send(message)
+
+
+def get_dishonest_peers():
+    dishonest_peers = os.getenv("DISHONEST_PEERS")
+    if dishonest_peers == "dishonest_peers":
+        return list()
+    dishonest_peers.split(",")
+    return dishonest_peers
