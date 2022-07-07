@@ -1,5 +1,4 @@
 argparse
-plyvel
 torch
 torchvision
 pandas
@@ -9,3 +8,4 @@ requests
 protobuf
 websockets
 asyncio
+redis

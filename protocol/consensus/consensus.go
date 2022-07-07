@@ -2,6 +2,7 @@ package consensus
 
 import (
 	"bytes"
+	"context"
 	"encoding/gob"
 	"encoding/json"
 	"errors"
@@ -10,7 +11,6 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -19,11 +19,11 @@ import (
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
 	scpb "github.com/Lekssays/ProxDAG/protocol/proto/score"
+	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/sbinet/npyio"
-	"github.com/syndtr/goleveldb/leveldb"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -41,16 +41,6 @@ const (
 	IPFS_ENDPOINT         = "http://0.0.0.0:5001"
 )
 
-type Peers struct {
-	Peers []Peer `json:"peers"`
-}
-
-type Peer struct {
-	Pubkey string `json:"pubkey"`
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-}
-
 type Payload struct {
 	File []byte `json:"file"`
 }
@@ -60,7 +50,7 @@ type Gradients struct {
 }
 
 // ComputeCS returns the cosine similarity of two vectors
-func ComputeCS(a []float64, b []float64) (float64, error) {
+func ComputeCS(a []float64, b []float64) float64 {
 	count := 0
 	length_a := len(a)
 	length_b := len(b)
@@ -86,11 +76,11 @@ func ComputeCS(a []float64, b []float64) (float64, error) {
 		s2 += math.Pow(b[k], 2)
 	}
 	if s1 == 0 || s2 == 0 {
-		return 0.0, errors.New("Vectors should not be null (all zeros)")
+		return float64(0.0)
 	}
 
 	cosine := sumA / (math.Sqrt(s1) * math.Sqrt(s2))
-	return cosine, nil
+	return cosine
 }
 
 func getAverage(a []float64) float64 {
@@ -102,11 +92,14 @@ func getAverage(a []float64) float64 {
 }
 
 func ComputeCSMatrix(modelID string) ([][]float64, error) {
-	var csMatrix [][]float64
-
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
 		return [][]float64{}, err
+	}
+
+	csMatrix := make([][]float64, len(clients))
+	for i := range csMatrix {
+		csMatrix[i] = make([]float64, len(clients))
 	}
 
 	gradients, err := GetLatestGradients(modelID)
@@ -116,34 +109,23 @@ func ComputeCSMatrix(modelID string) ([][]float64, error) {
 
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
-			if clients[i] == clients[j] {
-				csMatrix[i][j] = 1.0
-				csMatrix[j][i] = 1.0
-				continue
-			}
-
 			flattenedGradientsA := flatten(gradients[clients[i]])
 			flattenedGradientsB := flatten(gradients[clients[j]])
-			csMatrix[i][j], err = ComputeCS(flattenedGradientsA, flattenedGradientsB)
-			if err != nil {
-				return [][]float64{}, err
-			}
-
+			csMatrix[i][j] = ComputeCS(flattenedGradientsA, flattenedGradientsB)
 			csMatrix[j][i] = csMatrix[i][j]
 		}
 	}
-
 	return csMatrix, nil
 }
 
 func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
-	var algnScore []float64
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
 		return []float64{}
 	}
+
+	algnScore := make([]float64, len(clients))
 	for i := 0; i < len(clients); i++ {
-		// warning(lekssays): not sure about the alignment score
 		algnScore[i] = getAverage(csMatrix[i])
 	}
 	return algnScore
@@ -169,7 +151,7 @@ func EvaluatePardoning(modelID string, algnScore []float64, csMatrix [][]float64
 }
 
 func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, error) {
-	var trustScores map[string]float32
+	trustScores := make(map[string]float32)
 
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
@@ -188,20 +170,21 @@ func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, erro
 }
 
 func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return &scpb.Score{}, err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	key := fmt.Sprintf("%s!%s", modelID, scoreType)
-	data, err := db.Get([]byte(key), nil)
+	data, err := rdb.Get(ctx, key).Result()
 	if err != nil {
 		return &scpb.Score{}, err
 	}
 
 	score := &scpb.Score{}
-	err = proto.Unmarshal(data, score)
+	err = proto.Unmarshal([]byte(data), score)
 	if err != nil {
 		return &scpb.Score{}, err
 	}
@@ -305,11 +288,12 @@ func AddContentIPFS(content []byte) (string, error) {
 }
 
 func StoreScoreOnLevelDB(modelID string, score scpb.Score) error {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	scoreBytes, err := proto.Marshal(&score)
 	if err != nil {
@@ -330,7 +314,7 @@ func StoreScoreOnLevelDB(modelID string, score scpb.Score) error {
 	}
 
 	key := fmt.Sprintf("%s!%s", modelID, scoreType)
-	err = db.Put([]byte(key), scoreBytes, nil)
+	err = rdb.Set(ctx, key, scoreBytes, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -451,10 +435,11 @@ func GetLatestGradients(modelID string) (map[string][][]float64, error) {
 		return gradients.Content, err
 	}
 
-	reader := bytes.NewReader(latestGradientBytes)
-	dec := gob.NewDecoder(reader)
+	buf := bytes.NewBuffer(latestGradientBytes[512:len(latestGradientBytes)])
+	dec := gob.NewDecoder(buf)
 	err = dec.Decode(&gradients)
 	if err != nil {
+		fmt.Println("GetLatestGradients-latestGradientBytes", err.Error())
 		return gradients.Content, err
 	}
 
@@ -462,14 +447,15 @@ func GetLatestGradients(modelID string) (map[string][][]float64, error) {
 }
 
 func GetLatestRoundTimestamp(modelID string) (uint32, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return uint32(time.Now().Unix()), err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	key := fmt.Sprintf("%s!timestamp", modelID)
-	timestampStr, err := db.Get([]byte(key), nil)
+	timestampStr, err := rdb.Get(ctx, key).Result()
 	if err != nil {
 		return uint32(time.Now().Unix()), err
 	}
@@ -483,16 +469,17 @@ func GetLatestRoundTimestamp(modelID string) (uint32, error) {
 }
 
 func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	key := fmt.Sprintf("%s!timestamp", modelID)
 	var timestampStr = strconv.FormatUint(uint64(timestamp), 10)
 
-	err = db.Put([]byte(key), []byte(timestampStr), nil)
+	err := rdb.Set(ctx, key, timestampStr, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -503,14 +490,14 @@ func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
 func StoreGradientsIPFS(gradients map[string][][]float64) (string, error) {
 	gradientsStruct := Gradients{Content: gradients}
 
-	var network bytes.Buffer
-	enc := gob.NewEncoder(&network)
+	buf := new(bytes.Buffer)
+	enc := gob.NewEncoder(buf)
 	err := enc.Encode(gradientsStruct)
 	if err != nil {
 		return "", err
 	}
 
-	path, err := AddContentIPFS(network.Bytes())
+	path, err := AddContentIPFS(buf.Bytes())
 	if err != nil {
 		return "", err
 	}
@@ -590,7 +577,7 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 }
 
 func ComputeGradients(modelID string) (map[string][][]float64, error) {
-	var gradients map[string][][]float64
+	gradients := make(map[string][][]float64)
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
 		return gradients, err
@@ -617,8 +604,6 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 			gradients[clients[i]] = addMatrix(latestGradient[clients[i]], substractWeights)
 		}
 	}
-
-	fmt.Println("Gradients", gradients)
 
 	// publish the new gradients
 	gradientsPath, err := StoreGradientsIPFS(gradients)
@@ -683,8 +668,8 @@ func ComputePhi(algnScores []float64) []float64 {
 	return phi
 }
 
-func getClientIDLocally(pubkey string) (int, error) {
-	pubkeys, err := LoadClients()
+func getClientIDLocally(modelID string, pubkey string) (int, error) {
+	pubkeys, err := graph.GetClients(modelID)
 	if err != nil {
 		return -1, err
 	}
@@ -701,7 +686,7 @@ func getClientIDLocally(pubkey string) (int, error) {
 func converTrustToSlice(modelID string, trust map[string]float32) ([]float32, error) {
 	trustScores := make([]float32, len(trust))
 	for pubkey, score := range trust {
-		id, err := getClientIDLocally(pubkey)
+		id, err := getClientIDLocally(modelID, pubkey)
 		if err != nil {
 			return []float32{}, err
 		}
@@ -795,14 +780,13 @@ func Run(modelID string) error {
 		return err
 	}
 
+	fmt.Println("csMatrix", csMatrix)
 	algnScore := ComputeAlignmentScore(modelID, csMatrix)
-
 	csMatrix, algnScore, err = EvaluatePardoning(modelID, algnScore, csMatrix)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("csMatrix", csMatrix)
 	err = PublishScore(modelID, csMatrix, SIMILARITY_PURPOSE_ID)
 	if err != nil {
 		return err
@@ -811,6 +795,7 @@ func Run(modelID string) error {
 	fmt.Println("algnScore", algnScore)
 	err = PublishScore(modelID, algnScore, ALIGNMENT_PURPOSE_ID)
 	if err != nil {
+		fmt.Println("algnScore Error", err.Error())
 		return err
 	}
 
@@ -820,7 +805,6 @@ func Run(modelID string) error {
 	if err != nil {
 		return err
 	}
-	
 
 	trustScore, err := ComputeTrust(modelID, algnScore)
 	if err != nil {
@@ -841,34 +825,12 @@ func Run(modelID string) error {
 	return nil
 }
 
-func LoadClients() ([]string, error) {
-	jsonFile, err := os.Open("./consensus/peers.json")
-
-	if err != nil {
-		return []string{}, err
-	}
-
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-
-	var peers Peers
-	json.Unmarshal(byteValue, &peers)
-
-	var pubkeys []string
-	for i := 0; i < len(peers.Peers); i++ {
-		pubkeys = append(pubkeys, peers.Peers[i].Pubkey)
-	}
-
-	return pubkeys, nil
-}
-
 func Initialize(modelID string, x int, y int) error {
-	clients, err := LoadClients()
+	clients, err := graph.GetClients(modelID)
 	if err != nil {
 		return err
 	}
-
+	
 	empty2DSlice := make([][]float64, y)
 	for i := range empty2DSlice {
 		empty2DSlice[i] = make([]float64, x)
@@ -911,6 +873,7 @@ func Initialize(modelID string, x int, y int) error {
 		csMatrix[i] = make([]float64, len(clients))
 	}
 
+	fmt.Println("csMatrix", csMatrix)
 	err = PublishScore(modelID, csMatrix, SIMILARITY_PURPOSE_ID)
 	if err != nil {
 		return err
@@ -922,6 +885,7 @@ func Initialize(modelID string, x int, y int) error {
 	}
 
 	phiScore := ComputePhi(empty1DSlice)
+	fmt.Println("phiScore", phiScore)
 	err = PublishScore(modelID, phiScore, PHI_PURPOSE_ID)
 	if err != nil {
 		return err
@@ -932,6 +896,7 @@ func Initialize(modelID string, x int, y int) error {
 		trustScore[clients[i]] = 0.00
 	}
 
+	fmt.Println("trustScore", trustScore)
 	err = PublishScore(modelID, trustScore, TRUST_PURPOSE_ID)
 	if err != nil {
 		return err

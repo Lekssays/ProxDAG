@@ -5,12 +5,12 @@ import score_pb2
 import torch
 import io
 import requests
-import plyvel
 import json
 import os
 import time
 import random 
 import websockets
+import redis
 
 import numpy as np
 
@@ -95,33 +95,15 @@ def get_content_from_ipfs(path: str):
 
 
 def get_resource_from_leveldb(key: str):
-    try:
-        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-        resource =  db.get(bytes(key, encoding='utf8'))
-        db.close()
-        return resource
-    except Exception as e:
-        print("ERROR" + str(e.decode("utf-8")))
-        time.sleep(2)
-        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-        resource =  db.get(bytes(key, encoding='utf8'))
-        db.close()
-        print("ERROR" + str(e.decode("utf-8")))
-        return resource
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    value = r.get(key)
+    return value
 
 
-def store_resource_on_leveldb(key: str, content: bytes):
-    try:
-        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-        db.put(bytes(key, encoding='utf8'), content)
-        db.close()
-    except Exception as e:
-        print("ERROR", str(e))
-        time.sleep(2)
-        db = plyvel.DB(LEVEL_DB_PATH, create_if_missing=True)
-        db.put(bytes(key, encoding='utf8'), content)
-        db.close()
-        print("FIXED", str(e))
+def store_resource_on_redis(key: str, content: bytes):
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    res = r.set(key, content)
+    return res
 
 
 def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
@@ -135,30 +117,20 @@ def get_model_update(messageID: str) -> modelUpdate_pb2.ModelUpdate:
 
 
 def get_similarity():
-    similarity_bytes = get_resource_from_leveldb(key="similarity")
-    
-    if similarity_bytes is None:
-        num_clients = get_parameter(param="num_clients")
-        similarity = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
-        return similarity
-
-    similarity_path = str(similarity_bytes).split('"')
+    similarity_path = get_resource_from_leveldb(key="similarity")
+    if similarity_path is None:
+        return None
+    similarity_path = str(similarity_path).split('"')
     similarity_bytes = get_content_from_ipfs(path=similarity_path[1])
-    
     return np.load(BytesIO(similarity_bytes))
 
 
 def get_trust():
-    trust_bytes = get_resource_from_leveldb(key="trust")
-    
-    if trust_bytes is None:
-        num_clients = get_parameter(param="num_clients")
-        trust = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
-        return trust
-
-    trust_path = str(trust_bytes).split('"')
+    trust_path = get_resource_from_leveldb(key="trust")
+    if trust_path is None:
+        return None
+    trust_path = str(trust_path).split('"')
     trust_bytes = get_content_from_ipfs(path=trust_path[1])
-    
     return np.load(BytesIO(trust_bytes))
 
 
@@ -205,7 +177,7 @@ def get_weights_ids(modelID, limit):
         content = f.readlines()
         for line in content:
             line = line.strip()
-            if line not in weights:
+            if line not in weights and len(line) > 0:
                 weights.append(line)
 
     if limit >= len(weights):
@@ -305,12 +277,8 @@ def publish_model_update(modelID, accuracy, parents, model, weights):
 
 def get_phi():
     phi_path = get_resource_from_leveldb(key="phi")
-    
     if phi_path is None:
-        num_clients = get_parameter(param="num_clients")
-        phi = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
-        return phi
-
+        return
     phi_path = str(phi_path).split('"')
     phi_bytes = get_content_from_ipfs(path=phi_path[1])
     return np.load(BytesIO(phi_bytes))
@@ -323,19 +291,18 @@ def process_message(message):
     print(purpose, payload)
     payload_bytes = bytes(text_format.MessageToString(payload), encoding='utf8')
     if int(purpose) in [MODEL_UPDATE_PYTHON_PURPOSE_ID, MODEL_UPDATE_GOLANG_PURPOSE_ID]:
-        store_resource_on_leveldb(messageID, payload_bytes)
-        store_weight_id(modelID=payload.modelID, messageID=messageID)
-    elif int(purpose) in [TRUST_PURPOSE_ID, SIMILARITY_PURPOSE_ID, GRADIENTS_PURPOSE_ID, PHI_PURPOSE_ID, ALIGNMENT_PURPOSE_ID]:
+        if payload.pubkey != os.getenv("MY_PUB_KEY"):
+            store_resource_on_redis(messageID, payload_bytes)
+            store_weight_id(modelID=payload.modelID, messageID=messageID)
+    elif int(purpose) in [TRUST_PURPOSE_ID, SIMILARITY_PURPOSE_ID, PHI_PURPOSE_ID, ALIGNMENT_PURPOSE_ID]:
         if int(purpose) == TRUST_PURPOSE_ID:
-            store_resource_on_leveldb("trust", payload_bytes)
+            store_resource_on_redis("trust", payload_bytes)
         elif int(purpose) == SIMILARITY_PURPOSE_ID:
-            store_resource_on_leveldb("similarity", payload_bytes)             
-        elif int(purpose) == GRADIENTS_PURPOSE_ID:
-            store_resource_on_leveldb("gradients", payload_bytes)
+            store_resource_on_redis("similarity", payload_bytes)
         elif int(purpose) == ALIGNMENT_PURPOSE_ID:
-            store_resource_on_leveldb("algnscore", payload_bytes)
+            store_resource_on_redis("algnscore", payload_bytes)
         elif int(purpose) == PHI_PURPOSE_ID:
-            store_resource_on_leveldb("phi", payload_bytes)
+            store_resource_on_redis("phi", payload_bytes)
 
 
 def get_my_latest_accuracy():
@@ -347,7 +314,7 @@ def get_my_latest_accuracy():
 
 def store_my_latest_accuracy(accuracy: float):
     content = bytes(str(accuracy), encoding="utf-8")
-    store_resource_on_leveldb(key="accuracy", content=content)
+    store_resource_on_redis(key="accuracy", content=content)
 
 
 async def send_log(message: str):

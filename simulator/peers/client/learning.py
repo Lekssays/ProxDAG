@@ -61,6 +61,8 @@ def aggregate(peers_indices, peers_weights=[]):
     if len(peers_weights) == 0:
         return
     phi = utils.get_phi()
+    if phi is None:
+        return
     global_dict = peers_weights[-1].state_dict()
     for k in global_dict.keys():
         global_dict[k] = torch.stack([peers_weights[idx].state_dict()[k].float()* phi[peers_indices[idx]] for idx in range(0, len(peers_indices))], 0).mean(0)
@@ -208,7 +210,7 @@ def evaluate(local_model, loss, attack=0):
     losses_test.append(test_loss)
     acc_test.append(acc)
 
-    message = 'average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / num_selected, test_loss, acc)
+    message = 'average train loss %0.6g | test loss %0.6g | test acc: %0.6f' % (loss / num_selected, test_loss, acc)
     print(message)
     loop.run_until_complete(utils.send_log(message))
     asr = attack/(len(test_loader)*batch_size)
@@ -241,26 +243,9 @@ def train(local_model, dishonest_peers=[], alpha="100", attack_type="lf"):
     epochs = utils.get_parameter(param="epochs")
     batch_size = utils.get_parameter(param="batch_size")
     
-    # weights = []
-
-    # for w in peers_weights:
-    #     # w = utils.get_weights(path=path)
-    #     m = load_weights_into_model(w)
-    #     weights.append(m)
-    
-    # if not initial:
-    #     weights.append(local_model)
-    #     peers_indices.append(int(os.getenv("MY_ID")))
-    # local_model = aggregate(peers_weights=weights, peers_indices=peers_indices)
-
     attack = 0
-
-    # client update
     loss = 0
-
     my_id = int(os.getenv("MY_ID"))
-
-    # read the local data
     if dataset == "MNIST" or dataset == "CIFAR":
         train_obj = pickle.load(open(os.getenv("DATA_FOLDER") + dataset + "/" + str(my_id) + "/train_" + alpha +"_.pickle", "rb"))
         x = torch.stack(train_obj.x)

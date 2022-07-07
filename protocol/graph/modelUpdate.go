@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -36,6 +37,16 @@ type Response struct {
 type Message struct {
 	Purpose uint32 `json:"purpose"`
 	Data    []byte `json:"data"`
+}
+
+type Peers struct {
+	Peers []Peer `json:"peers"`
+}
+
+type Peer struct {
+	Pubkey string `json:"pubkey"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
 }
 
 func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
@@ -241,27 +252,54 @@ func StoreClientID(pubkey string, modelID string) error {
 }
 
 func GetClients(modelID string) ([]string, error) {
-	messageIDs, err := GetModelUpdatesMessageIDs(modelID)
-
-	if err != nil {
-		return []string{}, err
+	if len(os.Getenv("ENVIRONMENT")) == 0 {
+		return []string{}, errors.New("Initialize ENVIRONMENT")
 	}
 
-	set := make(map[string]bool)
-	var clients []string
-	for i := 0; i < len(messageIDs); i++ {
-		modelUpdate, err := RetrieveModelUpdate(modelID, messageIDs[i])
+	if os.Getenv("ENVIRONMENT") == "DEV" {
+		jsonFile, err := os.Open("./consensus/peers.json")
 		if err != nil {
 			return []string{}, err
 		}
-		_, exists := set[modelUpdate.Pubkey]
-		if !exists {
-			clients = append(clients, modelUpdate.Pubkey)
-			set[modelUpdate.Pubkey] = true
+
+		defer jsonFile.Close()
+
+		byteValue, _ := ioutil.ReadAll(jsonFile)
+
+		var peers Peers
+		json.Unmarshal(byteValue, &peers)
+
+		var pubkeys []string
+		for i := 0; i < len(peers.Peers); i++ {
+			pubkeys = append(pubkeys, peers.Peers[i].Pubkey)
 		}
+
+		return pubkeys, nil
+	} else if os.Getenv("ENVIRONMENT") == "PROD" {
+		messageIDs, err := GetModelUpdatesMessageIDs(modelID)
+
+		if err != nil {
+			return []string{}, err
+		}
+
+		set := make(map[string]bool)
+		var clients []string
+		for i := 0; i < len(messageIDs); i++ {
+			modelUpdate, err := RetrieveModelUpdate(modelID, messageIDs[i])
+			if err != nil {
+				return []string{}, err
+			}
+			_, exists := set[modelUpdate.Pubkey]
+			if !exists {
+				clients = append(clients, modelUpdate.Pubkey)
+				set[modelUpdate.Pubkey] = true
+			}
+		}
+
+		return clients, nil
 	}
 
-	return clients, nil
+	return []string{}, errors.New("Invalid operation!")
 }
 
 func GetClientID(pubkey string, modelID string) (uint32, error) {

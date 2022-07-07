@@ -7,6 +7,7 @@ import argparse
 import random
 import string
 import websockets
+import redis
 
 from datetime import datetime
 
@@ -41,6 +42,11 @@ def parse_args():
                         dest = "attack_type",
                         help = "Attack type: lf , backdoor, untargeted",
                         default = "",
+                        required = False)
+    parser.add_argument('-dc', '--dynamic_committee',
+                        dest = "dc",
+                        help = "Enable dynamic committee",
+                        default = "true",
                         required = False)
     return parser.parse_args()
 
@@ -164,8 +170,8 @@ async def send_log(message: str):
         await websocket.send(message)
 
 def clear_host_state():
-    command = "rm -rf ./../../ldb/"
-    subprocess.call(command, shell=True)
+    r = redis.Redis()
+    r.flushall()
 
 
 def main():
@@ -179,6 +185,7 @@ def main():
     dataset = parse_args().dataset
     iterations = int(parse_args().iterations)
     attack_type = parse_args().attack_type
+    dc = parse_args().dc
 
     print("Generating docker-compose.yaml")
     peers = generate_peers(num_peers=peers_len)
@@ -192,42 +199,31 @@ def main():
         stop_containers(peers=peers, peers_len=peers_len)
         return
 
+    settings = "\nlog!dataset = {}, peers = {}, alpha = {}, iterations = {}, dync_committee = {}, attack_type = {}\n".format(dataset, str(peers_len), str(alpha), str(iterations), dc, attack_type)
+    loop.run_until_complete(send_log(settings))    
+    
     start_containers(peers=peers, peers_len=peers_len)
-    time.sleep(3)
+    time.sleep(5)
     initialize_protocol()
-    for i in range(0, iterations):
-        print("\nIteration #{}".format(str(i)))
+    time.sleep(5)
+    for i in range(1, iterations + 1):
+        print("Iteration #{}".format(str(i)))
         log_message = "log!\niteration #" + str(i) + "#\n"
         loop.run_until_complete(send_log(log_message))
         if len(attack_type) > 0:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
         else:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
+        if dc == "true":
+            print("\n Generating Scores for Iteration #{}".format(str(i)))
+            log_message = "\n\log!scores iteration #" + str(i) + "#\n\n\n"
+            loop.run_until_complete(send_log(log_message))
+            run_consensus()
+            time.sleep(5)
+
     stop_containers(peers=peers, peers_len=peers_len)
     clear_host_state()
 
-    log_message = "\n\n\nlog!==============WITH_DYN.COMM==================\n\n\n"
-    loop.run_until_complete(send_log(log_message))
-
-    time.sleep(300)
-    start_containers(peers=peers, peers_len=peers_len)
-    time.sleep(3)
-    initialize_protocol()
-    for i in range(0, iterations):
-        print("\nIteration #{}".format(str(i)))
-        log_message = "\nlog!iteration #" + str(i) + "#\n"
-        loop.run_until_complete(send_log(log_message))
-        if len(attack_type) > 0:
-            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
-        else:
-            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
-        time.sleep(20)
-        print("\n Generating Scores for Iteration #{}".format(str(i)))
-        log_message = "\n\log!scores iteration #" + str(i) + "#\n\n\n"
-        loop.run_until_complete(send_log(log_message))
-        run_consensus()
-    stop_containers(peers=peers, peers_len=peers_len)
-    clear_host_state()
 
 if __name__ == "__main__":
     main()
