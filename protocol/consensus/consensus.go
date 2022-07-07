@@ -618,6 +618,8 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 		}
 	}
 
+	fmt.Println("Gradients", gradients)
+
 	// publish the new gradients
 	gradientsPath, err := StoreGradientsIPFS(gradients)
 	if err != nil {
@@ -800,23 +802,32 @@ func Run(modelID string) error {
 		return err
 	}
 
+	fmt.Println("csMatrix", csMatrix)
 	err = PublishScore(modelID, csMatrix, SIMILARITY_PURPOSE_ID)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("algnScore", algnScore)
 	err = PublishScore(modelID, algnScore, ALIGNMENT_PURPOSE_ID)
 	if err != nil {
 		return err
 	}
 
 	phiScore := ComputePhi(algnScore)
+	fmt.Println("Phi", phiScore)
 	err = PublishScore(modelID, phiScore, PHI_PURPOSE_ID)
 	if err != nil {
 		return err
 	}
+	
 
 	trustScore, err := ComputeTrust(modelID, algnScore)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("trustScore", trustScore)
 	err = PublishScore(modelID, trustScore, TRUST_PURPOSE_ID)
 	if err != nil {
 		return err

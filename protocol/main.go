@@ -118,8 +118,8 @@ func main() {
 				wg.Wait()
 				<-timer
 			}
-		} else if args[0] == "consensus" {
-			fmt.Println("Running Consensus")
+		} else if args[0] == "vote" {
+			fmt.Println("Voting")
 			vote := vpb.Vote{
 				ModelID:  "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4",
 				VoteID:   "vote_iazea55ezze",
@@ -146,9 +146,10 @@ func main() {
 			}
 
 			fmt.Println("Retrieved Vote:", rvote)
-
+		} else if args[0] == "consensus" {
+			fmt.Println("Running consensus - Generating Scores")
 			modelID := "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
-			err = consensus.Run(modelID)
+			err := consensus.Run(modelID)
 			if err != nil {
 				fmt.Errorf(err.Error())
 			}

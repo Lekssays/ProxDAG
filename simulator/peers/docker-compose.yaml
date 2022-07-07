@@ -12,7 +12,7 @@ services:
     environment:
     - MY_NAME=peer0.proxdag.io
     - MY_ID=0
-    - MY_PUB_KEY=1w04ohZV3YU9b4Zi9f0lmtMQq
+    - MY_PUB_KEY=x6ueb6s3wIKzKbwHWc7bgVi3a
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -35,7 +35,7 @@ services:
     environment:
     - MY_NAME=peer1.proxdag.io
     - MY_ID=1
-    - MY_PUB_KEY=20EkcfqVwrW3fmMvYnXULCjcs
+    - MY_PUB_KEY=vZlTiw723OvMDdw8FMpIhhsk8
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -58,7 +58,7 @@ services:
     environment:
     - MY_NAME=peer2.proxdag.io
     - MY_ID=2
-    - MY_PUB_KEY=vuB1UYmLJXww7K9YW6aS6m7HS
+    - MY_PUB_KEY=sAbpfltvZwuB6O7UQiAy5yTLb
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -81,7 +81,7 @@ services:
     environment:
     - MY_NAME=peer3.proxdag.io
     - MY_ID=3
-    - MY_PUB_KEY=MPafnZhoKmoOoiaPlE6jnAJkW
+    - MY_PUB_KEY=ZrzVDc8lwBhJ3zx0m3i062AYa
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -104,7 +104,7 @@ services:
     environment:
     - MY_NAME=peer4.proxdag.io
     - MY_ID=4
-    - MY_PUB_KEY=TTPrQG2Hxv0jtpQcl51ZYv1hj
+    - MY_PUB_KEY=cMzLROnGmzVPdRlJpKMakVPrR
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -127,7 +127,7 @@ services:
     environment:
     - MY_NAME=peer5.proxdag.io
     - MY_ID=5
-    - MY_PUB_KEY=toFMUXJrOi7kf4PwQEuo0HT1Z
+    - MY_PUB_KEY=MUCMeJ8vy1LcFM2umm6hjl9hT
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -150,7 +150,7 @@ services:
     environment:
     - MY_NAME=peer6.proxdag.io
     - MY_ID=6
-    - MY_PUB_KEY=hNUnwFNkxnAkIaR0b2qGSvFIG
+    - MY_PUB_KEY=L3ZZ55VyIXaewbYveWTdfBskk
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -173,7 +173,7 @@ services:
     environment:
     - MY_NAME=peer7.proxdag.io
     - MY_ID=7
-    - MY_PUB_KEY=bIBeCfOMkYmKVoSvBXuiMeBJb
+    - MY_PUB_KEY=akVe3x2c9C2zGLJyMk3rmCnVu
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -196,7 +196,7 @@ services:
     environment:
     - MY_NAME=peer8.proxdag.io
     - MY_ID=8
-    - MY_PUB_KEY=9vAE72Crsv38Pd13uKffAkaG7
+    - MY_PUB_KEY=3E3uwO4Sh57HZ31Za6dIEwIpq
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -219,7 +219,7 @@ services:
     environment:
     - MY_NAME=peer9.proxdag.io
     - MY_ID=9
-    - MY_PUB_KEY=MaXTax9Yux8mDyhkDRL2GOt4u
+    - MY_PUB_KEY=cxzLlI8alb6sCho0C4vHEoez0
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -242,7 +242,7 @@ services:
     environment:
     - MY_NAME=peer10.proxdag.io
     - MY_ID=10
-    - MY_PUB_KEY=MSyznmLIdyAcYxkctBj5UDLzJ
+    - MY_PUB_KEY=EqSk4PdRrOxQIaWPXf35J3UVP
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -265,7 +265,7 @@ services:
     environment:
     - MY_NAME=peer11.proxdag.io
     - MY_ID=11
-    - MY_PUB_KEY=HX3jbuTtuVVBCoMiV2za0O8Ee
+    - MY_PUB_KEY=kwO0qa3iYVaxnKwPYL417PqoG
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -288,7 +288,7 @@ services:
     environment:
     - MY_NAME=peer12.proxdag.io
     - MY_ID=12
-    - MY_PUB_KEY=z6AARvmtzzl4LY3MI7LlwYxTa
+    - MY_PUB_KEY=o04ue6HpOZlANsxmq92CVGgfj
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -311,7 +311,7 @@ services:
     environment:
     - MY_NAME=peer13.proxdag.io
     - MY_ID=13
-    - MY_PUB_KEY=N3l4kGscBNI3tSpPJtHb58OGN
+    - MY_PUB_KEY=AtjrQgGInbryyYurtyX8FC5A8
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -334,7 +334,7 @@ services:
     environment:
     - MY_NAME=peer14.proxdag.io
     - MY_ID=14
-    - MY_PUB_KEY=A8FsOdRzCZCTdZbGoTXhjpfPy
+    - MY_PUB_KEY=pomDmg9pJZz6aESN8ubZN98KZ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -357,7 +357,7 @@ services:
     environment:
     - MY_NAME=peer15.proxdag.io
     - MY_ID=15
-    - MY_PUB_KEY=p9uufIiRbZiZoqpj04acE2ya1
+    - MY_PUB_KEY=8q2oHRLttbzNiHzgUbzjnOPBy
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -380,7 +380,7 @@ services:
     environment:
     - MY_NAME=peer16.proxdag.io
     - MY_ID=16
-    - MY_PUB_KEY=KiMJOUjVL7x0eXYLIATmrWfCp
+    - MY_PUB_KEY=vUAghVluzbURg5B8ClDRwRklP
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -403,7 +403,7 @@ services:
     environment:
     - MY_NAME=peer17.proxdag.io
     - MY_ID=17
-    - MY_PUB_KEY=tNaclFeDAeE6krX3aouYohpCa
+    - MY_PUB_KEY=Vi9DbSxRMwGGn17D2gzLhicfF
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -426,7 +426,7 @@ services:
     environment:
     - MY_NAME=peer18.proxdag.io
     - MY_ID=18
-    - MY_PUB_KEY=MnIoRYMLYNcRoD9vxBdz0HbiA
+    - MY_PUB_KEY=jzie7cXa9Nzbo7CXmgnQxTW7m
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -449,7 +449,7 @@ services:
     environment:
     - MY_NAME=peer19.proxdag.io
     - MY_ID=19
-    - MY_PUB_KEY=CsDZdqtd57XAUUDZkWpO1ISoA
+    - MY_PUB_KEY=sqVAybTvW07VSNnpYo9xmIUS0
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -472,7 +472,7 @@ services:
     environment:
     - MY_NAME=peer20.proxdag.io
     - MY_ID=20
-    - MY_PUB_KEY=Ve3v1X7mN5xSnfhy2gZmIWIJ4
+    - MY_PUB_KEY=lhqWLXQJK2xHszH9PUT6Jti2N
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -495,7 +495,7 @@ services:
     environment:
     - MY_NAME=peer21.proxdag.io
     - MY_ID=21
-    - MY_PUB_KEY=LeFMpNitAHOBuF6GZl5NQYbx7
+    - MY_PUB_KEY=eXMtZ7LKUW9Ta56Khdbx9jPf4
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -518,7 +518,7 @@ services:
     environment:
     - MY_NAME=peer22.proxdag.io
     - MY_ID=22
-    - MY_PUB_KEY=geWup0hl62GUS60F4byac4g5p
+    - MY_PUB_KEY=N5viapylUWPswxiNIzmwdZi1T
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -541,7 +541,7 @@ services:
     environment:
     - MY_NAME=peer23.proxdag.io
     - MY_ID=23
-    - MY_PUB_KEY=df7zsTqFOFLNTnZdei9FlVXR3
+    - MY_PUB_KEY=pCN4rQQj0PvygoKIRo8RNXnVi
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -564,7 +564,7 @@ services:
     environment:
     - MY_NAME=peer24.proxdag.io
     - MY_ID=24
-    - MY_PUB_KEY=3FGitGIxPJWuvR6bp5WunEf4O
+    - MY_PUB_KEY=VGWl8GNPJrX80abXKhJFfsizd
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -587,7 +587,7 @@ services:
     environment:
     - MY_NAME=peer25.proxdag.io
     - MY_ID=25
-    - MY_PUB_KEY=0HOI3N8YHMXul7k8j3MvehhNv
+    - MY_PUB_KEY=2CCOQsXGQCn7Oc5vUbUzaVfG2
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -610,7 +610,7 @@ services:
     environment:
     - MY_NAME=peer26.proxdag.io
     - MY_ID=26
-    - MY_PUB_KEY=06AGhVz3TwRS6Ccf5IXYN1Ruv
+    - MY_PUB_KEY=m3UFcYbkhsi1N9tnb8510VL7l
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -633,7 +633,7 @@ services:
     environment:
     - MY_NAME=peer27.proxdag.io
     - MY_ID=27
-    - MY_PUB_KEY=IqRjNhvRqEtEsoPprcybU7mlV
+    - MY_PUB_KEY=ZNGPCcE6pqevb3LCcgW1gnoie
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -656,7 +656,7 @@ services:
     environment:
     - MY_NAME=peer28.proxdag.io
     - MY_ID=28
-    - MY_PUB_KEY=kCuwK7ei0uW8WBamihGcZ0DvT
+    - MY_PUB_KEY=qunG4ImP2VCf53DcBbUGiY5cI
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -679,7 +679,7 @@ services:
     environment:
     - MY_NAME=peer29.proxdag.io
     - MY_ID=29
-    - MY_PUB_KEY=9VRnKcEW7de3uCh69uK9C7QwB
+    - MY_PUB_KEY=eRF6SDOTYBW5xxYRNm05EE6T3
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -702,7 +702,7 @@ services:
     environment:
     - MY_NAME=peer30.proxdag.io
     - MY_ID=30
-    - MY_PUB_KEY=w5Iwczo0tNh4KwKBqLim34g7P
+    - MY_PUB_KEY=GObVxeRnabDlc0Eweb5gOQb9F
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -725,7 +725,7 @@ services:
     environment:
     - MY_NAME=peer31.proxdag.io
     - MY_ID=31
-    - MY_PUB_KEY=lXPoSzbhcHFYPRce7679zHhMD
+    - MY_PUB_KEY=BWX5hrySweOpqFdTVL6OQ075y
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -748,7 +748,7 @@ services:
     environment:
     - MY_NAME=peer32.proxdag.io
     - MY_ID=32
-    - MY_PUB_KEY=mDQDtJSQ69B8P1GqyVmkFrFCR
+    - MY_PUB_KEY=P2nRrUzhucEobe7dLom3uBUnJ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -771,7 +771,7 @@ services:
     environment:
     - MY_NAME=peer33.proxdag.io
     - MY_ID=33
-    - MY_PUB_KEY=skITNktETRrAAKE2Q4OmrXK8N
+    - MY_PUB_KEY=TNgbVDSOkHa1siKrjS0QTn1ST
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -794,7 +794,7 @@ services:
     environment:
     - MY_NAME=peer34.proxdag.io
     - MY_ID=34
-    - MY_PUB_KEY=6xiVnaI5dyNinztS6HfS502Cb
+    - MY_PUB_KEY=D9y3UbyW1ngJueSjyCOl6LJqe
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -817,7 +817,7 @@ services:
     environment:
     - MY_NAME=peer35.proxdag.io
     - MY_ID=35
-    - MY_PUB_KEY=kMXL6FvP64CpaKHmNGzMW6VIc
+    - MY_PUB_KEY=aLtyM716pl3VrjCsfHLATeoE1
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -840,7 +840,7 @@ services:
     environment:
     - MY_NAME=peer36.proxdag.io
     - MY_ID=36
-    - MY_PUB_KEY=7M7dfEhCas2oaREOtQhid19kP
+    - MY_PUB_KEY=dAVIdal1LeC1QsrAAEkDjg9Pf
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -863,7 +863,7 @@ services:
     environment:
     - MY_NAME=peer37.proxdag.io
     - MY_ID=37
-    - MY_PUB_KEY=8k823X61sKdm3bQ3WpIdm5LZ8
+    - MY_PUB_KEY=whg0AnbSt6EWLGdO2n1G1DPTK
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -886,7 +886,7 @@ services:
     environment:
     - MY_NAME=peer38.proxdag.io
     - MY_ID=38
-    - MY_PUB_KEY=6LSLcK5PNYLi57lmxtb1waPVv
+    - MY_PUB_KEY=DBUaNZh5SPUr1NNzx13Z8ztAG
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -909,7 +909,7 @@ services:
     environment:
     - MY_NAME=peer39.proxdag.io
     - MY_ID=39
-    - MY_PUB_KEY=oVJj97qgZ3CzRIWN8YqWc2lUC
+    - MY_PUB_KEY=8adYDOIoVaVbly8N2NFcNn5QZ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -932,7 +932,7 @@ services:
     environment:
     - MY_NAME=peer40.proxdag.io
     - MY_ID=40
-    - MY_PUB_KEY=ojhYMFCTtnw1JJUMlEmibfXZO
+    - MY_PUB_KEY=PhGdInbDgVjxEtjvFj3OLiBpZ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -955,7 +955,7 @@ services:
     environment:
     - MY_NAME=peer41.proxdag.io
     - MY_ID=41
-    - MY_PUB_KEY=05SJPZYYIgE5Ib1dwV6tLlCVQ
+    - MY_PUB_KEY=kCIyK7xK7gHTGyXEyE7TGNy2S
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -978,7 +978,7 @@ services:
     environment:
     - MY_NAME=peer42.proxdag.io
     - MY_ID=42
-    - MY_PUB_KEY=OXSALC9BSRUot176L7KvWvwyW
+    - MY_PUB_KEY=8Lz22nDkA68MU5J9aVfqpTAP7
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1001,7 +1001,7 @@ services:
     environment:
     - MY_NAME=peer43.proxdag.io
     - MY_ID=43
-    - MY_PUB_KEY=JUK62wlLyo2Ep7BkND48Xc4nv
+    - MY_PUB_KEY=7djjkgC8Jvna8sNMHepXpzhOt
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1024,7 +1024,7 @@ services:
     environment:
     - MY_NAME=peer44.proxdag.io
     - MY_ID=44
-    - MY_PUB_KEY=U5QHN4bNtlNxUrLV4EJDNHpc6
+    - MY_PUB_KEY=beQq9aOcffu74JKFwZiTsSLcr
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1047,7 +1047,7 @@ services:
     environment:
     - MY_NAME=peer45.proxdag.io
     - MY_ID=45
-    - MY_PUB_KEY=tUOlhLFL5MjZTbJ9YjvekjU3m
+    - MY_PUB_KEY=aVbnPOyupNIdfcE9QDgue0iYf
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1070,7 +1070,7 @@ services:
     environment:
     - MY_NAME=peer46.proxdag.io
     - MY_ID=46
-    - MY_PUB_KEY=7bCJ1baHAB2U55sLmjTj3DiKi
+    - MY_PUB_KEY=Qzx8p4LD0xFvJP2fCvBmfkQN3
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1093,7 +1093,7 @@ services:
     environment:
     - MY_NAME=peer47.proxdag.io
     - MY_ID=47
-    - MY_PUB_KEY=2PWsaPoqBP0s7BKMmiMhaHfmG
+    - MY_PUB_KEY=DgWPsvpA46M9Q8i9nFrcvGpNc
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1116,7 +1116,7 @@ services:
     environment:
     - MY_NAME=peer48.proxdag.io
     - MY_ID=48
-    - MY_PUB_KEY=6ogjhAhcloQTEQWHSTsXXu8qH
+    - MY_PUB_KEY=h5ozHoJyh8AtgVR2SpdWqMkKP
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1139,7 +1139,7 @@ services:
     environment:
     - MY_NAME=peer49.proxdag.io
     - MY_ID=49
-    - MY_PUB_KEY=IuW6obSP6MidiAou9agbTltiu
+    - MY_PUB_KEY=izb74MYDSpNiUItN8chf7E5tn
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1162,7 +1162,7 @@ services:
     environment:
     - MY_NAME=peer50.proxdag.io
     - MY_ID=50
-    - MY_PUB_KEY=kbCGWH4VyTdtXhJ5ifhpSvDlW
+    - MY_PUB_KEY=LnP5cFulv4fyPCwTAx3l8zn5t
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1185,7 +1185,7 @@ services:
     environment:
     - MY_NAME=peer51.proxdag.io
     - MY_ID=51
-    - MY_PUB_KEY=gc05ONyuxf9dwCvi3eGdBBagk
+    - MY_PUB_KEY=5P4TQQ42ImSSURiKJtPB7uKXN
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1208,7 +1208,7 @@ services:
     environment:
     - MY_NAME=peer52.proxdag.io
     - MY_ID=52
-    - MY_PUB_KEY=c1vcb7SerUgnjWbJ6gMxglNpc
+    - MY_PUB_KEY=yGEIyzEaXBb1LyzNGzMJIaVFE
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1231,7 +1231,7 @@ services:
     environment:
     - MY_NAME=peer53.proxdag.io
     - MY_ID=53
-    - MY_PUB_KEY=2DuODlo0PkNbQKdByzOp4vyi9
+    - MY_PUB_KEY=ugZV0l8pY6wn9Ho9aR1vl43mP
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1254,7 +1254,7 @@ services:
     environment:
     - MY_NAME=peer54.proxdag.io
     - MY_ID=54
-    - MY_PUB_KEY=du6ckdHiV0FeEkYfPUlEZQYMH
+    - MY_PUB_KEY=HCnZZ8zSSVFRKU0HDC31brnwO
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1277,7 +1277,7 @@ services:
     environment:
     - MY_NAME=peer55.proxdag.io
     - MY_ID=55
-    - MY_PUB_KEY=OuCt5Y881c6iC6VKKhemfzxKF
+    - MY_PUB_KEY=8ljVZ3IhZ8wGbRduaxTuabtQG
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1300,7 +1300,7 @@ services:
     environment:
     - MY_NAME=peer56.proxdag.io
     - MY_ID=56
-    - MY_PUB_KEY=IAW3DTLgfntkFgvC6Zjs7gOmu
+    - MY_PUB_KEY=ZoXWdmktB1EO5TwtyO3mGwTmO
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1323,7 +1323,7 @@ services:
     environment:
     - MY_NAME=peer57.proxdag.io
     - MY_ID=57
-    - MY_PUB_KEY=Xbw7u5F1UDl28cTOczhKvSZ5b
+    - MY_PUB_KEY=hI1gMrP5xuZpCyDSci0tSc6kS
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1346,7 +1346,7 @@ services:
     environment:
     - MY_NAME=peer58.proxdag.io
     - MY_ID=58
-    - MY_PUB_KEY=rVC9TRtsLudD6yrMzlOUdPYnU
+    - MY_PUB_KEY=XF0ewObYNAvKyfdteckG3oSye
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1369,7 +1369,7 @@ services:
     environment:
     - MY_NAME=peer59.proxdag.io
     - MY_ID=59
-    - MY_PUB_KEY=GpzuYMsxeiDPeJjU6CtdQ2mSL
+    - MY_PUB_KEY=SqMQcRBAohkCA3QpvhUObjjL8
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1392,7 +1392,7 @@ services:
     environment:
     - MY_NAME=peer60.proxdag.io
     - MY_ID=60
-    - MY_PUB_KEY=hevh77rcSpH4zf2dKMq1Ctd9W
+    - MY_PUB_KEY=xdz76zgUjLNQ2Evw98NKO0kVY
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1415,7 +1415,7 @@ services:
     environment:
     - MY_NAME=peer61.proxdag.io
     - MY_ID=61
-    - MY_PUB_KEY=xePXezGj9UG9cVpbfCKJHq3Vw
+    - MY_PUB_KEY=oN6sI4bdZBnKDtjmhyel84uo6
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1438,7 +1438,7 @@ services:
     environment:
     - MY_NAME=peer62.proxdag.io
     - MY_ID=62
-    - MY_PUB_KEY=mE8aeZVvVVidy1kNBP7SA7LIb
+    - MY_PUB_KEY=9BtTSJF8cVUtv5Rmmjye84b3G
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1461,7 +1461,7 @@ services:
     environment:
     - MY_NAME=peer63.proxdag.io
     - MY_ID=63
-    - MY_PUB_KEY=9L0Mjyg4w9lRUZoznpmZFHqzo
+    - MY_PUB_KEY=hQQWyUp2Z5CXNDV9cw6uADiob
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1484,7 +1484,7 @@ services:
     environment:
     - MY_NAME=peer64.proxdag.io
     - MY_ID=64
-    - MY_PUB_KEY=Ugddhxy4FO2ZS74ayIBezYyEO
+    - MY_PUB_KEY=KrFoQJtkPTp6eiImWqYzAF5JN
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1507,7 +1507,7 @@ services:
     environment:
     - MY_NAME=peer65.proxdag.io
     - MY_ID=65
-    - MY_PUB_KEY=Flhsgim5KkgOR3doAQ8xxvUfp
+    - MY_PUB_KEY=wSfj6NlrJbIQbWdR6VgRp7qNF
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1530,7 +1530,7 @@ services:
     environment:
     - MY_NAME=peer66.proxdag.io
     - MY_ID=66
-    - MY_PUB_KEY=oCxcE0lQO5L2FmvBELsPQnc9K
+    - MY_PUB_KEY=6qF1pzI27ML3ontiCtn8OWO2P
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1553,7 +1553,7 @@ services:
     environment:
     - MY_NAME=peer67.proxdag.io
     - MY_ID=67
-    - MY_PUB_KEY=fbpdcJxXHxZ9v7XSlhrTbTjYQ
+    - MY_PUB_KEY=zN2Hoh1Zs9wYg7o8XM7kLsOCQ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1576,7 +1576,7 @@ services:
     environment:
     - MY_NAME=peer68.proxdag.io
     - MY_ID=68
-    - MY_PUB_KEY=9gTSkfbqkMjavS5yhqFfpW3do
+    - MY_PUB_KEY=Q9LY8yobjOKFEaGfurly7dpWY
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1599,7 +1599,7 @@ services:
     environment:
     - MY_NAME=peer69.proxdag.io
     - MY_ID=69
-    - MY_PUB_KEY=YsOjdLtKgVzZCoA37T1myiKVu
+    - MY_PUB_KEY=0pOBwlKRM6ktzmBbBOZkX11jJ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1622,7 +1622,7 @@ services:
     environment:
     - MY_NAME=peer70.proxdag.io
     - MY_ID=70
-    - MY_PUB_KEY=t92bNwM0NwHsKpuHz8TUMuiyw
+    - MY_PUB_KEY=1JTg9VRlmo9JxTl37EebvQnJL
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1645,7 +1645,7 @@ services:
     environment:
     - MY_NAME=peer71.proxdag.io
     - MY_ID=71
-    - MY_PUB_KEY=Cl3EKEkGy1BiQwrroMfeVoG1w
+    - MY_PUB_KEY=XL2QlB13IymQtfr9KrPCb7FN0
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1668,7 +1668,7 @@ services:
     environment:
     - MY_NAME=peer72.proxdag.io
     - MY_ID=72
-    - MY_PUB_KEY=CToMoSGj9Y96WzyKZ0vzb0PV4
+    - MY_PUB_KEY=h4fKsZSoCH0sieyKE3ZOpbuBd
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1691,7 +1691,7 @@ services:
     environment:
     - MY_NAME=peer73.proxdag.io
     - MY_ID=73
-    - MY_PUB_KEY=FWrzNWccSGy6p4xkIMScr4l8t
+    - MY_PUB_KEY=8PBwVpKqAJ07MDAHfKmpynKTE
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1714,7 +1714,7 @@ services:
     environment:
     - MY_NAME=peer74.proxdag.io
     - MY_ID=74
-    - MY_PUB_KEY=tv1ZTYpD0mlIcVxhSUQXO2Fvx
+    - MY_PUB_KEY=cCvd2nBl3pbihG3jYQ9Hq6vSQ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1737,7 +1737,7 @@ services:
     environment:
     - MY_NAME=peer75.proxdag.io
     - MY_ID=75
-    - MY_PUB_KEY=jIJL55kK6ZDFefAe3547XY9Cn
+    - MY_PUB_KEY=GWt1VIn1dliaQYlUMKUCOplRs
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1760,7 +1760,7 @@ services:
     environment:
     - MY_NAME=peer76.proxdag.io
     - MY_ID=76
-    - MY_PUB_KEY=awsSWOH87yBE8mmcm1g9X2EYq
+    - MY_PUB_KEY=Zvc7Ps0EgmexhtaF3rurYkjDe
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1783,7 +1783,7 @@ services:
     environment:
     - MY_NAME=peer77.proxdag.io
     - MY_ID=77
-    - MY_PUB_KEY=uJiEQm0M8zayfejG7Iin0eXdh
+    - MY_PUB_KEY=bHeIUMaz9qLJbmmMaVIo0R5Md
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1806,7 +1806,7 @@ services:
     environment:
     - MY_NAME=peer78.proxdag.io
     - MY_ID=78
-    - MY_PUB_KEY=WHw4DTcd2F06CNqKzXkitxs7D
+    - MY_PUB_KEY=iBy4z6Z65vEZhc7D4QJUDGlC9
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1829,7 +1829,7 @@ services:
     environment:
     - MY_NAME=peer79.proxdag.io
     - MY_ID=79
-    - MY_PUB_KEY=JD4YaEAOAiwyO0SGKOkJUbZSw
+    - MY_PUB_KEY=VdVvNNIzAlt5DMXWiSylQRVG5
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1852,7 +1852,7 @@ services:
     environment:
     - MY_NAME=peer80.proxdag.io
     - MY_ID=80
-    - MY_PUB_KEY=BFraq55FXP3jguq2zD4x4YSsl
+    - MY_PUB_KEY=5V7xiOvwXv7DLSMZsIeUUE3Hi
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1875,7 +1875,7 @@ services:
     environment:
     - MY_NAME=peer81.proxdag.io
     - MY_ID=81
-    - MY_PUB_KEY=8s6AKClvujwA2V35guyGz5A3L
+    - MY_PUB_KEY=mxDRI7ZjKOo5tnLhhXp2H4Jeg
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1898,7 +1898,7 @@ services:
     environment:
     - MY_NAME=peer82.proxdag.io
     - MY_ID=82
-    - MY_PUB_KEY=vAvJJBaXoh4sn54HY6wGBk0RX
+    - MY_PUB_KEY=0n5nq1C1xntTI5MLBoxxTZ8AV
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1921,7 +1921,7 @@ services:
     environment:
     - MY_NAME=peer83.proxdag.io
     - MY_ID=83
-    - MY_PUB_KEY=cBhtXsImXqeDxVeVZWewfx0jd
+    - MY_PUB_KEY=eThaB8aTY8BKZM6Gwsc50zXDZ
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1944,7 +1944,7 @@ services:
     environment:
     - MY_NAME=peer84.proxdag.io
     - MY_ID=84
-    - MY_PUB_KEY=7NCy2ZyyYFC09pscaqHcEI7Cc
+    - MY_PUB_KEY=xrUXfTKFmfj9qs4eOA23Om1OS
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1967,7 +1967,7 @@ services:
     environment:
     - MY_NAME=peer85.proxdag.io
     - MY_ID=85
-    - MY_PUB_KEY=a6VtJcft0b247uH3yzM1WabL1
+    - MY_PUB_KEY=qKyCOR4Xga4WccGqHvZma7Wzk
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -1990,7 +1990,7 @@ services:
     environment:
     - MY_NAME=peer86.proxdag.io
     - MY_ID=86
-    - MY_PUB_KEY=wOWoMV5VH08lZA703zEe459R8
+    - MY_PUB_KEY=ZHxRjijszDfwaThc2sWbJBKq4
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2013,7 +2013,7 @@ services:
     environment:
     - MY_NAME=peer87.proxdag.io
     - MY_ID=87
-    - MY_PUB_KEY=tzWz8Cfk7NCrdGVFg4bmHDHn0
+    - MY_PUB_KEY=0RuVvtRMdybVUv8INviZm9JRk
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2036,7 +2036,7 @@ services:
     environment:
     - MY_NAME=peer88.proxdag.io
     - MY_ID=88
-    - MY_PUB_KEY=vPJEW7Orb7NXz3YbKNkxnpr3k
+    - MY_PUB_KEY=OK4CyndSbLrotxrR1fLRT3LZf
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2059,7 +2059,7 @@ services:
     environment:
     - MY_NAME=peer89.proxdag.io
     - MY_ID=89
-    - MY_PUB_KEY=OBVTOW6zPzvLB9Qlp9TphU3n0
+    - MY_PUB_KEY=6Cr7xrjgaEmFIzG8MBL2HkjpR
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2082,7 +2082,7 @@ services:
     environment:
     - MY_NAME=peer90.proxdag.io
     - MY_ID=90
-    - MY_PUB_KEY=TIB2D1ZmV0aGLD4mnmCCkwYoT
+    - MY_PUB_KEY=0A0TGqXyhvIrwPC6dmvWg6FzP
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2105,7 +2105,7 @@ services:
     environment:
     - MY_NAME=peer91.proxdag.io
     - MY_ID=91
-    - MY_PUB_KEY=i83JlPxSUn88uAo04DJvD3GyJ
+    - MY_PUB_KEY=sBtrsCXKL1G2DgPDCUWugrGDG
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2128,7 +2128,7 @@ services:
     environment:
     - MY_NAME=peer92.proxdag.io
     - MY_ID=92
-    - MY_PUB_KEY=fUJEHrIhyL2CehBmpF2LI4A2Q
+    - MY_PUB_KEY=3SMhkmKZ7DS6zfS8xa7EAH74Y
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2151,7 +2151,7 @@ services:
     environment:
     - MY_NAME=peer93.proxdag.io
     - MY_ID=93
-    - MY_PUB_KEY=VbWbQa6MBeez5bPTAiNarVC2n
+    - MY_PUB_KEY=UNsRsd3xGVqp8ENFJjtfw10Oe
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2174,7 +2174,7 @@ services:
     environment:
     - MY_NAME=peer94.proxdag.io
     - MY_ID=94
-    - MY_PUB_KEY=CSZNDczXnOrkBYgCVrD5bRHfw
+    - MY_PUB_KEY=gNp4XmX0yz9c2qnwo3YyqYDXI
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2197,7 +2197,7 @@ services:
     environment:
     - MY_NAME=peer95.proxdag.io
     - MY_ID=95
-    - MY_PUB_KEY=1bHR2Iqab5Ilfis3GFylOyDx0
+    - MY_PUB_KEY=qk2wXk6tNgyeauT41Mr7Zj8Of
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2220,7 +2220,7 @@ services:
     environment:
     - MY_NAME=peer96.proxdag.io
     - MY_ID=96
-    - MY_PUB_KEY=3NbP1EzLUDmQWJaRzP5taiOQt
+    - MY_PUB_KEY=yjhO8ogyfLw5gsl5Rxkneaj7P
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2243,7 +2243,7 @@ services:
     environment:
     - MY_NAME=peer97.proxdag.io
     - MY_ID=97
-    - MY_PUB_KEY=yrRofbI0oBMztnCNWd5h05GDy
+    - MY_PUB_KEY=shI1V2KlCciCZuhO9ctxiIq2S
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2266,7 +2266,7 @@ services:
     environment:
     - MY_NAME=peer98.proxdag.io
     - MY_ID=98
-    - MY_PUB_KEY=XjxptiNWtNQa4o3EJnodRDDzf
+    - MY_PUB_KEY=yBq5eJVbjbigX2w2CENs5YLqm
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001
@@ -2289,7 +2289,7 @@ services:
     environment:
     - MY_NAME=peer99.proxdag.io
     - MY_ID=99
-    - MY_PUB_KEY=r9KRB7azrNgZFRDDsoV1Thi6A
+    - MY_PUB_KEY=seyuQin0k6OujzMLcqA27HMbl
     - GOSHIMMER_API_ENDPOINT=http://172.17.0.1:8081
     - GOSHIMMER_WEBSOCKETS_ENDPOINT=ws://172.17.0.1:8081/ws
     - IPFS_API_ENDPOINT=http://ipfs.proxdag.io:5001

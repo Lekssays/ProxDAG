@@ -22,3 +22,4 @@ simulator/peers/client/test.py
 simulator/peers/tmp
 logs/system.log
 logs/metrics.log
+logs/results/*.log

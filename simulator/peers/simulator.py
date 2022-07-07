@@ -91,6 +91,11 @@ def initialize_protocol():
     subprocess.call(command, shell=True)
 
 
+def run_consensus():
+    command = "cd " + os.getenv("PROTOCOL_PATH") +  " && ./protocol consensus"
+    subprocess.call(command, shell=True)
+
+
 def write(filename: str, content: str):
     writing_file = open(filename, "w")
     writing_file.write(content)
@@ -158,6 +163,10 @@ async def send_log(message: str):
     async with websockets.connect(uri) as websocket:
         await websocket.send(message)
 
+def clear_host_state():
+    command = "rm -rf ./../../ldb/"
+    subprocess.call(command, shell=True)
+
 
 def main():
     print("Simulator :)")
@@ -184,22 +193,41 @@ def main():
         return
 
     start_containers(peers=peers, peers_len=peers_len)
-    
     time.sleep(3)
-
     initialize_protocol()
-
     for i in range(0, iterations):
-        print("\n\n\nIteration #{}".format(str(i)))
-        log_message = "\n\n\nlog!iteration #" + str(i) + "#\n\n\n"
+        print("\nIteration #{}".format(str(i)))
+        log_message = "log!\niteration #" + str(i) + "#\n"
         loop.run_until_complete(send_log(log_message))
         if len(attack_type) > 0:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
         else:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
-
     stop_containers(peers=peers, peers_len=peers_len)
+    clear_host_state()
 
+    log_message = "\n\n\nlog!==============WITH_DYN.COMM==================\n\n\n"
+    loop.run_until_complete(send_log(log_message))
+
+    time.sleep(300)
+    start_containers(peers=peers, peers_len=peers_len)
+    time.sleep(3)
+    initialize_protocol()
+    for i in range(0, iterations):
+        print("\nIteration #{}".format(str(i)))
+        log_message = "\nlog!iteration #" + str(i) + "#\n"
+        loop.run_until_complete(send_log(log_message))
+        if len(attack_type) > 0:
+            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
+        else:
+            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
+        time.sleep(20)
+        print("\n Generating Scores for Iteration #{}".format(str(i)))
+        log_message = "\n\log!scores iteration #" + str(i) + "#\n\n\n"
+        loop.run_until_complete(send_log(log_message))
+        run_consensus()
+    stop_containers(peers=peers, peers_len=peers_len)
+    clear_host_state()
 
 if __name__ == "__main__":
     main()
