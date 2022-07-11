@@ -19,3 +19,4 @@ simulator/peers/tmp
 *.json
 *.dat
 .env
+simulator/peers/docker-compose.yaml

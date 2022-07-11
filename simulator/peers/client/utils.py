@@ -317,7 +317,7 @@ def store_my_latest_accuracy(accuracy: float):
     store_resource_on_redis(key="accuracy", content=content)
 
 
-async def send_log(message: str, filename="system.log"):
+async def send_log(message: str):
     uri = "ws://172.17.0.1:7777"
     dt = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
     message = dt + " - [" + os.getenv("MY_NAME") + "] " + message

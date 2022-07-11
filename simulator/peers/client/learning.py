@@ -225,8 +225,8 @@ def evaluate(local_model, loss, attack=0):
     loop.run_until_complete(utils.send_log(message))
     
     metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
-    log_message = os.getenv("MY_NAME") + "," + str(loss / num_peers) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
-    loop.run_until_complete(utils.send_log(log_message, metric_filename))
+    log_message = os.getenv("MY_NAME") + "," + str(loss / num_peers) + "," + str(test_loss) + "," + str(acc) + "," + str(asr) + "!" + metric_filename
+    loop.run_until_complete(utils.send_log(log_message))
     return acc, asr
 
 

@@ -87,15 +87,15 @@ def start_containers(peers, peers_len=100):
     subprocess.call(command, shell=True)
 
 
-def start_learning(dataset, peers, peers_len=100, alpha="0.05", attack_type=None):
+def start_learning(dataset, peers, dc, iterations, attack_percentage=0, peers_len=100, alpha="0.05", attack_type=None):
     if peers_len > len(peers):
         peers_len = len(peers)
 
     for peer in peers[:peers_len]:
         if attack_type is None:
-            command = "docker exec -it {} python3 /client/main.py -d {} -al {}".format(peer, dataset, alpha)   
+            command = "docker exec -it {} python3 /client/main.py -d {} -al {} -ap {} -dc {} -i {}".format(peer, dataset, alpha, str(attack_percentage), dc, str(iterations))   
         else:
-            command = "docker exec -it {} python3 /client/main.py -d {} -al {} -at {}".format(peer, dataset, alpha, attack_type)
+            command = "docker exec -it {} python3 /client/main.py -d {} -al {} -at {} -ap {} -dc {} -i {}".format(peer, dataset, alpha, attack_type, str(attack_percentage), dc, str(iterations))
         print("Learning ", peer)
         subprocess.call(command, shell=True)
 
@@ -175,7 +175,7 @@ def copy_peers():
 async def send_log(message: str, filename="system.log"):
     uri = "ws://0.0.0.0:7777"
     dt = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-    message = filename + "!" + dt + " - [" + os.getenv("MY_NAME") + "] " + message
+    message = dt + " - [" + os.getenv("MY_NAME") + "] " + message + "!" + filename
     async with websockets.connect(uri) as websocket:
         await websocket.send(message)
 
@@ -234,7 +234,6 @@ def main():
         return
 
     metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
-
     settings = "dataset = {}, peers = {}, alpha = {}, iterations = {}, dync_committee = {}, attack_type = {}, attack_percentage = {}, dishonest_peers = {}\n".format(dataset, str(peers_len), str(alpha), str(iterations), dc, attack_type, str(attack_percentage), '-'.join(dishonest_peers))
     loop.run_until_complete(send_log(settings, metric_filename))    
     
@@ -244,12 +243,29 @@ def main():
     time.sleep(5)
     for i in range(1, iterations + 1):
         print("Iteration #{}".format(str(i)))
-        log_message = "iteration #" + str(i)
+        log_message = "it_" + str(i)
         loop.run_until_complete(send_log(log_message, metric_filename))
         if len(attack_type) > 0:
-            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
+            start_learning(
+                peers=peers,
+                dataset=dataset,
+                peers_len=peers_len,
+                alpha=alpha,
+                attack_type=attack_type, 
+                attack_percentage=attack_percentage,
+                dc=dc,
+                iterations=iterations
+            )
         else:
-            start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
+            start_learning(
+                peers=peers,
+                dataset=dataset,
+                peers_len=peers_len,
+                alpha=alpha,
+                dc=dc,
+                iterations=iterations
+            )
+        
         if dc == "true":
             print("\n Generating Scores for Iteration #{}".format(str(i)))
             run_consensus()

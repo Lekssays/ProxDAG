@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 
-def write(message: str, filename="system.log"):
+def write(message: str, filename: str):
     f = open(filename, "a")
     f.write(message + "\n")
     f.close()
@@ -9,11 +9,14 @@ def write(message: str, filename="system.log"):
 async def hello(websocket, path):
     message = await websocket.recv()
     print(message)
-    message = message.split("!")
-    if len(message) == 2:
-        write(message=message[1], filename=message[0])
+    if "!" in message:
+        message = message.split("!")
+        filename = message[1]
+        message = message[0].split("]")
+        message = message[1][1:]
+        write(message=message, filename=filename)
     else:
-        write(message=message[0])
+        write(message=message, filename="system.log")
 
 start_server = websockets.serve(hello, "0.0.0.0", 7777)
 
