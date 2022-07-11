@@ -62,7 +62,7 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, 
                         data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
                     elif attack_type == 'untargeted':
                         target[i] = random.randint(0, 9)
-                    else:  # untargeted with sybils
+                    elif attack_type == "untargeted_sybil":
                         target[i] = 0
             optimizer.zero_grad()
             output = client_model(data)

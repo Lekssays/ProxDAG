@@ -113,9 +113,9 @@ def generate_config():
 
 
 def main():
-    dataset = generate_config()
+    generate_config()
 
-    modelID = dataset
+    modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
     if not exists(os.getenv("TMP_FOLDER") + modelID + ".dat"):
         local_model = learning.initialize(modelID)
         weights_bytes = utils.to_bytes(local_model.state_dict()['fc.weight'].cpu().numpy())

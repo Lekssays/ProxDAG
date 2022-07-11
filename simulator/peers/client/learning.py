@@ -3,6 +3,7 @@ import pickle
 import os
 import models
 import utils
+import random
 
 import numpy as np
 import pandas as pd
@@ -41,7 +42,9 @@ def peer_update(local_model, train_loader, epoch=5, attack_type=None):
                         elif attack_type == 'backdoor':
                             target[i] = 1  # set the label
                             data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
-                        elif attack_type == "untargeted":
+                        elif attack_type == 'untargeted':
+                            target[i] = random.randint(0, 9)
+                        else:  # untargeted with sybils
                             target[i] = 0
                 elif dataset == "KDD":
                     for i, t in enumerate(target):
@@ -72,7 +75,7 @@ def aggregate(peers_indices, peers_weights=[]):
 
 
 def load_kdd_dataset():
-    kdd_df = pd.read_csv('kddcup.csv', delimiter=',', header=None)
+    kdd_df = pd.read_csv(os.getenv("DATA_FOLDER") + 'kddcup.csv', delimiter=',', header=None)
     col_names = [str(i) for i in range(42)]
     kdd_df.columns=  col_names
     values_1 = kdd_df['1'].unique()
@@ -234,7 +237,7 @@ def train(local_model, alpha="100", attack_type="lf"):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    if attack_type not in ["backdoor", "lf", "untargeted"]:
+    if attack_type not in ["backdoor", "lf", "untargeted", "untargeted_sybil"]:
         message = "[x] ERROR: attack type not recognized :)"
         print(message)
         loop.run_until_complete(utils.send_log(message))
