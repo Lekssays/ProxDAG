@@ -42,8 +42,8 @@ def parse_args():
                         required = False)
     parser.add_argument('-at', '--attack_type',
                         dest = "attack_type",
-                        help = "Attack type: lf , backdoor, untargeted",
-                        default = "",
+                        help = "Attack type: lf , backdoor, untargeted, untargeted_sybil",
+                        default = "None",
                         required = False)
     parser.add_argument('-ap', '--attack_percentage',
                         dest = "attack_percentage",
@@ -206,7 +206,7 @@ def main():
     peers_len = int(parse_args().peers)
     dataset = parse_args().dataset
     iterations = int(parse_args().iterations)
-    attack_type = parse_args().attack_type
+    attack_type = str(parse_args().attack_type)
     attack_percentage = int(parse_args().attack_percentage)
     dc = parse_args().dc
 
@@ -233,7 +233,7 @@ def main():
         stop_containers(peers=peers, peers_len=peers_len)
         return
 
-    metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
+    metric_filename = "{}_{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, attack_type, str(attack_percentage))
     settings = "dataset = {}, peers = {}, alpha = {}, iterations = {}, dync_committee = {}, attack_type = {}, attack_percentage = {}, dishonest_peers = {}\n".format(dataset, str(peers_len), str(alpha), str(iterations), dc, attack_type, str(attack_percentage), '-'.join(dishonest_peers))
     loop.run_until_complete(send_log(settings, metric_filename))    
     
@@ -245,7 +245,7 @@ def main():
         print("Iteration #{}".format(str(i)))
         log_message = "it_" + str(i)
         loop.run_until_complete(send_log(log_message, metric_filename))
-        if len(attack_type) > 0:
+        if attack_type != "None":
             start_learning(
                 peers=peers,
                 dataset=dataset,

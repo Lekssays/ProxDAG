@@ -44,7 +44,7 @@ def peer_update(local_model, train_loader, epoch=5, attack_type=None):
                             data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
                         elif attack_type == 'untargeted':
                             target[i] = random.randint(0, 9)
-                        else:  # untargeted with sybils
+                        elif attack_type == "untargeted_sybil":  # untargeted with sybils
                             target[i] = 0
                 elif dataset == "KDD":
                     for i, t in enumerate(target):
@@ -53,7 +53,9 @@ def peer_update(local_model, train_loader, epoch=5, attack_type=None):
                                 target[i] = torch.tensor(7)
                         elif attack_type == 'backdoor':
                             pass
-                        elif attack_type == "untargeted":
+                        elif attack_type == 'untargeted':
+                            target[i] = random.randint(0, 22)
+                        elif attack_type == "untargeted_sybil":  # untargeted with sybils
                             target[i] = 0
             loss = F.nll_loss(output, target)
             loss.backward()
