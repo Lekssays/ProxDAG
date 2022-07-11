@@ -70,21 +70,3 @@ class SFMNet(nn.Module):
         return F.log_softmax(x, dim=1)
 
 
-class loan_model(nn.Module):
-    def __init__(self, n_features = 127, n_classes=3):
-        super(loan_model, self).__init__()
-        self.n_features = n_features
-        self.n_classes = n_classes
-        self.classifier = nn.Sequential(
-            nn.Linear(n_features, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 41),
-            nn.ReLU(True),
-            nn.Linear(41, n_classes)
-        )
-
-    def forward(self, x):
-        x = x.float()
-        x = x.view(-1, self.n_features)  # flatten
-        x = self.classifier(x)
-        return F.log_softmax(x, dim=1)

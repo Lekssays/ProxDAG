@@ -2,7 +2,6 @@
 ##### importing libraries #####
 ###############################
 import pickle
-import random
 import numpy as np
 from tqdm import tqdm
 import os
@@ -60,8 +59,6 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, 
                     elif attack_type == 'backdoor':
                         target[i] = 1  # set the label
                         data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
-                    elif attack_type == 'untargeted':
-                        target[i] = random.randint(0, 9)
                     else:
                         target[i] = 0
             loss = F.nll_loss(output, target)
@@ -130,22 +127,21 @@ def compute_contribitions(client_scores):
     phi[(phi == 1)] = .99
     # Logit function
     phi = (np.log((phi / (1 - phi)) + 0.000001) + 0.5)
-    # phi[(np.isinf(phi))] = 1
+    phi[(np.isinf(phi))] = 1
     #return [phi[i] / max(phi) for i in range(len(client_scores))]
     phi[(np.isinf(phi) + phi > 1)] = 1
     phi[(phi < 0)] = 0
     return phi
 
 
-def server_aggregate(global_model, client_models, phi, client_idx):
+def server_aggregate(global_model, client_gradients, phi, client_idx):
     """
     This function has aggregation method 'mean'
     """
     ### This will take simple mean of the weights of models ###
-    global_dict = global_model.state_dict()
-    for k in global_dict.keys():
-        global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[idx] for idx in client_idx], 0).mean(0)
-    global_model.load_state_dict(global_dict)
+    gradients = -torch.stack([torch.from_numpy(client_gradients[idx]) * phi[idx] for idx in client_idx], 0).sum(0)
+    global_model.fc.weight.data = global_model.fc.weight.data + gradients.type(torch.float32).cuda()
+    return global_model
 
 
 def test(global_model, test_loader):
@@ -176,7 +172,7 @@ def test(global_model, test_loader):
 num_clients = 100
 num_selected = 10
 num_rounds = 100
-epochs = 5
+epochs = 1
 batch_size = 50
 
 #############################################################
@@ -214,7 +210,7 @@ cs_mat = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
 
 r = [1 / num_clients for i in range(num_clients)]  # trust scores
 ############### optimizers ################
-opt = [optim.SGD(model.parameters(), lr=0.01) for model in client_models]
+opt = [optim.SGD(model.parameters(), lr=0.001) for model in client_models]
 
 ###### List containing info about learning #########
 losses_train = []
@@ -223,7 +219,7 @@ acc_train = []
 acc_test = []
 
 clients = np.arange(num_clients)
-dishonest_client_idx =np.random.permutation(num_clients)[:int(0.05 * num_selected)]
+dishonest_client_idx =np.random.permutation(num_clients)[:int(0.9 * num_selected)]
 
 # Runnining FL
 for round in range(num_rounds):
@@ -236,7 +232,7 @@ for round in range(num_rounds):
         # get the global weights
         client_models[i].load_state_dict(global_model.state_dict())
         # read the local data
-        train_obj = pickle.load(open("MNIST/" + str(i) + "/train_100_.pickle", "rb"))
+        train_obj = pickle.load(open("MNIST/" + str(i) + "/train_0.05_.pickle", "rb"))
         x = torch.stack(train_obj.x)
         y = torch.tensor(train_obj.y)
         dat = TensorDataset(x, y)
@@ -264,8 +260,7 @@ for round in range(num_rounds):
     phi = compute_contribitions(client_scores)
 
     # server aggregate
-    #print(client_scores)
-    server_aggregate(global_model, client_models, phi, client_idx)
+    global_model = server_aggregate(global_model, client_gradients, phi, client_idx)
 
 attack = 0
 test_loss, acc = test(global_model, test_loader)

@@ -19,7 +19,7 @@ torch.manual_seed(42)
 np.random.seed(42)
 
 delta = 0.1
-threshold = 0.1
+threshold = 0.5
 
 attack = 0
 asr = []
@@ -170,7 +170,7 @@ def server_aggregate(global_model, client_models, phi, client_idx):
     ### This will take simple mean of the weights of models ###
     global_dict = global_model.state_dict()
     for k in global_dict.keys():
-        global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[i] for idx in client_idx], 0).mean(0)
+        global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[idx] for idx in client_idx], 0).mean(0)
     global_model.load_state_dict(global_dict)
 
 
@@ -200,7 +200,7 @@ def test(global_model, test_loader):
 ##### Hyperparameters for federated learning #########
 num_clients = 300
 num_selected = 30
-num_rounds = 79
+num_rounds = 100
 epochs = 3
 batch_size = 50
 
@@ -238,7 +238,7 @@ cs_mat = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
 r = [1 / num_clients for i in range(num_clients)]  # trust scores
 
 ############### optimizers ################
-opt = [optim.SGD(model.parameters(), lr=0.001) for model in client_models]
+opt = [optim.Adam(model.parameters(), lr=0.001) for model in client_models]
 
 ###### List containing info about learning #########
 losses_train = []
@@ -267,40 +267,38 @@ for round in range(num_rounds):
         dat = TensorDataset(x, y)
         train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
         # honst or not honest update
-        if j in dishonest_client_idx:
+        if i in dishonest_client_idx:
             attack +=1
             loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs, honest=False)
         else:
             loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
 
-        # historical gradient aggregate.
-        # historical gradient aggregate.
-        client_gradients = weight_aggregate(global_model, client_models, client_gradients, client_idx)
-        # compute similarity matrix and alignment scores scores.
-        cs_mat = compute_cosine_sim(client_gradients, cs_mat)
-        # pardoning the honest clients
-        cs_mat = pardoning_fun(cs_mat)
-        # alignment scores
-        client_scores = np.mean(cs_mat, axis=1)
+    # historical gradient aggregate.
+    # historical gradient aggregate.
+    client_gradients = weight_aggregate(global_model, client_models, client_gradients, client_idx)
+    # compute similarity matrix and alignment scores scores.
+    cs_mat = compute_cosine_sim(client_gradients, cs_mat)
+    # pardoning the honest clients
+    cs_mat = pardoning_fun(cs_mat)
+    # alignment scores
+    client_scores = np.mean(cs_mat, axis=1)
 
-        # compute and normalize trust scores
-        r = compute_trust_scores(client_scores, r)
-        r = [r[i] / max(r) for i in range(num_clients)]
-        # update the contribution rates
-        phi = compute_contribitions(client_scores)
-        # server aggregate
-        server_aggregate(global_model, client_models, phi, client_idx)
-    #print(dishonest_client_idx)
-    #print(phi)
+    # compute and normalize trust scores
+    r = compute_trust_scores(client_scores, r)
+    r = [r[i] / max(r) for i in range(num_clients)]
+    # update the contribution rates
+    phi = compute_contribitions(client_scores)
+    # server aggregate
+    server_aggregate(global_model, client_models, phi, client_idx)
 
-    #print(phi)
+attack = 0
+test_loss, acc = test(global_model, test_loader)
+print(attack,(len(test_loader)*batch_size) )
 
-    attack = 0
-    test_loss, acc = test(global_model, test_loader)
-    losses_test.append(test_loss)
-    acc_test.append(acc)
-    print('%d-th round' % round)
-    print('average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / num_selected, test_loss, acc))
+losses_test.append(test_loss)
+acc_test.append(acc)
+print('%d-th round' % round)
+print('average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / num_selected, test_loss, acc))
 
-    asr = attack/(len(test_loader)*batch_size)
-    print('attack success rate %0.3g' %(asr))
+asr = attack/(len(test_loader)*batch_size)
+print('attack success rate %0.3g' %(asr))

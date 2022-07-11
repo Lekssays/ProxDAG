@@ -1,26 +1,28 @@
 ###############################
 ##### importing libraries #####
 ###############################
-import pickle
-import random
 import numpy as np
+import random
+import time
 from tqdm import tqdm
+import pickle
 import os
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, Dataset, TensorDataset
-from models import SFMNet
+from torch.utils.data import TensorDataset, Dataset, DataLoader
+from models import VGG
 from numpy.linalg import norm
+
 torch.backends.cudnn.benchmark=True
 
 torch.manual_seed(42)
 np.random.seed(42)
 
-delta = 0.5
-decay = 0.1
-threshold = 0.1
+delta = 0.1
+threshold = 0.5
+decay = 0
 
 attack = 0
 asr = []
@@ -42,7 +44,7 @@ class client:
             pickle.dump(self, f)
 
 
-def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, attack_type ='lf'):
+def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, attack_type= 'lf'):
     """
     This function updates/trains client model on client data
     """
@@ -50,8 +52,6 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, 
     for e in range(epoch):
         for batch_idx, (data, target) in enumerate(train_loader):
             data, target = data.cuda(), target.cuda()
-            optimizer.zero_grad()
-            output = client_model(data)
             if not honest:
                 for i, t in enumerate(target):
                     if attack_type == 'lf':  # label flipping
@@ -62,8 +62,10 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, 
                         data[:, :, 27, 27] = torch.max(data)  # set the bottom right pixel to white.
                     elif attack_type == 'untargeted':
                         target[i] = random.randint(0, 9)
-                    else:
+                    else:  # untargeted with sybils
                         target[i] = 0
+            optimizer.zero_grad()
+            output = client_model(data)
             loss = F.nll_loss(output, target)
             loss.backward()
             optimizer.step()
@@ -73,8 +75,8 @@ def client_update(client_model, optimizer, train_loader, epoch=5, honest= True, 
 def weight_aggregate(global_model, client_models, client_gradients, client_idx):
     for i in client_idx:
         model = client_models[i]
-        w = model.state_dict()['fc.weight'].cpu().numpy()
-        global_w = global_model.state_dict()['fc.weight'].cpu().numpy()
+        w = model.state_dict()['classifier.4.weight'].cpu().numpy()
+        global_w = global_model.state_dict()['classifier.4.weight'].cpu().numpy()
         gradient = global_w - w
         client_gradients[i] =  np.add(client_gradients[i], gradient)
     return client_gradients
@@ -110,9 +112,10 @@ def pardoning_fun(cs_mat):
 
 
 def compute_trust_scores(client_scores, r):
+    #print(client_scores)
     # compute/update trust scores
     for i in range(len(client_scores)):
-        #r[i] -= decay
+        r[i] *= (1-decay)
         if client_scores[i] > threshold:
             r[i] -= delta
             r[i] = max(1e-6, r[i])
@@ -144,7 +147,7 @@ def server_aggregate(global_model, client_models, phi, client_idx):
     ### This will take simple mean of the weights of models ###
     global_dict = global_model.state_dict()
     for k in global_dict.keys():
-        global_dict[k] = torch.stack([client_models[idx].state_dict()[k].float()* phi[idx] for idx in client_idx], 0).mean(0)
+        global_dict[k] = torch.stack([global_dict[k].float() - (global_dict[k].float()- client_models[idx].state_dict()[k].float())* phi[idx] for idx in client_idx], 0).mean(0)
     global_model.load_state_dict(global_dict)
 
 
@@ -171,29 +174,35 @@ def test(global_model, test_loader):
 
     return test_loss, acc
 
-
 ##### Hyperparameters for federated learning #########
 num_clients = 100
-num_selected = 10
+num_selected = 30
 num_rounds = 100
-epochs = 5
+epochs = 1
 batch_size = 50
 
 #############################################################
 ##### Creating desired data distribution among clients  #####
 #############################################################
 
-transform = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize((0.1307,), (0.3081,))
-            ])
+# Image augmentation
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
 
-testdata = datasets.MNIST('../data', train=False, transform=transform)
-
-
-# Loading the test data and thus converting them into a test_loader
-test_loader = torch.utils.data.DataLoader(testdata, batch_size=batch_size, shuffle=True)
+# Normalizing the test images
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+torch.manual_seed(42)
+# Loading the test iamges and thus converting them into a test_loader
+test_loader = torch.utils.data.DataLoader(
+        datasets.CIFAR10('./data', train=False, transform=transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
+        ), batch_size=batch_size, shuffle=True)
 
 
 ############################################
@@ -201,53 +210,57 @@ test_loader = torch.utils.data.DataLoader(testdata, batch_size=batch_size, shuff
 ############################################
 
 #### global model ##########
-global_model =  SFMNet(784, 10).cuda()
+global_model =  VGG('VGG19').cuda()
 
 ############## client models ##############
-client_gradients = np.zeros([num_clients, 10, 784])   # dimensions of the last layer
-client_models = [SFMNet(784, 10).cuda() for _ in range(num_clients)]
-for i, model in enumerate(client_models):
+client_gradients = np.zeros([num_clients, 10, 512])   # dimensions of the last layer
+client_models = [ VGG('VGG19').cuda() for _ in range(num_clients)]
+for model in client_models:
     model.load_state_dict(global_model.state_dict()) ### initial synchronizing with global model
 
-# cosine similarity matrix between clients
 cs_mat = np.zeros((num_clients, num_clients), dtype=float) * 1e-6
 
 r = [1 / num_clients for i in range(num_clients)]  # trust scores
+
 ############### optimizers ################
-opt = [optim.SGD(model.parameters(), lr=0.01) for model in client_models]
+opt = [optim.SGD(model.parameters(), lr=0.1) for model in client_models]
 
 ###### List containing info about learning #########
 losses_train = []
 losses_test = []
 acc_train = []
 acc_test = []
+# Runnining FL
 
 clients = np.arange(num_clients)
+np.random.seed(42)
 dishonest_client_idx =np.random.permutation(num_clients)[:int(0.05 * num_selected)]
 
-# Runnining FL
+attack = 0
+elapsed_time = 0
 for round in range(num_rounds):
+    print(round)
     probs = [r[i] / sum(r) for i in range(num_clients)]
+    np.random.seed(round)
     client_idx = np.random.choice(clients, size=num_selected, replace=False, p=probs)
     # client update
     loss = 0
-    print(round)
     for j, i in tqdm(enumerate(client_idx)):
         # get the global weights
         client_models[i].load_state_dict(global_model.state_dict())
         # read the local data
-        train_obj = pickle.load(open("MNIST/" + str(i) + "/train_100_.pickle", "rb"))
+        train_obj = pickle.load(open("cifar/" + str(i) + "/train_0.05_.pickle", "rb"))
         x = torch.stack(train_obj.x)
         y = torch.tensor(train_obj.y)
         dat = TensorDataset(x, y)
-        # train on data
         train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
-        # honst or not honest update
         if i in dishonest_client_idx:
+            attack+=1
             loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs, honest=False, attack_type='lf')
         else:
             loss += client_update(client_models[i], opt[i], train_loader, epoch=epochs)
 
+    st = time.time()
     # historical gradient aggregate.
     client_gradients = weight_aggregate(global_model, client_models, client_gradients, client_idx)
     # compute similarity matrix and alignment scores scores.
@@ -264,8 +277,9 @@ for round in range(num_rounds):
     phi = compute_contribitions(client_scores)
 
     # server aggregate
-    #print(client_scores)
     server_aggregate(global_model, client_models, phi, client_idx)
+    et = time.time()
+    elapsed_time += (et - st)
 
 attack = 0
 test_loss, acc = test(global_model, test_loader)
@@ -276,3 +290,4 @@ print('average train loss %0.3g | test loss %0.3g | test acc: %0.3f' % (loss / n
 
 asr = attack/(len(test_loader)*batch_size)
 print('attack success rate %0.3g' %(asr))
+print('Execution time:', elapsed_time, 'seconds')
