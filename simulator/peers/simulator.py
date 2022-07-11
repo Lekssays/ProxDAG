@@ -1,4 +1,5 @@
 import asyncio
+from fileinput import filename
 import json
 import subprocess
 import time
@@ -171,12 +172,13 @@ def copy_peers():
     subprocess.call(command, shell=True)
 
 
-async def send_log(message: str):
+async def send_log(message: str, filename="system.log"):
     uri = "ws://0.0.0.0:7777"
     dt = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-    message = dt + " - [" + os.getenv("MY_NAME") + "] " + message
+    message = filename + "!" + dt + " - [" + os.getenv("MY_NAME") + "] " + message
     async with websockets.connect(uri) as websocket:
         await websocket.send(message)
+
 
 def clear_host_state():
     r = redis.Redis()
@@ -208,13 +210,18 @@ def main():
     attack_percentage = int(parse_args().attack_percentage)
     dc = parse_args().dc
 
+    if len(os.getenv("PROTOCOL_PATH")) == 0:
+        print("PROTOCOL_PATH not found! Please run source $HOME/ProxDAG/.env")
+        return
+
     print("Generating docker-compose.yaml")
     peers = generate_peers(num_peers=peers_len)
     
     dishonest_peers = []
     if len(attack_type) > 0:
         dishonest_peers = generate_dishonest_peers(peers_len, attack_percentage)
-        print("Dishonest Peers", dishonest_peers)
+        print("Dishonest Peers", "-".join(dishonest_peers))
+        loop.run_until_complete(send_log("Dishonest Peers " + str(dishonest_peers)))    
 
     configs = generate_peers_configs(peers=peers, num_peers=peers_len, dishonest_peers=dishonest_peers)
     generate_docker_compose(configs=configs)
@@ -226,8 +233,10 @@ def main():
         stop_containers(peers=peers, peers_len=peers_len)
         return
 
-    settings = "\nlog!dataset = {}, peers = {}, alpha = {}, iterations = {}, dync_committee = {}, attack_type = {}\n".format(dataset, str(peers_len), str(alpha), str(iterations), dc, attack_type)
-    loop.run_until_complete(send_log(settings))    
+    metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
+
+    settings = "dataset = {}, peers = {}, alpha = {}, iterations = {}, dync_committee = {}, attack_type = {}, attack_percentage = {}, dishonest_peers = {}\n".format(dataset, str(peers_len), str(alpha), str(iterations), dc, attack_type, str(attack_percentage), '-'.join(dishonest_peers))
+    loop.run_until_complete(send_log(settings, metric_filename))    
     
     start_containers(peers=peers, peers_len=peers_len)
     time.sleep(5)
@@ -235,16 +244,14 @@ def main():
     time.sleep(5)
     for i in range(1, iterations + 1):
         print("Iteration #{}".format(str(i)))
-        log_message = "log!\niteration #" + str(i) + "#\n"
-        loop.run_until_complete(send_log(log_message))
+        log_message = "iteration #" + str(i)
+        loop.run_until_complete(send_log(log_message, metric_filename))
         if len(attack_type) > 0:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha, attack_type=attack_type)
         else:
             start_learning(peers=peers, dataset=dataset, peers_len=peers_len, alpha=alpha)
         if dc == "true":
             print("\n Generating Scores for Iteration #{}".format(str(i)))
-            log_message = "\n\log!scores iteration #" + str(i) + "#\n\n\n"
-            loop.run_until_complete(send_log(log_message))
             run_consensus()
             time.sleep(5)
 

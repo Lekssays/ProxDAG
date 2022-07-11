@@ -830,7 +830,7 @@ func Initialize(modelID string, x int, y int) error {
 	if err != nil {
 		return err
 	}
-	
+
 	empty2DSlice := make([][]float64, y)
 	for i := range empty2DSlice {
 		empty2DSlice[i] = make([]float64, x)

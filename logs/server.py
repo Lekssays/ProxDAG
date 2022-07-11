@@ -1,20 +1,19 @@
 import asyncio
 import websockets
 
-def write(message: str, path="system.log"):
-    f = open(path, "a")
+def write(message: str, filename="system.log"):
+    f = open(filename, "a")
     f.write(message + "\n")
     f.close()
 
 async def hello(websocket, path):
     message = await websocket.recv()
-    if "log" in message:
-        message = message.split("!")
-        message = message[1]
-        write(message=message, path="metrics.log") 
+    print(message)
+    message = message.split("!")
+    if len(message) == 2:
+        write(message=message[1], filename=message[0])
     else:
-        print(message)
-        write(message=message)
+        write(message=message[0])
 
 start_server = websockets.serve(hello, "0.0.0.0", 7777)
 

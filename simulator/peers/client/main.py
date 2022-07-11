@@ -33,19 +33,14 @@ def parse_args():
                         help = "Dataset: MNIST, CIFAR, KDD",
                         default = "MNIST",
                         required = True)
-    parser.add_argument('-c', '--clients',
-                        dest = "num_clients",
-                        help = "Number of Clients ",
+    parser.add_argument('-p', '--peers',
+                        dest = "num_peers",
+                        help = "Number of Peers ",
                         default = 100,
                         required = False)
-    parser.add_argument('-sc', '--selected_clients',
-                        dest = "num_selected",
-                        help = "Number of Selected Clients for Aggregation",
-                        default = 10,
-                        required = False)
-    parser.add_argument('-r', '--rounds',
-                        dest = "num_rounds",
-                        help = "Number of Training Rounds",
+    parser.add_argument('-i', '--iterations',
+                        dest = "iterations",
+                        help = "Number of Iterations",
                         default = 100,
                         required = False)
     parser.add_argument('-e', '--epochs',
@@ -57,16 +52,6 @@ def parse_args():
                         dest = "batch_size",
                         help = "Batch Size",
                         default = 50,
-                        required = False)
-    parser.add_argument('-dt', '--delta',
-                        dest = "delta",
-                        help = "Delta",
-                        default = 0.5,
-                        required = False)
-    parser.add_argument('-dc', '--decay',
-                        dest = "decay",
-                        help = "Decay",
-                        default = 0.001,
                         required = False)
     parser.add_argument('-tr', '--threshold',
                         dest = "threshold",
@@ -83,66 +68,54 @@ def parse_args():
                         help = "Attack type: lf , backdoor, untargeted",
                         default = "lf",
                         required = False)
+    parser.add_argument('-ap', '--attack_percentage',
+                        dest = "attack_percentage",
+                        help = "Attack percentage",
+                        default = "0",
+                        required = False)
+    parser.add_argument('-dc', '--dynamic_committee',
+                        dest = "dc",
+                        help = "Enable dynamic committee",
+                        default = "true",
+                        required = False)
     return parser.parse_args()
 
 
 def generate_config():
+
     dataset = parse_args().dataset
-    num_clients = int(parse_args().num_clients)
-    num_selected = int(parse_args().num_selected)
-    num_rounds = int(parse_args().num_rounds)
+    num_peers = int(parse_args().num_peers)
     epochs = int(parse_args().epochs)
     batch_size = int(parse_args().batch_size)
     alpha = str(parse_args().alpha)
     attack_type = str(parse_args().attack_type)
-
-    delta = float(parse_args().delta)
-    decay = float(parse_args().decay)
-    threshold = float(parse_args().threshold)
+    iterations = int(parse_args().iterations)
+    dc = parse_args().dc
+    attack_percentage = int(parse_args().attack_percentage)
 
     config = {
         'dataset': dataset,
-        'num_clients': num_clients,
-        'num_selected': num_selected,
-        'num_rounds': num_rounds,
+        'num_peers': num_peers,
+        'iterations': iterations,
         'epochs': epochs,
         'batch_size': batch_size,
         'alpha': alpha,
-        'delta': delta,
-        'decay': decay,
-        'threshold': threshold,
         'attack_type': attack_type,
+        'dc': dc,
+        'attack_percentage': attack_percentage,
     }
 
     f = open('config.json', 'w')
     f.write(json.dumps(config))
     f.close()
 
+    return dataset
+
 
 def main():
-    generate_config()
+    dataset = generate_config()
 
-    # weights = torch.tensor([1,2,3])
-    # gradients = torch.tensor([5,6,7,102])
-    # weights_bytes = utils.to_bytes(weights)
-    # weights_path = utils.add_content_to_ipfs(content=weights_bytes)
-    # accuracy = 0.911
-
-    # modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
-    # parents = ["HckSwavfZ5gceB58aMCYd6wc9Qd5VE2cRhqujiXBfVRv", "CkmuFbBXLgu11PXySQSmdeyodS13TQj67Zse5M6cuDTh"]
-
-    # messageID = utils.publish_model_update(
-    #     modelID=modelID,
-    #     parents=parents,
-    #     weights=weights_path,
-    #     accuracy=accuracy,
-    # )
-
-    # time.sleep(1)    
-    # model_update = utils.get_model_update(messageID=messageID)
-    # print("model_update", model_update)
-
-    modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
+    modelID = dataset
     if not exists(os.getenv("TMP_FOLDER") + modelID + ".dat"):
         local_model = learning.initialize(modelID)
         weights_bytes = utils.to_bytes(local_model.state_dict()['fc.weight'].cpu().numpy())

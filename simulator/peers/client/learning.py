@@ -22,7 +22,7 @@ torch.manual_seed(42)
 np.random.seed(42)
 
 
-def client_update(local_model, train_loader, epoch=5, attack_type=None):
+def peer_update(local_model, train_loader, epoch=5, attack_type=None):
     print(os.getenv("MY_NAME"), "attack_type", attack_type)
     dataset = utils.get_parameter(param="dataset")
     optimizer = get_optimizer(local_model)
@@ -203,23 +203,30 @@ def evaluate(local_model, loss, attack=0):
     losses_test = []
     acc_test = []
 
-    num_selected = utils.get_parameter(param="num_selected")
+    num_peers = utils.get_parameter(param="num_peers")
     batch_size = utils.get_parameter(param="batch_size")
+    dataset = utils.get_parameter(param="dataset")
+    alpha = utils.get_parameter(param="alpha")
+    iterations = utils.get_parameter(param="iterations")
+    dc = utils.get_parameter(param="dc")
+    attack_percentage = utils.get_parameter(param="attack_percentage")
 
     test_loader, _, _ = load_data()
     test_loss, acc, attack = test(local_model=local_model, test_loader=test_loader, attack=attack)
     losses_test.append(test_loss)
     acc_test.append(acc)
 
-    message = 'average train loss %0.6g | test loss %0.6g | test acc: %0.6f' % (loss / num_selected, test_loss, acc)
+    message = 'average train loss %0.6g | test loss %0.6g | test acc: %0.6f' % (loss / num_peers, test_loss, acc)
     print(message)
     loop.run_until_complete(utils.send_log(message))
     asr = attack/(len(test_loader)*batch_size)
     message = 'attack success rate %0.3g' %(asr)
     print(message)
     loop.run_until_complete(utils.send_log(message))
-    log_message = "log!" + os.getenv("MY_NAME") + "," + str(loss / num_selected) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
-    loop.run_until_complete(utils.send_log(log_message))
+    
+    metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
+    log_message = os.getenv("MY_NAME") + "," + str(loss / num_peers) + "," + str(test_loss) + "," + str(acc) + "," + str(asr)
+    loop.run_until_complete(utils.send_log(log_message, metric_filename))
     return acc, asr
 
 
@@ -227,7 +234,7 @@ def train(local_model, alpha="100", attack_type="lf"):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-    if attack_type not in ["backdoor", "lf"]:
+    if attack_type not in ["backdoor", "lf", "untargeted"]:
         message = "[x] ERROR: attack type not recognized :)"
         print(message)
         loop.run_until_complete(utils.send_log(message))
@@ -240,7 +247,7 @@ def train(local_model, alpha="100", attack_type="lf"):
         return
 
     dataset = utils.get_parameter(param="dataset")
-    num_clients = utils.get_parameter(param="num_clients")
+    num_peers = utils.get_parameter(param="num_peers")
     epochs = utils.get_parameter(param="epochs")
     batch_size = utils.get_parameter(param="batch_size")
     
@@ -255,17 +262,17 @@ def train(local_model, alpha="100", attack_type="lf"):
         train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
     elif dataset == "KDD":
         _, train_x, train_y = load_data()
-        x = torch.tensor(train_x[int(my_id* len(train_x)/num_clients):int((my_id+1)*len(train_x)/num_clients)])
-        y = torch.tensor(train_y[int(my_id* len(train_x)/num_clients):int((my_id+1)*len(train_x)/num_clients)])
+        x = torch.tensor(train_x[int(my_id* len(train_x)/num_peers):int((my_id+1)*len(train_x)/num_peers)])
+        y = torch.tensor(train_y[int(my_id* len(train_x)/num_peers):int((my_id+1)*len(train_x)/num_peers)])
         dat = TensorDataset(x, y)
         train_loader = DataLoader(dat, batch_size=batch_size, shuffle=True)
 
     dishonest_peers = utils.get_dishonest_peers()
     if os.getenv("MY_ID") in dishonest_peers:
         attack += 1
-        loss, local_model = client_update(local_model=local_model, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
+        loss, local_model = peer_update(local_model=local_model, train_loader=train_loader, epoch=epochs, attack_type=attack_type)
     else:
-        loss, local_model = client_update(local_model=local_model, train_loader=train_loader, epoch=epochs)
+        loss, local_model = peer_update(local_model=local_model, train_loader=train_loader, epoch=epochs)
 
     return loss, attack, local_model
 
