@@ -215,6 +215,7 @@ def evaluate(local_model, loss, attack=0):
     iterations = utils.get_parameter(param="iterations")
     dc = utils.get_parameter(param="dc")
     attack_percentage = utils.get_parameter(param="attack_percentage")
+    attack_type = utils.get_parameter(param="attack_type")
 
     test_loader, _, _ = load_data()
     test_loss, acc, attack = test(local_model=local_model, test_loader=test_loader, attack=attack)
@@ -229,7 +230,7 @@ def evaluate(local_model, loss, attack=0):
     print(message)
     loop.run_until_complete(utils.send_log(message))
     
-    metric_filename = "{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, str(attack_percentage))
+    metric_filename = "{}_{}_{}_{}_{}_{}.csv".format(dataset, str(alpha), str(iterations), dc, attack_type, str(attack_percentage))
     log_message = os.getenv("MY_NAME") + "," + str(loss / num_peers) + "," + str(test_loss) + "," + str(acc) + "," + str(asr) + "!" + metric_filename
     loop.run_until_complete(utils.send_log(log_message))
     return acc, asr
