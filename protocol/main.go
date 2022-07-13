@@ -194,7 +194,7 @@ func main() {
 				classes = 23
 			}
 
-			err := consensus.Initialize(modelID, features, classes)
+			err := consensus.Initialize(modelID, classes, features)
 			if err != nil {
 				fmt.Errorf(err.Error())
 			}

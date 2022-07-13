@@ -151,7 +151,11 @@ func EvaluatePardoning(modelID string, algnScore []float64, csMatrix [][]float64
 }
 
 func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, error) {
-	trustScores := make(map[string]float32)
+	trustScores, err := GetLatestTrustScores(modelID)
+	if err != nil {
+		fmt.Println("trustScores", err.Error())
+		return map[string]float32{}, err
+	}
 
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
@@ -160,9 +164,9 @@ func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, erro
 
 	for i := 0; i < len(clients); i++ {
 		if algnScore[i] >= THRESHOLD {
-			trustScores[clients[i]] -= DELTA
+			trustScores[clients[i]] -= float32(DELTA)
 		} else {
-			trustScores[clients[i]] += DELTA
+			trustScores[clients[i]] += float32(DELTA)
 		}
 	}
 
@@ -408,17 +412,25 @@ func GetWeightsFromNumpy(path string) ([][]float64, error) {
 		return [][]float64{}, err
 	}
 
-	r, err := npyio.NewReader(bytes.NewBuffer(weightsBytes))
-	if err != nil {
-		fmt.Println("NewReader", err.Error())
-		return [][]float64{}, err
-	}
+	buf := bytes.NewBuffer(weightsBytes)
 
-	var weights [][]float64
-	err = r.Read(&weights)
+	var weightsMat mat.Dense
+	err = npyio.Read(buf, &weightsMat)
 	if err != nil {
 		fmt.Println("Error: Read", err.Error())
 		return [][]float64{}, err
+	}
+
+	r, c := weightsMat.Dims()	
+	weights := make([][]float64, r)
+	for i := range weights {
+		weights[i] = make([]float64, c)
+	}
+
+	for i := 0; i < r; i++ {
+		for j := 0; j < r; j++ {
+			weights[i][j] = weightsMat.At(i, j)
+		}
 	}
 
 	return weights, nil
@@ -441,11 +453,33 @@ func GetLatestGradients(modelID string) (map[string][][]float64, error) {
 	dec := gob.NewDecoder(buf)
 	err = dec.Decode(&gradients)
 	if err != nil {
-		fmt.Println("GetLatestGradients-latestGradientBytes", err.Error())
 		return gradients.Content, err
 	}
 
 	return gradients.Content, nil
+}
+
+func GetLatestTrustScores(modelID string) (map[string]float32, error) {
+	var trustScores map[string]float32
+	scoreType := "trust"
+	latestTrustScores, err := GetScorePath(modelID, scoreType)
+	if err != nil {
+		return trustScores, err
+	}
+
+	latestTrustScoresBytes, err := GetContentIPFS(latestTrustScores.Path)
+	if err != nil {
+		return trustScores, err
+	}
+
+	buf := bytes.NewBuffer(latestTrustScoresBytes)
+	dec := gob.NewDecoder(buf)
+	err = dec.Decode(&trustScores)
+	if err != nil {
+		return trustScores, err
+	}
+
+	return trustScores, nil
 }
 
 func GetLatestRoundTimestamp(modelID string) (uint32, error) {
@@ -508,20 +542,28 @@ func StoreGradientsIPFS(gradients map[string][][]float64) (string, error) {
 }
 
 func substractMatrix(a [][]float64, b [][]float64) [][]float64 {
-	var result [][]float64
+	result := make([][]float64, len(a))
+	for i := range result {
+		result[i] = make([]float64, len(a[0]))
+	}
+
 	for i := 0; i < len(a); i++ {
-		for j := 0; j < len(a[i]); j++ {
-			result[i][j] = a[i][j] - a[i][j]
+		for j := 0; j < len(a[0]); j++ {
+			result[i][j] = a[i][j] - b[i][j]
 		}
 	}
 	return result
 }
 
 func addMatrix(a [][]float64, b [][]float64) [][]float64 {
-	var result [][]float64
+	result := make([][]float64, len(a))
+	for i := range result {
+		result[i] = make([]float64, len(a[0]))
+	}
+
 	for i := 0; i < len(a); i++ {
 		for j := 0; j < len(a[i]); j++ {
-			result[i][j] = a[i][j] + a[i][j]
+			result[i][j] = a[i][j] + b[i][j]
 		}
 	}
 	return result
@@ -547,11 +589,14 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 
 	if len(updatesToProcess) < 2 {
 		w1, err := GetWeightsFromNumpy(updatesToProcess[0].Weights)
-		fmt.Println("w1", w1)
+		w2 := make([][]float64, len(w1))
+		for i := range w2 {
+			w2[i] = make([]float64, len(w1[0]))
+		}
 		if err != nil {
 			return [][]float64{}, [][]float64{}, err
 		}
-		return w1, [][]float64{}, nil
+		return w1, w2, nil
 	} else {
 		fst := rand.Intn(len(updatesToProcess))
 		var scd int
@@ -593,7 +638,10 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 	}
 
 	for i := 0; i < len(clients); i++ {
-		for j := 0; j < len(clients[i]); i++ {
+		for j := 0; j < len(clients); j++ {
+			if i == j {
+				continue
+			}
 			// get randomly two weights of this client
 			w1, w2, err := GetLatestWeights(modelID, clients[i])
 			if err != nil {
@@ -607,6 +655,8 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 			gradients[clients[i]] = addMatrix(latestGradient[clients[i]], substractWeights)
 		}
 	}
+
+	
 
 	// publish the new gradients
 	gradientsPath, err := StoreGradientsIPFS(gradients)
@@ -846,9 +896,9 @@ func Initialize(modelID string, x int, y int) error {
 		return err
 	}
 
-	empty2DSlice := make([][]float64, y)
+	empty2DSlice := make([][]float64, x)
 	for i := range empty2DSlice {
-		empty2DSlice[i] = make([]float64, x)
+		empty2DSlice[i] = make([]float64, y)
 	}
 
 	empty1DSlice := make([]float64, len(clients))
@@ -908,7 +958,7 @@ func Initialize(modelID string, x int, y int) error {
 
 	trustScore := make(map[string]float32)
 	for i := 0; i < len(clients); i++ {
-		trustScore[clients[i]] = 0.00
+		trustScore[clients[i]] = float32(1.00)
 	}
 
 	fmt.Println("trustScore", trustScore)

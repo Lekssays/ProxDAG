@@ -238,9 +238,9 @@ def main():
     loop.run_until_complete(send_log(settings, metric_filename))    
     
     start_containers(peers=peers, peers_len=peers_len)
-    time.sleep(5)
+    time.sleep(8)
     initialize_protocol(dataset=dataset)
-    time.sleep(5)
+    time.sleep(8)
     for i in range(1, iterations + 1):
         print("Iteration #{}".format(str(i)))
         log_message = "it_" + str(i)

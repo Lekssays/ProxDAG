@@ -266,9 +266,7 @@ def publish_model_update(modelID, accuracy, parents, model, weights):
     model_bytes = to_bytes(model)
     model_path = add_content_to_ipfs(content=model_bytes)
 
-    print("weights.dtype", weights.dtype)
-    weights_bytes = to_numpy_bytes(weights)
-    print("weights_bytes", weights_bytes)
+    weights_bytes = to_numpy_bytes(weights.astype('float64'))
     weights_path = add_content_to_ipfs(content=weights_bytes)
 
     model_update_pb = to_protobuf(
