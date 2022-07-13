@@ -775,6 +775,11 @@ func PublishScore(modelID string, content interface{}, purpose uint32) error {
 }
 
 func Run(modelID string) error {
+	_, err := ComputeGradients(modelID)
+	if err != nil {
+		return err
+	}
+
 	csMatrix, err := ComputeCSMatrix(modelID)
 	if err != nil {
 		return err
@@ -813,11 +818,6 @@ func Run(modelID string) error {
 
 	fmt.Println("trustScore", trustScore)
 	err = PublishScore(modelID, trustScore, TRUST_PURPOSE_ID)
-	if err != nil {
-		return err
-	}
-
-	_, err = ComputeGradients(modelID)
 	if err != nil {
 		return err
 	}

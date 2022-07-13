@@ -179,13 +179,22 @@ func main() {
 		} else if args[0] == "init" {
 			fmt.Println("Initializing the system")
 			modelID := "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
-			var modelX int
-			var modelY int
+			
+			dataset := args[1]
+			features := 10
+			classes := 10
+			if dataset == 'MNIST' {
+				features := 784
+				classes := 10				
+			} else if dataset == 'CIFAR' {
+				features := 512
+				classes := 10							
+			} else if dataset == 'KDD' {
+				features := 41
+				classes := 23	
+			}
 
-			modelX = 768
-			modelY = 1223
-
-			err := consensus.Initialize(modelID, modelX, modelY)
+			err := consensus.Initialize(modelID, features, classes)
 			if err != nil {
 				fmt.Errorf(err.Error())
 			}

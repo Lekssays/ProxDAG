@@ -100,8 +100,8 @@ def start_learning(dataset, peers, dc, iterations, attack_percentage=0, peers_le
         subprocess.call(command, shell=True)
 
 
-def initialize_protocol():
-    command = "cd " + os.getenv("PROTOCOL_PATH") +  " && ./protocol init"
+def initialize_protocol(dataset: str):
+    command = "cd " + os.getenv("PROTOCOL_PATH") +  " && ./protocol init " + dataset
     subprocess.call(command, shell=True)
 
 
@@ -239,7 +239,7 @@ def main():
     
     start_containers(peers=peers, peers_len=peers_len)
     time.sleep(5)
-    initialize_protocol()
+    initialize_protocol(dataset=dataset)
     time.sleep(5)
     for i in range(1, iterations + 1):
         print("Iteration #{}".format(str(i)))
