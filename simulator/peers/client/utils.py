@@ -18,7 +18,7 @@ from collections import OrderedDict, defaultdict
 from datetime import datetime
 from google.protobuf import text_format
 from io import BytesIO
-
+from tempfile import TemporaryFile
 
 GOSHIMMER_API_ENDPOINT = os.getenv("GOSHIMMER_API_ENDPOINT") # http://0.0.0.0:8081
 IPFS_API_ENDPOINT = os.getenv("IPFS_API_ENDPOINT") # http://0.0.0.0:5001
@@ -57,6 +57,13 @@ def to_protobuf(modelID: str, parents: list, weights: str, model: str, pubkey: s
 def to_bytes(content: OrderedDict) -> bytes:
     buff = io.BytesIO()
     torch.save(content, buff)
+    buff.seek(0)
+    return buff.read()
+
+
+def to_numpy_bytes(content) -> bytes:
+    buff = TemporaryFile()
+    np.save(buff, content)
     buff.seek(0)
     return buff.read()
 
@@ -259,7 +266,9 @@ def publish_model_update(modelID, accuracy, parents, model, weights):
     model_bytes = to_bytes(model)
     model_path = add_content_to_ipfs(content=model_bytes)
 
-    weights_bytes = to_bytes(weights)
+    print("weights.dtype", weights.dtype)
+    weights_bytes = to_numpy_bytes(weights)
+    print("weights_bytes", weights_bytes)
     weights_path = add_content_to_ipfs(content=weights_bytes)
 
     model_update_pb = to_protobuf(

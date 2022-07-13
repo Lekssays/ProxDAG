@@ -118,15 +118,11 @@ def main():
     modelID = "9313eb37-9fbd-47dc-bcbd-76c9cbf4cce4"
     if not exists(os.getenv("TMP_FOLDER") + modelID + ".dat"):
         local_model = learning.initialize(modelID)
-        weights_bytes = utils.to_bytes(local_model.state_dict()['fc.weight'].cpu().numpy())
-        weights_path = utils.add_content_to_ipfs(content=weights_bytes)
-        model_bytes = utils.to_bytes(local_model.state_dict())
-        model_path = utils.add_content_to_ipfs(content=model_bytes)
         messageID = utils.publish_model_update(
             modelID=modelID,
             parents=[],
-            weights=weights_path,
-            model=model_path,
+            weights=local_model.state_dict()['fc.weight'].cpu().numpy(),
+            model=local_model.state_dict(),
             accuracy=0.0,
         )
         utils.store_my_latest_accuracy(accuracy=0.00)

@@ -17,6 +17,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 const (
@@ -58,9 +59,15 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		return mupb.ModelUpdate{}, err
 	}
 
-	if payload.Purpose() == MODEL_UPDATE_GOLANG_PURPOSE_ID || payload.Purpose() == MODEL_UPDATE_PYTHON_PURPOSE_ID {
-		var mupdate mupb.ModelUpdate 
+	var mupdate mupb.ModelUpdate
+	if payload.Purpose() == MODEL_UPDATE_GOLANG_PURPOSE_ID {
 		err = proto.Unmarshal([]byte(payload.Data()), &mupdate)
+		if err != nil {
+			return mupb.ModelUpdate{}, err
+		}
+		return mupdate, nil
+	} else if payload.Purpose() == MODEL_UPDATE_PYTHON_PURPOSE_ID {
+		err = prototext.Unmarshal([]byte(payload.Data()), &mupdate)
 		if err != nil {
 			return mupb.ModelUpdate{}, err
 		}
@@ -99,7 +106,7 @@ func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
 		return err
 	}
 
-	err = rdb.Set(ctx, modelUpdate.ModelID, modelUpdateBytes, 0).Err()
+	err = rdb.Set(ctx, messageID, modelUpdateBytes, 0).Err()
 	if err != nil {
 		return err
 	}
@@ -126,17 +133,13 @@ func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, e
 		return &mupb.ModelUpdate{}, err
 	}
 
+	var modelUpdate mupb.ModelUpdate
+	err = proto.Unmarshal([]byte(data), &modelUpdate)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
 
-	modelUpdate := &mupb.ModelUpdate{}
-	err = proto.Unmarshal([]byte(data), modelUpdate)
-	if err != nil {
-		return &mupb.ModelUpdate{}, err
-	}
-
-	return modelUpdate, nil
+	return &modelUpdate, nil
 }
 
 func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
@@ -148,7 +151,7 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	}
 
 	payload := Message{
-		Purpose: 	MODEL_UPDATE_GOLANG_PURPOSE_ID ,
+		Purpose: MODEL_UPDATE_GOLANG_PURPOSE_ID,
 		Data:    modelUpdateBytes,
 	}
 
@@ -194,7 +197,6 @@ func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
 	key := fmt.Sprintf("%s!MU!", modelID)
 	messageIDs, err := rdb.SMembers(ctx, key).Result()
 	if err != nil {
-		fmt.Println("Error: SMembers", messageIDs)
 		return []string{}, err
 	}
 
@@ -203,9 +205,7 @@ func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
 
 func GetModelUpdates(modelID string) ([]*mupb.ModelUpdate, error) {
 	messageIDs, err := GetModelUpdatesMessageIDs(modelID)
-	fmt.Println("messageIDs", messageIDs)
 	if err != nil {
-		fmt.Println("GetModelUpdatesMessageIDs", err.Error())
 		return []*mupb.ModelUpdate{}, err
 	}
 

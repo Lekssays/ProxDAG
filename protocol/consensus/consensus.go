@@ -274,7 +274,7 @@ func GetContentIPFS(path string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	return body, nil
+	return body[512:len(body)], nil
 }
 
 func AddContentIPFS(content []byte) (string, error) {
@@ -408,14 +408,16 @@ func GetWeightsFromNumpy(path string) ([][]float64, error) {
 		return [][]float64{}, err
 	}
 
-	r, err := npyio.NewReader(bytes.NewReader(weightsBytes))
+	r, err := npyio.NewReader(bytes.NewBuffer(weightsBytes))
 	if err != nil {
+		fmt.Println("NewReader", err.Error())
 		return [][]float64{}, err
 	}
 
 	var weights [][]float64
 	err = r.Read(&weights)
 	if err != nil {
+		fmt.Println("Error: Read", err.Error())
 		return [][]float64{}, err
 	}
 
@@ -435,7 +437,7 @@ func GetLatestGradients(modelID string) (map[string][][]float64, error) {
 		return gradients.Content, err
 	}
 
-	buf := bytes.NewBuffer(latestGradientBytes[512:len(latestGradientBytes)])
+	buf := bytes.NewBuffer(latestGradientBytes)
 	dec := gob.NewDecoder(buf)
 	err = dec.Decode(&gradients)
 	if err != nil {
@@ -532,9 +534,7 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 	}
 
 	updates, err := graph.GetModelUpdates(modelID)
-	fmt.Println("updates", updates)
 	if err != nil {
-		fmt.Println("GetModelUpdates", err.Error())
 		return [][]float64{}, [][]float64{}, err
 	}
 
@@ -547,6 +547,7 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 
 	if len(updatesToProcess) < 2 {
 		w1, err := GetWeightsFromNumpy(updatesToProcess[0].Weights)
+		fmt.Println("w1", w1)
 		if err != nil {
 			return [][]float64{}, [][]float64{}, err
 		}

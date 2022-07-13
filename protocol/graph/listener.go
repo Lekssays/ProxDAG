@@ -2,6 +2,7 @@ package graph
 
 import (
 	"flag"
+	"encoding/json"
 	"log"
 	"net/url"
 	"os"
@@ -16,6 +17,17 @@ import (
 const (
 	GOSHIMMER_WEBSOCKETS_ENDPOINT = "0.0.0.0:8081"
 )
+
+type Data struct {
+	ID          string `json:"id,omitempty"`
+	Value       int    `json:"value,omitempty"`
+	PayloadType int    `json:"payload_type,omitempty"`
+}
+
+type GHResponse struct {
+	Type string `json:"type,omitempty"`
+	Data Data   `json:"data,omitempty"`
+}
 
 var addr = flag.String("addr", GOSHIMMER_WEBSOCKETS_ENDPOINT, "http service address")
 
@@ -45,9 +57,13 @@ func RunLiveFeed(wg *sync.WaitGroup) {
 				log.Println("read:", err)
 				return
 			}
+
+			var response GHResponse
+			json.Unmarshal(message, &response)
+
 			// PayloadType for ProxDAG is 787 (see plugins/proxdag/proxdag.go)
 			if strings.Contains(string(message), "\"payload_type\":787") {
-				messageID := message[24:68]
+				messageID := response.Data.ID
 				log.Printf("MessageID: %s", messageID)
 				mupdate, err := GetModelUpdate(string(messageID))
 				if err != nil {
@@ -57,7 +73,7 @@ func RunLiveFeed(wg *sync.WaitGroup) {
 				err = SaveModelUpdate(string(messageID), mupdate)
 				if err != nil {
 					log.Println("Error SaveModelUpdate-", err.Error())
-				}				
+				}
 			}
 		}
 	}()
