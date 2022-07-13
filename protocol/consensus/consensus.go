@@ -287,7 +287,7 @@ func AddContentIPFS(content []byte) (string, error) {
 	return response, nil
 }
 
-func StoreScoreOnLevelDB(modelID string, score scpb.Score) error {
+func StoreScoreLocally(modelID string, score scpb.Score) error {
 	ctx := context.Background()
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "0.0.0.0:6379",
@@ -532,7 +532,9 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 	}
 
 	updates, err := graph.GetModelUpdates(modelID)
+	fmt.Println("updates", updates)
 	if err != nil {
+		fmt.Println("GetModelUpdates", err.Error())
 		return [][]float64{}, [][]float64{}, err
 	}
 
@@ -621,7 +623,7 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 		return gradients, err
 	}
 
-	err = StoreScoreOnLevelDB(modelID, score)
+	err = StoreScoreLocally(modelID, score)
 	if err != nil {
 		return gradients, err
 	}
@@ -766,7 +768,7 @@ func PublishScore(modelID string, content interface{}, purpose uint32) error {
 		return err
 	}
 
-	err = StoreScoreOnLevelDB(modelID, score)
+	err = StoreScoreLocally(modelID, score)
 	if err != nil {
 		return err
 	}
@@ -822,10 +824,22 @@ func Run(modelID string) error {
 		return err
 	}
 
+	currentTimestamp := uint32(time.Now().Unix())
+	err = StoreLatestRoundTimestamp(modelID, currentTimestamp)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func Initialize(modelID string, x int, y int) error {
+	currentTimestamp := uint32(time.Now().Unix())
+	err := StoreLatestRoundTimestamp(modelID, currentTimestamp)
+	if err != nil {
+		return err
+	}
+
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
 		return err
@@ -863,7 +877,7 @@ func Initialize(modelID string, x int, y int) error {
 		return err
 	}
 
-	err = StoreScoreOnLevelDB(modelID, score)
+	err = StoreScoreLocally(modelID, score)
 	if err != nil {
 		return err
 	}

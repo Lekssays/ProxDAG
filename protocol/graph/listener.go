@@ -49,6 +49,15 @@ func RunLiveFeed(wg *sync.WaitGroup) {
 			if strings.Contains(string(message), "\"payload_type\":787") {
 				messageID := message[24:68]
 				log.Printf("MessageID: %s", messageID)
+				mupdate, err := GetModelUpdate(string(messageID))
+				if err != nil {
+					log.Println("Error GetModelUpdate-", err.Error())
+					continue
+				}
+				err = SaveModelUpdate(string(messageID), mupdate)
+				if err != nil {
+					log.Println("Error SaveModelUpdate-", err.Error())
+				}				
 			}
 		}
 	}()

@@ -2,6 +2,7 @@ package graph
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,15 +14,14 @@ import (
 
 	"github.com/Lekssays/ProxDAG/protocol/plugins/proxdag"
 	mupb "github.com/Lekssays/ProxDAG/protocol/proto/modelUpdate"
+	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"github.com/iotaledger/goshimmer/client"
-	"github.com/syndtr/goleveldb/leveldb"
-	"github.com/syndtr/goleveldb/leveldb/opt"
-	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 const (
-	MODEL_UPDATE_PURPOSE_ID = 17
+	MODEL_UPDATE_PYTHON_PURPOSE_ID = 16
+	MODEL_UPDATE_GOLANG_PURPOSE_ID = 17
 )
 
 type Model struct {
@@ -58,8 +58,8 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		return mupb.ModelUpdate{}, err
 	}
 
-	if payload.Purpose() == MODEL_UPDATE_PURPOSE_ID {
-		var mupdate mupb.ModelUpdate
+	if payload.Purpose() == MODEL_UPDATE_GOLANG_PURPOSE_ID || payload.Purpose() == MODEL_UPDATE_PYTHON_PURPOSE_ID {
+		var mupdate mupb.ModelUpdate 
 		err = proto.Unmarshal([]byte(payload.Data()), &mupdate)
 		if err != nil {
 			return mupb.ModelUpdate{}, err
@@ -67,7 +67,7 @@ func GetModelUpdate(messageID string) (mupb.ModelUpdate, error) {
 		return mupdate, nil
 	}
 
-	return mupb.ModelUpdate{}, errors.New("Unknown payload type!")
+	return mupb.ModelUpdate{}, errors.New("PurposeID does not match ModelUpdate Type")
 
 }
 
@@ -87,48 +87,51 @@ func AddModelUpdateEdge(messageID string, graph Graph) (bool, error) {
 }
 
 func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	modelUpdateBytes, err := proto.Marshal(&modelUpdate)
 	if err != nil {
 		return err
 	}
 
-	ID := fmt.Sprintf("%s!MU!%s", modelUpdate.ModelID, messageID)
-	exists, err := db.Has([]byte(ID), &opt.ReadOptions{})
+	err = rdb.Set(ctx, modelUpdate.ModelID, modelUpdateBytes, 0).Err()
 	if err != nil {
 		return err
 	}
 
-	if !exists {
-		err = db.Put([]byte(ID), modelUpdateBytes, nil)
-		if err != nil {
-			return err
-		}
+	key := fmt.Sprintf("%s!MU!", modelUpdate.ModelID)
+	err = rdb.SAdd(ctx, key, messageID).Err()
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
 func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	data, err := rdb.Get(ctx, messageID).Result()
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
-	defer db.Close()
 
-	ID := fmt.Sprintf("%s!MU!%s", modelID, messageID)
-	data, err := db.Get([]byte(ID), nil)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
 
 	modelUpdate := &mupb.ModelUpdate{}
-	err = proto.Unmarshal(data, modelUpdate)
+	err = proto.Unmarshal([]byte(data), modelUpdate)
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
@@ -145,7 +148,7 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 	}
 
 	payload := Message{
-		Purpose: MODEL_UPDATE_PURPOSE_ID,
+		Purpose: 	MODEL_UPDATE_GOLANG_PURPOSE_ID ,
 		Data:    modelUpdateBytes,
 	}
 
@@ -174,11 +177,6 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 		if err != nil {
 			return "", err
 		}
-
-		err = StoreClientID(mupdate.Pubkey, mupdate.ModelID)
-		if err != nil {
-			return "", err
-		}
 		return response.MessageID, nil
 	}
 
@@ -186,30 +184,28 @@ func SendModelUpdate(mupdate mupb.ModelUpdate) (string, error) {
 }
 
 func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	key := fmt.Sprintf("%s!MU!", modelID)
+	messageIDs, err := rdb.SMembers(ctx, key).Result()
 	if err != nil {
+		fmt.Println("Error: SMembers", messageIDs)
 		return []string{}, err
 	}
-	defer db.Close()
 
-	var key string
-	var updates []string
-
-	ID := fmt.Sprintf("%s!MU!", modelID)
-	iter := db.NewIterator(util.BytesPrefix([]byte(ID)), nil)
-	for iter.Next() {
-		key = string(iter.Key())
-		messageID := strings.Split(string(key[:]), "!")[2]
-		updates = append(updates, messageID)
-	}
-	iter.Release()
-
-	return updates, iter.Error()
+	return messageIDs, nil
 }
 
 func GetModelUpdates(modelID string) ([]*mupb.ModelUpdate, error) {
 	messageIDs, err := GetModelUpdatesMessageIDs(modelID)
+	fmt.Println("messageIDs", messageIDs)
 	if err != nil {
+		fmt.Println("GetModelUpdatesMessageIDs", err.Error())
 		return []*mupb.ModelUpdate{}, err
 	}
 
@@ -225,27 +221,18 @@ func GetModelUpdates(modelID string) ([]*mupb.ModelUpdate, error) {
 	return modelUpdates, nil
 }
 
-func StoreClientID(pubkey string, modelID string) error {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func StoreClientID(id uint32, pubkey string, modelID string) error {
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
-	clients, err := GetClients(modelID)
-	ID := []byte(strconv.Itoa(len(clients)))
 	key := fmt.Sprintf("%s!CL!%s", modelID, pubkey)
-
-	exists, err := db.Has([]byte(key), &opt.ReadOptions{})
+	err := rdb.Set(ctx, key, id, 0).Err()
 	if err != nil {
 		return err
-	}
-
-	if !exists {
-		err = db.Put([]byte(key), []byte(ID), nil)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -272,8 +259,16 @@ func GetClients(modelID string) ([]string, error) {
 		var pubkeys []string
 		for i := 0; i < len(peers.Peers); i++ {
 			pubkeys = append(pubkeys, peers.Peers[i].Pubkey)
-		}
+			ID, err := strconv.Atoi(string(peers.Peers[i].ID))
+			if err != nil {
+				return []string{}, err
+			}
 
+			err = StoreClientID(uint32(ID), peers.Peers[i].Pubkey, modelID)
+			if err != nil {
+				return []string{}, err
+			}
+		}
 		return pubkeys, nil
 	} else if os.Getenv("ENVIRONMENT") == "PROD" {
 		messageIDs, err := GetModelUpdatesMessageIDs(modelID)
@@ -303,18 +298,23 @@ func GetClients(modelID string) ([]string, error) {
 }
 
 func GetClientID(pubkey string, modelID string) (uint32, error) {
-	db, err := leveldb.OpenFile(LEVELDB_ENDPOINT, nil)
-	if err != nil {
-		return INF, err
-	}
-	defer db.Close()
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
 
 	key := fmt.Sprintf("%s!CL!%s", modelID, pubkey)
-	data, err := db.Get([]byte(key), nil)
+	data, err := rdb.Get(ctx, key).Result()
 	if err != nil {
-		return INF, err
+		return 0, err
 	}
 
 	ID, err := strconv.Atoi(string(data))
+	if err != nil {
+		return 0, err
+	}
+
 	return uint32(ID), nil
 }
