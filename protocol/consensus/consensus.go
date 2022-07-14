@@ -32,7 +32,7 @@ const (
 	THRESHOLD             = 0.1
 	DECAY_RATE            = 0.0001
 	DELTA                 = 0.01
-	ALPHA                 = 0.8
+	ALPHA                 = 0.5
 	K                     = 10
 	TRUST_PURPOSE_ID      = 21
 	SIMILARITY_PURPOSE_ID = 22
