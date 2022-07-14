@@ -207,21 +207,24 @@ def get_weights_to_train(modelID: str):
     timestamps = []
 
     chosen_weights_ids = get_weights_ids(modelID=modelID, limit=LIMIT_CHOOSE)
-    trust_score = get_trust()
     similarity = get_similarity()
 
     metrics = []
     for messageID in chosen_weights_ids:
         mu = get_model_update(messageID=messageID)
         tmp = {
-            'trust_score': trust_score[get_client_id(pubkey=mu.pubkey)],
             'similarity': similarity[get_client_id(pubkey=mu.pubkey)][get_client_id(pubkey=MY_PUB_KEY)],
             'messageID': messageID,
             'timestamp': mu.timestamp,
         }
         metrics.append(tmp)
     
-    metrics = sorted(metrics, key=lambda x: (x['timestamp'], x['trust_score'], x['similarity']), reverse=True)
+    metrics = sorted(metrics, key=lambda x: (x['timestamp']), reverse=True)
+
+    limit = min(LIMIT_SELECTED, len(metrics))
+    metrics = metrics[:limit]
+
+    metrics = sorted(metrics, key=lambda x: (x['similarity']))
 
     for m in metrics:
         mu = get_model_update(messageID=m['messageID'])
@@ -235,14 +238,11 @@ def get_weights_to_train(modelID: str):
             parents.append(m['messageID'])
             timestamps.append(m['timestamp'])
 
-    if len(weights) <= LIMIT_SELECTED:
-        return weights, indices, parents
-
     c = list(zip(weights, indices, parents, timestamps))
     random.shuffle(c)
     weights, indices, parents, timestamps = zip(*c)
 
-    return weights[:LIMIT_SELECTED], indices[:LIMIT_SELECTED], parents[:LIMIT_SELECTED]
+    return weights, indices, parents
 
 
 def get_client_id(pubkey: str):
