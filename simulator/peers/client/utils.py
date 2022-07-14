@@ -238,9 +238,10 @@ def get_weights_to_train(modelID: str):
             parents.append(m['messageID'])
             timestamps.append(m['timestamp'])
 
-    c = list(zip(weights, indices, parents, timestamps))
-    random.shuffle(c)
-    weights, indices, parents, timestamps = zip(*c)
+    if len(weights) > 0:
+        c = list(zip(weights, indices, parents, timestamps))
+        random.shuffle(c)
+        weights, indices, parents, timestamps = zip(*c)
 
     return weights, indices, parents
 
