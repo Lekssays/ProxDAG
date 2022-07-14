@@ -32,6 +32,7 @@ const (
 	THRESHOLD             = 0.1
 	DECAY_RATE            = 0.0001
 	DELTA                 = 0.01
+	ALPHA                 = 0.8
 	K                     = 10
 	TRUST_PURPOSE_ID      = 21
 	SIMILARITY_PURPOSE_ID = 22
@@ -418,7 +419,7 @@ func GetWeightsFromNumpy(path string) ([][]float64, error) {
 		return [][]float64{}, err
 	}
 
-	r, c := weightsMat.Dims()	
+	r, c := weightsMat.Dims()
 	weights := make([][]float64, r)
 	for i := range weights {
 		weights[i] = make([]float64, c)
@@ -654,8 +655,6 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 		}
 	}
 
-	
-
 	// publish the new gradients
 	gradientsPath, err := StoreGradientsIPFS(gradients)
 	if err != nil {
@@ -682,38 +681,9 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 
 func ComputePhi(algnScores []float64) []float64 {
 	phi := make([]float64, len(algnScores))
-	max := float64(-1.0)
-	for i := 0; i < len(algnScores); i++ {
-		phi[i] = 1 - algnScores[i]
-
-		if phi[i] < 0 {
-			phi[i] = 0
-		}
-
-		if phi[i] > 1 {
-			phi[i] = 1
-		}
-
-		if phi[i] >= max {
-			max = phi[i]
-		}
-	}
 
 	for i := 0; i < len(algnScores); i++ {
-		phi[i] = phi[i] / max
-		if phi[i] == 1 {
-			phi[i] = 0.99
-		}
-	}
-
-	for i := 0; i < len(algnScores); i++ {
-		phi[i] = math.Log(phi[i]/(1-phi[i])+0.000001) + 0.5
-		if phi[i] > INF || phi[i] > 1 {
-			phi[i] = 1
-		}
-		if phi[i] < 0 {
-			phi[i] = 0
-		}
+		phi[i] = 1 - math.Pow(algnScores[i], ALPHA)
 	}
 
 	return phi
