@@ -7,9 +7,12 @@ def parse_args():
                         help = "filename",
                         default = "metrics_10_0.05_100_dc.log",
                         required = True)
+    parser.add_argument('-i', '--iterations',
+                        dest = "iterations",
+                        help = "iterations",
+                        default = "Number of iterations",
+                        required = True)
     return parser.parse_args()
-
-dishonest_peers = ['73', '26', '90', '82', '21', '38', '75', '29', '34', '41', '20', '45', '22', '1', '95', '55', '88', '85', '83', '36', '71', '43', '15', '84', '33', '3', '32', '52', '77', '49', '8', '89', '98', '62', '59', '7', '4', '86', '46', '99', '81', '42', '27', '80', '19', '87', '74', '17', '9', '58']
 
 
 def get_dishonest_peers(line: str):
