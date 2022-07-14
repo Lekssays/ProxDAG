@@ -169,6 +169,12 @@ func ComputeTrust(modelID string, algnScore []float64) (map[string]float32, erro
 		} else {
 			trustScores[clients[i]] += float32(DELTA)
 		}
+
+		if trustScores[clients[i]] > 1 {
+			trustScores[clients[i]] = 1.0
+		} else if trustScores[clients[i]] < 0 {
+			trustScores[clients[i]] = 0.0
+		}
 	}
 
 	return trustScores, nil
@@ -184,6 +190,11 @@ func GetScorePath(modelID string, scoreType string) (*scpb.Score, error) {
 
 	key := fmt.Sprintf("%s!%s", modelID, scoreType)
 	data, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return &scpb.Score{}, err
+	}
+
+	err = rdb.Close()
 	if err != nil {
 		return &scpb.Score{}, err
 	}
@@ -320,6 +331,11 @@ func StoreScoreLocally(modelID string, score scpb.Score) error {
 
 	key := fmt.Sprintf("%s!%s", modelID, scoreType)
 	err = rdb.Set(ctx, key, scoreBytes, 0).Err()
+	if err != nil {
+		return err
+	}
+
+	err = rdb.Close()
 	if err != nil {
 		return err
 	}
@@ -495,6 +511,11 @@ func GetLatestRoundTimestamp(modelID string) (uint32, error) {
 		return uint32(time.Now().Unix()), err
 	}
 
+	err = rdb.Close()
+	if err != nil {
+		return uint32(time.Now().Unix()), err
+	}
+
 	timestamp, err := strconv.ParseUint(string(timestampStr), 10, 32)
 	if err != nil {
 		return uint32(time.Now().Unix()), err
@@ -517,6 +538,11 @@ func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
 	err := rdb.Set(ctx, key, timestampStr, 0).Err()
 	if err != nil {
 		return err
+	}
+
+	err = rdb.Close()
+	if err != nil {
+		return  err
 	}
 
 	return nil
@@ -586,7 +612,9 @@ func GetLatestWeights(modelID string, clientPubkey string) ([][]float64, [][]flo
 		}
 	}
 
-	if len(updatesToProcess) < 2 {
+	if len(updatesToProcess) == 0 {
+		return [][]float64{}, [][]float64{}, nil
+	} else if len(updatesToProcess) < 2 {
 		w1, err := GetWeightsFromNumpy(updatesToProcess[0].Weights)
 		w2 := make([][]float64, len(w1))
 		for i := range w2 {
@@ -633,6 +661,7 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 	// get the latest gradients for this client
 	latestGradient, err := GetLatestGradients(modelID)
 	if err != nil {
+		fmt.Println("GetLatestGradients", err.Error())
 		return gradients, err
 	}
 
@@ -644,7 +673,12 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 			// get randomly two weights of this client
 			w1, w2, err := GetLatestWeights(modelID, clients[i])
 			if err != nil {
+				fmt.Println("GetLatestWeights", err.Error())
 				return gradients, err
+			}
+
+			if len(w1) == 0 && len(w2) == 0 {
+				continue
 			}
 
 			// substract the two weights

@@ -117,6 +117,11 @@ func SaveModelUpdate(messageID string, modelUpdate mupb.ModelUpdate) error {
 		return err
 	}
 
+	err = rdb.Close()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -129,6 +134,11 @@ func RetrieveModelUpdate(modelID string, messageID string) (*mupb.ModelUpdate, e
 	})
 
 	data, err := rdb.Get(ctx, messageID).Result()
+	if err != nil {
+		return &mupb.ModelUpdate{}, err
+	}
+
+	err = rdb.Close()
 	if err != nil {
 		return &mupb.ModelUpdate{}, err
 	}
@@ -200,6 +210,11 @@ func GetModelUpdatesMessageIDs(modelID string) ([]string, error) {
 		return []string{}, err
 	}
 
+	err = rdb.Close()
+	if err != nil {
+		return []string{}, err
+	}
+
 	return messageIDs, nil
 }
 
@@ -237,6 +252,11 @@ func StoreClientID(id uint32, pubkey string, modelID string) error {
 
 	key = fmt.Sprintf("%s!CL!%d", modelID, id)
 	err = rdb.Set(ctx, key, pubkey, 0).Err()
+	if err != nil {
+		return err
+	}
+
+	err = rdb.Close()
 	if err != nil {
 		return err
 	}
@@ -317,6 +337,11 @@ func GetClientID(pubkey string, modelID string) (uint32, error) {
 		return 0, err
 	}
 
+	err = rdb.Close()
+	if err != nil {
+		return 0, err
+	}
+	
 	ID, err := strconv.Atoi(string(data))
 	if err != nil {
 		return 0, err
@@ -335,6 +360,11 @@ func GetClientPubkey(id int, modelID string) (string, error) {
 
 	key := fmt.Sprintf("%s!CL!%d", modelID, id)
 	data, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+
+	err = rdb.Close()
 	if err != nil {
 		return "", err
 	}
