@@ -235,6 +235,12 @@ func StoreClientID(id uint32, pubkey string, modelID string) error {
 		return err
 	}
 
+	key = fmt.Sprintf("%s!CL!%d", modelID, id)
+	err = rdb.Set(ctx, key, pubkey, 0).Err()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -317,4 +323,21 @@ func GetClientID(pubkey string, modelID string) (uint32, error) {
 	}
 
 	return uint32(ID), nil
+}
+
+func GetClientPubkey(id int, modelID string) (string, error) {
+	ctx := context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     "0.0.0.0:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	key := fmt.Sprintf("%s!CL!%d", modelID, id)
+	data, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }

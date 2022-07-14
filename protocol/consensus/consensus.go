@@ -372,13 +372,10 @@ func GetTrustFromNumpy(path string) ([]float64, error) {
 		return []float64{}, err
 	}
 
-	r, err := npyio.NewReader(bytes.NewReader(trustBytes))
-	if err != nil {
-		return []float64{}, err
-	}
+	buf := bytes.NewBuffer(trustBytes)
 
 	var trust []float64
-	err = r.Read(&trust)
+	err = npyio.Read(buf, &trust)
 	if err != nil {
 		return []float64{}, err
 	}
@@ -460,23 +457,24 @@ func GetLatestGradients(modelID string) (map[string][][]float64, error) {
 }
 
 func GetLatestTrustScores(modelID string) (map[string]float32, error) {
-	var trustScores map[string]float32
+	trustScores := make(map[string]float32)
 	scoreType := "trust"
-	latestTrustScores, err := GetScorePath(modelID, scoreType)
+	score, err := GetScorePath(modelID, scoreType)
 	if err != nil {
 		return trustScores, err
 	}
 
-	latestTrustScoresBytes, err := GetContentIPFS(latestTrustScores.Path)
+	latestTrustScores, err := GetTrustFromNumpy(score.Path)
 	if err != nil {
 		return trustScores, err
 	}
 
-	buf := bytes.NewBuffer(latestTrustScoresBytes)
-	dec := gob.NewDecoder(buf)
-	err = dec.Decode(&trustScores)
-	if err != nil {
-		return trustScores, err
+	for i := 0; i < len(latestTrustScores); i++ {
+		pubkey, err := graph.GetClientPubkey(i, modelID)
+		if err != nil {
+			return trustScores, err
+		}
+		trustScores[pubkey] = float32(latestTrustScores[i])
 	}
 
 	return trustScores, nil
@@ -736,14 +734,14 @@ func getClientIDLocally(modelID string, pubkey string) (int, error) {
 	return -1, errors.New("id not found")
 }
 
-func converTrustToSlice(modelID string, trust map[string]float32) ([]float32, error) {
-	trustScores := make([]float32, len(trust))
+func converTrustToSlice(modelID string, trust map[string]float32) ([]float64, error) {
+	trustScores := make([]float64, len(trust))
 	for pubkey, score := range trust {
 		id, err := getClientIDLocally(modelID, pubkey)
 		if err != nil {
-			return []float32{}, err
+			return []float64{}, err
 		}
-		trustScores[id] = score
+		trustScores[id] = float64(score)
 	}
 	return trustScores, nil
 }
