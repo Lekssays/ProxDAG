@@ -716,6 +716,22 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 func ComputePhi(algnScores []float64) []float64 {
 	phi := make([]float64, len(algnScores))
 
+	max := float64(-1)
+	min := float64(1000)
+	for i := 0; i < len(algnScores); i++ {
+		if algnScores[i] >= max {
+			max = algnScores[i]
+		}
+
+		if algnScores[i] <= min {
+			min = algnScores[i]
+		}		
+	}
+
+	for i := 0; i < len(algnScores); i++ {
+		algnScores[i] = min * (max-min) * algnScores[i]
+	}
+
 	for i := 0; i < len(algnScores); i++ {
 		phi[i] = 1 - math.Pow(algnScores[i], ALPHA)
 	}

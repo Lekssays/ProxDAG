@@ -49,7 +49,8 @@ def get_average(filename, iterations):
             if start == True:
                 line = line.split(",")
                 peer = line[0]
-                if peer not in dishonest_peers:
+                peer_id = get_peer_id(peer)
+                if peer_id not in dishonest_peers:
                     average_train_loss = float(line[1])
                     test_loss = float(line[2])
                     test_accuracy = float(line[3])
