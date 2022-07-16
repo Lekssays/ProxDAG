@@ -366,11 +366,18 @@ def learn(modelID):
             attack_type=utils.get_parameter(param="attack_type"),
         )
 
-        print(os.getenv("MY_NAME"), "Evaluating")
-        loop.run_until_complete(utils.send_log("Evaluating"))
-        acc, asr = evaluate(local_model=local_model, loss=loss, attack=attack)    
+        attacker = False
+        dishonest_peers = utils.get_dishonest_peers()
+        if os.getenv("MY_ID") in dishonest_peers:
+            attacker = True
+
+        acc = 0.0
+        if attacker == False:
+            print(os.getenv("MY_NAME"), "Evaluating")
+            loop.run_until_complete(utils.send_log("Evaluating"))
+            acc, asr = evaluate(local_model=local_model, loss=loss, attack=attack)    
         
-        if acc >= utils.get_my_latest_accuracy():
+        if acc >= utils.get_my_latest_accuracy() or attacker:
             print(os.getenv("MY_NAME"), "Publishing")
             loop.run_until_complete(utils.send_log("Publishing"))
             torch.save(local_model.state_dict(), os.getenv("TMP_FOLDER") + modelID + ".pt")

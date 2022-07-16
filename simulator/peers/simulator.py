@@ -240,7 +240,7 @@ def main():
     start_containers(peers=peers, peers_len=peers_len)
     time.sleep(10)
     initialize_protocol(dataset=dataset)
-    time.sleep(10)
+    time.sleep(15)
     for i in range(1, iterations + 1):
         print("Iteration #{}".format(str(i)))
         log_message = "it_" + str(i)
@@ -267,9 +267,9 @@ def main():
             )
         
         if dc == "true":
-            print("\n Generating Scores for Iteration #{}".format(str(i)))
+            print("\nGenerating Scores for Iteration #{}".format(str(i)))
             run_consensus()
-            time.sleep(10)
+            time.sleep(15)
 
     stop_containers(peers=peers, peers_len=peers_len)
     clear_host_state()
