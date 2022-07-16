@@ -40,6 +40,7 @@ def get_average(filename, iterations):
     with open(filename, "r") as f:
         content = f.readlines()
         dishonest_peers = get_dishonest_peers(content[0].strip())
+        print(dishonest_peers)
         for line in content[1:]:
             line = line.strip()
             if "it_" + str(iterations) in line:
@@ -61,7 +62,8 @@ def get_average(filename, iterations):
                     tot_test_accuracy += test_accuracy
                     tot_asr += asr
     
-    print("Train Loss = {}, Test Loss = {}, Test Accuracy = {}, ASR = {}".format(str(tot_average_train_loss/peers), str(tot_test_loss/peers), str(tot_test_accuracy/peers), str(tot_asr/peers)))
+    if start == True:
+        print("Train Loss = {}, Test Loss = {}, Test Accuracy = {}, ASR = {}".format(str(tot_average_train_loss/peers), str(tot_test_loss/peers), str(tot_test_accuracy/peers), str(tot_asr/peers)))
 
 
 def get_iterations(filename: str):
@@ -73,7 +75,7 @@ def main():
     print('parse results')
 
     filename = parse_args().filename
-    iterations = get_iterations(filename=filename)
+    iterations = int(parse_args().iterations)
     get_average(filename=filename, iterations=iterations)
 
 
