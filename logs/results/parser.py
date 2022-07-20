@@ -40,7 +40,6 @@ def get_average(filename, iterations):
     with open(filename, "r") as f:
         content = f.readlines()
         dishonest_peers = get_dishonest_peers(content[0].strip())
-        print(dishonest_peers)
         for line in content[1:]:
             line = line.strip()
             if "it_" + str(iterations) in line:

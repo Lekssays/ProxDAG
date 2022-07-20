@@ -92,6 +92,26 @@ func getAverage(a []float64) float64 {
 	return (float64(sum) / float64(len(a)))
 }
 
+func getMax(a []float64) float64 {
+	max := -1.0
+	for i := 0; i < len(a); i++ {
+		if a[i] >= max {
+			max = a[i]
+		}
+	}
+	return max
+}
+
+func getMin(a []float64) float64 {
+	min := 1000.0
+	for i := 0; i < len(a); i++ {
+		if a[i] <= min {
+			min = a[i]
+		}
+	}
+	return min
+}
+
 func ComputeCSMatrix(modelID string) ([][]float64, error) {
 	clients, err := graph.GetClients(modelID)
 	if err != nil {
@@ -108,15 +128,34 @@ func ComputeCSMatrix(modelID string) ([][]float64, error) {
 		return [][]float64{}, err
 	}
 
+	computed := make(map[string]bool)
 	for i := 0; i < len(clients); i++ {
 		for j := 0; j < len(clients); j++ {
-			flattenedGradientsA := flatten(gradients[clients[i]])
-			flattenedGradientsB := flatten(gradients[clients[j]])
-			csMatrix[i][j] = ComputeCS(flattenedGradientsA, flattenedGradientsB)
-			csMatrix[j][i] = csMatrix[i][j]
+			key := fmt.Sprintf("%d-%d", j, i)
+			if !computed[key] {
+				if i == j {
+					csMatrix[i][j] = 0.0
+				} else {
+					csMatrix[i][j] = ComputeClassCS(gradients[clients[i]], gradients[clients[j]])
+				}
+				csMatrix[j][i] = csMatrix[i][j]
+				computed[key] = true
+			}
 		}
 	}
 	return csMatrix, nil
+}
+
+func ComputeClassCS(a [][]float64, b [][]float64) float64 {
+	cs := make([]float64, 0)
+	for i := 0; i < len(a); i++ {
+		rcs := ComputeCS(a[i], b[i])
+		if rcs > 1.0 {
+			rcs = 1.0
+		}
+		cs = append(cs, rcs)
+	}
+	return getAverage(cs)
 }
 
 func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
@@ -127,7 +166,7 @@ func ComputeAlignmentScore(modelID string, csMatrix [][]float64) []float64 {
 
 	algnScore := make([]float64, len(clients))
 	for i := 0; i < len(clients); i++ {
-		algnScore[i] = getAverage(csMatrix[i])
+		algnScore[i] = getMax(csMatrix[i])
 	}
 	return algnScore
 }
@@ -145,8 +184,7 @@ func EvaluatePardoning(modelID string, algnScore []float64, csMatrix [][]float64
 				csMatrix[j][i] = csMatrix[i][j]
 			}
 		}
-		// warning(lekssays): not sure about the alignment score
-		algnScore[i] = getAverage(csMatrix[i])
+		algnScore[i] = getMax(csMatrix[i])
 	}
 	return csMatrix, algnScore, nil
 }
@@ -542,7 +580,7 @@ func StoreLatestRoundTimestamp(modelID string, timestamp uint32) error {
 
 	err = rdb.Close()
 	if err != nil {
-		return  err
+		return err
 	}
 
 	return nil
@@ -715,25 +753,38 @@ func ComputeGradients(modelID string) (map[string][][]float64, error) {
 
 func ComputePhi(algnScores []float64) []float64 {
 	phi := make([]float64, len(algnScores))
-
-	max := float64(-1)
-	min := float64(1000)
+	max := float64(-1000.0)
 	for i := 0; i < len(algnScores); i++ {
-		if algnScores[i] >= max {
-			max = algnScores[i]
+		phi[i] = 1.0 - algnScores[i]
+
+		if phi[i] < 0 {
+			phi[i] = 0
 		}
 
-		if algnScores[i] <= min {
-			min = algnScores[i]
-		}		
+		if phi[i] > 1 {
+			phi[i] = 1
+		}
+
+		if phi[i] >= max {
+			max = phi[i]
+		}
 	}
 
 	for i := 0; i < len(algnScores); i++ {
-		algnScores[i] = min * (max-min) * algnScores[i]
+		phi[i] = phi[i] / max
+		if phi[i] == 1 {
+			phi[i] = 0.99
+		}
 	}
 
 	for i := 0; i < len(algnScores); i++ {
-		phi[i] = 1 - math.Pow(algnScores[i], ALPHA)
+		phi[i] = math.Log(phi[i]/(1-phi[i])+0.000001) + 0.5
+		if phi[i] > INF || phi[i] > 1 {
+			phi[i] = 1.0
+		}
+		if phi[i] < 0 {
+			phi[i] = 0.0
+		}
 	}
 
 	return phi
